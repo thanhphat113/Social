@@ -3,6 +3,11 @@
 
 :root{
 	--background: #f2f2f2;
+	--left-and-right-item: 360px;
+}
+
+*{
+	box-sizing: border-box;
 }
 
 html {

@@ -1,0 +1,19 @@
+.header{
+	height: 56px;
+	display: flex;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Chỉ đổ bóng xuống dưới */
+	background-color: #edf8ff;
+}
+
+.left{
+	width: var(--left-and-right-item);
+	padding: 7px 7px;
+}
+
+.center{
+	flex: 1;
+}
+
+.right{
+	width: var(--left-and-right-item);
+}
