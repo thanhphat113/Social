@@ -1,0 +1,17 @@
+@import "normalize.css";
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+
+:root{
+	--background: #f2f2f2;
+}
+
+html {
+	font-size: 62.5%;
+	background-color: var(--background);
+}
+
+body {
+	
+	font-family: "Lora", serif;
+  	font-size: 1.6rem;
+}
