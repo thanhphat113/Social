@@ -4,13 +4,15 @@ import DefaultLayout from "./components/Layouts/DefaultLayout";
 
 function App() {
     return (
+        <Router>
         <DefaultLayout>
-            <Router>
                 <Routes>
                     <Route path="/message" element={<MessagePage />} />
+                    <Route path="/" element={<MessagePage />} />
+                    <Route path="/group" element={<MessagePage />} />
                 </Routes>
-            </Router>
         </DefaultLayout>
+            </Router>
     );
 }
 

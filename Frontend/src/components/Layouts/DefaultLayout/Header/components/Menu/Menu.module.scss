@@ -1,0 +1,22 @@
+.choice{
+	width: 120px;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px;
+	font-size: 20px;
+	&:hover{
+		background-color: var(--background);
+	}
+}
+
+.active{
+	color:#41788d;
+	border-bottom: 3px solid #41788d;
+}
+
+
+.content{
+	display: flex;
+}

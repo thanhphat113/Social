@@ -7,11 +7,17 @@
 .search{
 	position: relative;
 	background-color: white;
-	border-radius: 25px;
+	border-radius: 15px;
 	min-width: 280px;
 	overflow: hidden;
 	justify-items: center;
 	align-items: center;
+}
+
+.showlist{
+	margin: 50px 0 5px 0 ;
+	max-height: 400px;
+	overflow-y: auto;
 }
 
 .searcharea{
@@ -19,7 +25,6 @@
 	width: 252px;
 	height: 40px;
 	border: none;
-	background-color: none;
 	transition: width 0.1s ease-out;
 	border-radius: 25px;
 	transform-origin: right;
@@ -36,7 +41,10 @@
 }
 
 .searcharea.clicked{
-	width: 100%;
+	background-color: var(--background);
+	width: 270px;
+	margin:3px 5px;
+	border: none;
 }
 
 .logo{
