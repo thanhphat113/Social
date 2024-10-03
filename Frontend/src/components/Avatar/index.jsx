@@ -10,7 +10,7 @@ function Avatar({ src, alt, size = 80, borderColor = 'white', className }) {
       <Image
         src={src?src:defaultAvt}
         alt={alt}
-        className={clsx(styles.avatar)}
+        className={styles.avatar}
         style={{
           borderColor: borderColor,
           width: size,
