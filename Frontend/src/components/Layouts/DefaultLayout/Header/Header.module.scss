@@ -1,13 +1,13 @@
 .header{
-	height: 56px;
+	height: 5.6rem;
 	display: flex;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Chỉ đổ bóng xuống dưới */
+    box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.1); /* Chỉ đổ bóng xuống dưới */
 	background-color: #edf8ff;
 }
 
 .left{
 	width: var(--left-and-right-item);
-	padding: 7px 7px;
+	padding: 0.7rem 0.7rem;
 }
 
 .center{
@@ -15,7 +15,7 @@
 	height: 100%;
 	flex: 1;
 	justify-content: center;
-	padding: 5px 0;
+	padding: 0.5rem 0;
 }
 
 .right{

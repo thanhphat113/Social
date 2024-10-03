@@ -3,14 +3,14 @@
 }
 
 .left{
-	padding: 5px;
+	padding: 0.5rem;
 	width: var(--left-and-right-item);
-	border-right: 1px solid rgba(0, 0, 0, 0.1);
+	border-right: 0.1rem solid rgba(0, 0, 0, 0.1);
 }
 
 .center{
 	flex: 1;
-	border-right: 1px solid rgba(0, 0, 0, 0.1);
+	border-right: 0.1rem solid rgba(0, 0, 0, 0.1);
 }
 
 .right{

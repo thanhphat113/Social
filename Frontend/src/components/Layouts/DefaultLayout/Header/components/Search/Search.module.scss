@@ -1,32 +1,32 @@
 .wrapper{
 	display: flex;
-	gap: 7px;
+	gap: 0.7rem;
 	justify-items: center;
 }
 
 .search{
 	position: relative;
 	background-color: white;
-	border-radius: 15px;
-	min-width: 280px;
+	border-radius: 1.5rem;
+	min-width: 28rem;
 	overflow: hidden;
 	justify-items: center;
 	align-items: center;
 }
 
 .showlist{
-	margin: 50px 0 5px 0 ;
-	max-height: 400px;
+	margin: 5rem 0 0.5rem 0 ;
+	max-height: 40rem;
 	overflow-y: auto;
 }
 
 .searcharea{
-	padding: 7px 8px 9px;
-	width: 252px;
-	height: 40px;
+	padding: 0.7rem 0.8rem 0.9rem;
+	width: 25.2rem;
+	height: 4rem;
 	border: none;
 	transition: width 0.1s ease-out;
-	border-radius: 25px;
+	border-radius: 2.5rem;
 	transform-origin: right;
 	position: absolute;
     right: 0;
@@ -35,20 +35,20 @@
 .icon{
 	// margin-left: 10px;
 	position: absolute;
-	top:10px;
-	left:8px;
-	font-size: 20px;
+	top:1rem;
+	left:0.8rem;
+	font-size: 2rem;
 }
 
 .searcharea.clicked{
 	background-color: var(--background);
-	width: 270px;
-	margin:3px 5px;
+	width: 27rem;
+	margin:0.3rem 0.5rem;
 	border: none;
 }
 
 .logo{
-	width: 40px;
-	height: 40px;
-	margin-left: 12px;
+	width: 4rem;
+	height: 4rem;
+	margin-left: 1.2rem;
 }

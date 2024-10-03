@@ -7,11 +7,11 @@ import { styled } from '@mui/material/styles';
 export const CustomTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ tooltip: className }} arrow/>
 ))(({ theme }) => ({
-    fontSize: '15px', // Kích thước chữ lớn hơn
-    padding: '5px 15px', // Khoảng cách bên trong
+    fontSize: '1.5rem', // Kích thước chữ lớn hơn
+    padding: '0.5rem 1.5rem', // Khoảng cách bên trong
     backgroundColor: '#333', // Màu nền
     color: 'white', // Màu chữ
-    borderRadius: '8px', // Bo góc
+    borderRadius: '0.8rem', // Bo góc
 }));
 
 function GlobalStyles({ children }) {
