@@ -19,8 +19,8 @@ function Avatar({ src, alt, size = 80, borderColor = 'white', shape = 'circle', 
         className={styles.avatar}
         style={{
           borderColor: borderColor,
-          width: size,
-          height: size,
+          width: '100%',
+          height:'100%',
         }}
       />
     </div>

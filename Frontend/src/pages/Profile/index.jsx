@@ -68,15 +68,17 @@ function Profile() {
                         edit profile
                 </Button>
             </SubHeader>
-            <div className={clsx(styles.content)}>
-                <div className={clsx(styles.wrapper)}>
-                    {/* Chỗ nhét bài viết */}
-                    content
+            <div className={clsx(styles.main)}>
+                <div className={clsx(styles.content)}>
+                    <div className={clsx(styles.wrapper)}>
+                        {/* Chỗ nhét bài viết */}
+                        content
+                    </div>
                 </div>
+                <Connections 
+                type='user'
+                data={{ connections: user.friends, totalConnections: user.totalFriends }}/>
             </div>
-            <Connections 
-            type='user'
-            data={{ connections: user.friends, totalConnections: user.totalFriends }}/>
         </div>
      );
 }

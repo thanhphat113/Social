@@ -27,3 +27,17 @@
     display: flex;
     flex-wrap: wrap;  
 }
+@media (max-width: 768px){
+    .sideBar{
+        width: 100%;
+    }
+    .sideBarWrapper {
+        margin-top:0;
+        h2 {
+            font-size: 2rem!important; 
+        }
+        h1{
+            font-size: 3rem!important; 
+        }
+    }
+}

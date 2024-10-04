@@ -60,16 +60,18 @@ function ProfileGroup() {
             <SubHeader type='group' data={data}>
                 {/* Chỗ nhét các button và logic Page */}
             </SubHeader>
-            <div className={clsx(styles.content)}>
-                <div className={clsx(styles.wrapper)}>
-                    {/* Chỗ nhét bài viết */}
-                    content
+            <div className={clsx(styles.main)}>
+                <div className={clsx(styles.content)}>
+                    <div className={clsx(styles.wrapper)}>
+                        {/* Chỗ nhét bài viết */}
+                        content
+                    </div>
                 </div>
-            </div>
-            <Connections
-             type='group'
-             data={{ connections: group.members, totalConnections: group.totalMembers }}
-             />
+                <Connections
+                type='group'
+                data={{ connections: group.members, totalConnections: group.totalMembers }}
+                />
+             </div>
     </div>         
      );
 }

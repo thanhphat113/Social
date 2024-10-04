@@ -15,6 +15,7 @@ function SubHeader({type='user', data,children}) {
     const handleClick = (index) => {
         setIsActive(index)
       }
+    const avatarSize = window.innerWidth <= 768 ? '100px' : '120px'
     return ( 
         <div className={clsx(styles.subHeader)}>
                 <div className={clsx(styles.wrapper)}>
@@ -33,7 +34,7 @@ function SubHeader({type='user', data,children}) {
                                 <Avatar 
                                 shape='circle'
                                 src={data.avatar}
-                                size={'120px'}
+                                size={avatarSize}
                                 className={clsx(styles.avatarShadow)}
                                 />
                             </div>

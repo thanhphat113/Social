@@ -12,6 +12,20 @@
     margin: 1rem;
     border-radius:10px;
 }
+.main{
+    display: flex;
+}
 .content{
     width:70%;
+}
+@media (max-width: 768px){
+    .container{
+        padding:10px 0;
+    }
+    .content{
+        width:100%;
+    }
+    .main{
+        flex-direction: column-reverse;
+    }
 }

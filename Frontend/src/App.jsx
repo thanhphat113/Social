@@ -10,7 +10,7 @@ function App() {
         <DefaultLayout>
                 <Routes>
                     <Route path="/message" element={<MessagePage />} />
-                    <Route path="/" element={<ProfileGroup />} />
+                    <Route path="/" element={<Profile />} />
                     <Route path="/group" element={<MessagePage />} />
                 </Routes>
         </DefaultLayout>
