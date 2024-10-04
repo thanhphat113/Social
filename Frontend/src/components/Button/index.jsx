@@ -34,7 +34,7 @@ Button.propTypes = {
     children: PropTypes.node.isRequired,
     onClick: PropTypes.func,              
     type: PropTypes.oneOf(['button', 'submit', 'reset']), 
-    color: PropTypes.oneOf(['primary', 'secondary', 'danger']),  
+    color: PropTypes.oneOf(['primary', 'secondary','thirdary' ,'danger']),  
     size: PropTypes.oneOf(['small', 'medium', 'large']), 
     className: PropTypes.string,          
     disabled: PropTypes.bool,             

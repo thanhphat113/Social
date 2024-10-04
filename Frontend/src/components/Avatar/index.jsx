@@ -4,11 +4,17 @@ import PropTypes from 'prop-types'
 import styles from './Avatar.module.scss';
 import clsx from "clsx";
 
-function Avatar({ src, alt, size = 80, borderColor = 'white', className }) {
+function Avatar({ src, alt, size = 80, borderColor = 'white', shape = 'circle', className }) {
     return ( 
-        <div className={clsx(styles.avatarContainer, className)} style={{ width: size, height: size }}>
+      <div
+      className={clsx(styles.avatarContainer, className, {
+        [styles.circle]: shape === 'circle',
+        [styles.square]: shape === 'square',
+      })}
+      style={{ width: size, height: size }}
+    >
       <Image
-        src={src?src:defaultAvt}
+        src={src || defaultAvt}
         alt={alt}
         className={styles.avatar}
         style={{
@@ -20,11 +26,13 @@ function Avatar({ src, alt, size = 80, borderColor = 'white', className }) {
     </div>
      )
 }
+
 Avatar.propTypes = {
-    src: PropTypes.string,
-    alt: PropTypes.string,
-    size: PropTypes.number, 
-    borderColor: PropTypes.string,  
-    className: PropTypes.string,  
-  };
+  src: PropTypes.string,
+  alt: PropTypes.string,
+  size: PropTypes.string,
+  borderColor: PropTypes.string,
+  shape: PropTypes.oneOf(['circle', 'square']), 
+  className: PropTypes.string,
+}
 export default Avatar;

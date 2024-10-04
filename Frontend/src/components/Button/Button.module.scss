@@ -40,6 +40,19 @@
         background-color: #4e555b;
       }
     }
+    &--thirdary {
+      background-color: #dad6d6;
+      color: white;
+  
+      &:hover {
+        background-color: #5a6268;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+  
+      &:active {
+        background-color: #4e555b;
+      }
+    }
   
     &--small {
       font-size: 0.875rem;

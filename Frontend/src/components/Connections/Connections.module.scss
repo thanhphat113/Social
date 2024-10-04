@@ -1,0 +1,29 @@
+.sideBar{
+    width: 30%;
+    .sideBarWrapper{
+        display: flex;
+        background-color: white;
+        flex-wrap: wrap;
+        margin: 1rem;
+        border-radius:10px;
+        padding:10px;
+        h1{
+            margin-top:0;
+            margin-bottom:5px;
+            padding-left: 5px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: left;
+            width: 100%;
+        }
+        h2{
+            font-size: 1.4rem;
+            color: #007bff;
+            margin: 5px 0px;
+        }
+    }
+}
+.avatarWrapper {
+    display: flex;
+    flex-wrap: wrap;  
+}

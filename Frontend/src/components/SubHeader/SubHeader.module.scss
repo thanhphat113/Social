@@ -1,0 +1,181 @@
+@import '../../components/GlobalStyles/GlobalStyles.scss';
+.container{
+    background-color: $background-color;
+    padding: 10px 100px;
+    display:flex;
+    flex-wrap: wrap;
+}
+.wrapper{
+    display: flex;
+    background-color: white;
+    margin: 1rem;
+    border-radius:10px;
+}
+.subHeader{
+    width:100%;
+    .wrapper{
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+}
+
+.content{
+    width:70%;
+}
+.sideBar{
+    width: 30%;
+    .sideBarWrapper{
+        display: flex;
+        background-color: white;
+        flex-wrap: wrap;
+        margin: 1rem;
+        border-radius:10px;
+        padding:10px;
+        h1{
+            margin-top:0;
+            margin-bottom:5px;
+            padding-left: 5px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: left;
+            width: 100%;
+        }
+        h2{
+            font-size: 1.4rem;
+            color: #007bff;
+            margin: 5px 0px;
+            cursor: pointer;
+        }
+    }
+}
+
+.coverPhoto{
+    height: 300px;
+    position: relative;
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit:cover;
+    }
+    .coverButton {
+        position: absolute;
+        bottom: 10px;
+        right: 10px; 
+        .icon{
+            font-size: 20px;
+            margin-right: 3px;
+        }
+    }
+}
+
+.info{
+    display:flex;
+    flex-direction: row;
+    position: relative;
+    justify-content: flex-start;
+    .avatar{
+        position: absolute;
+        top:0;
+        left: 50%;
+        transform: translate(-50%, -20%);
+    }
+    .avatarHolder {
+        position: relative;
+        width: 175px;
+        .avatarShadow{
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    }
+    .detail{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        .userName {
+            display:flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 15px;
+            h1{
+                font-weight: 600;
+                font-size: 2rem;
+                margin:0;
+                margin-inline-end: 0.5rem;
+            }
+            p{
+                font-size: 1rem;
+            }
+        }
+        .description {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-bottom:10px;
+            > * {
+              display: flex;
+              flex-direction: row;
+              gap: 5px;
+            }
+          }
+    }
+    .editInfo{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-grow: 1;
+        .editInfoWrapper{
+            display:flex;
+            align-items: flex-end;
+            .editButton{
+                padding:15px 20px;
+                margin:20px;
+                border-radius:10px;
+            }
+        }
+    }
+}
+
+.subBar{
+    margin:0 10px;
+    display:flex;
+    flex: row;
+    .item {
+        padding: 10px 5px;
+        position: relative;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background-color: transparent;
+          transition: background-color 0.3s ease, transform 0.3s ease;
+          transform: scaleX(0);
+        }
+    
+        &:hover {
+          color: #007bff;
+        }
+    
+        &.active {
+          color: #007bff;
+    
+          &::after {
+            transform: scaleX(1);
+            background-color: #007bff;
+          }
+        }
+      }
+}
+
+.divider{
+  height: 1px; 
+  background-color: #ccc;
+  margin:0 10px;
+  margin-bottom:10px; 
+  
+}
