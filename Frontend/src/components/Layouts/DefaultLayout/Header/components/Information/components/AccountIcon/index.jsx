@@ -5,24 +5,26 @@ import styles from "./AccountIcon.module.scss";
 import { typeContext } from "../../../..";
 
 function AccountIcon(props) {
-    const [isClicked, setIsClicked] = useState(false);
     const user = props;
-
+    // const [isClicked, setIsClicked] = useState(user.choice === 'notification' || false);
+    
+    
     const {  handleClick } = useContext(typeContext);
 
     
     return (
-        <>
+        <div className={styles.accounticon}>
             <CustomTooltip title={user.title}>
                 <img
                     onClick={() => {
-                        setIsClicked(!isClicked);
+                        props.onToggle('B')
+                        // setIsClicked(!isClicked);
                     }}
                     className={styles.circle}
                     src={user.img}
                 ></img>
             </CustomTooltip>
-            {isClicked && (
+            {props.isActive && (
                 <div className={styles.content}>
                     <Link to="/profile" onClick={() => handleClick("profile")}>
                         <div className={styles.account}>
@@ -31,8 +33,8 @@ function AccountIcon(props) {
                         </div>
                     </Link>
                     <Link
-                        to="/information"
-                        onClick={() => handleClick("imformation")}
+                        to="/profile"
+                        onClick={() => handleClick("profile")}
                     >
                         <div className={styles.choise}>
                             <i className="fa-solid fa-gear"></i>
@@ -47,7 +49,7 @@ function AccountIcon(props) {
                     </Link>
                 </div>
             )}
-        </>
+        </div>
     );
 }
 

@@ -1,0 +1,58 @@
+img {
+    border: 1px solid black;
+    border-radius: 50%;
+    width: 7rem;
+    height: 7rem;
+}
+
+.wrapper {
+    padding: 1rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+	border-radius: 10px;
+
+    &:hover {
+        background-color: var(--background);
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        width: 35rem;
+        p {
+            word-wrap: break-word;
+            min-height: 3rem;
+        }
+        .choice {
+            display: flex;
+            gap: 1.2rem;
+            cursor: default;
+        }
+        button {
+            border: none;
+            font-size: 1.7rem;
+            padding: 0.7rem;
+            border-radius: 10px;
+            cursor: pointer;
+            &:hover {
+                filter: brightness(0.7);
+            }
+        }
+        .accept {
+            background-color: cornflowerblue;
+            color: white;
+        }
+    }
+
+    .isread {
+        padding-top: 1rem;
+        span {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: rgb(87, 228, 228);
+            display: inline-block;
+        }
+    }
+}
