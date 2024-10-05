@@ -54,35 +54,42 @@ const list = [
     },
 ];
 
-function Notifications({ title, nameicon, onToggle, isActive}) {
-    const [isClicked, setIsClicked] = useState(false);
-	console.log(onToggle,isActive)
-    const [type, setType] = useState('request');
-
+function Notifications({ title, nameicon, onToggle, isActive }) {
+    console.log(onToggle, isActive);
+    const [type, setType] = useState("request");
 
     return (
         <div className={styles.wrapper}>
             <CustomTooltip title={title}>
                 <i
-                    className={nameicon}
+                    className={clsx(nameicon, 
+					{ [styles.active]: isActive }
+					)}
                     onClick={() => {
-						onToggle('A')
-						// setIsClicked(!isClicked)
-						// onHandleClick('notification')
-						
-					}}
+                        onToggle("A");
+                    }}
                 ></i>
             </CustomTooltip>
             {isActive && (
                 <div className={styles.content}>
                     <h1>Thông báo</h1>
                     <div className={styles.choice}>
-                        <button 
-						onClick={ () => setType('request') }
-						className={clsx({[styles.active]:type === 'request'})}>Kết bạn</button>
-                        <button 
-							onClick={ () => setType('post') }
-						className={clsx({[styles.active]:type === 'post'})}>Thông báo</button>
+                        <button
+                            onClick={() => setType("request")}
+                            className={clsx({
+                                [styles.active]: type === "request",
+                            })}
+                        >
+                            Kết bạn
+                        </button>
+                        <button
+                            onClick={() => setType("post")}
+                            className={clsx({
+                                [styles.active]: type === "post",
+                            })}
+                        >
+                            Thông báo
+                        </button>
                     </div>
                     <div className={clsx(styles.list)}>
                         {list.map((item) =>

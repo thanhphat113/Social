@@ -6,9 +6,6 @@ import { typeContext } from "../../../..";
 
 function AccountIcon(props) {
     const user = props;
-    // const [isClicked, setIsClicked] = useState(user.choice === 'notification' || false);
-    
-    
     const {  handleClick } = useContext(typeContext);
 
     
