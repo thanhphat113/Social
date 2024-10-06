@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import styles from './Information.module.scss';
+import Button from '../../components/Button';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 function Information() {
   // Mặc định là "User information"
@@ -9,6 +12,18 @@ function Information() {
   const handleSelectContent = (content) => {
     setSelectedContent(content);
   };
+
+  const handleChangePasswordClick = () => {
+    setChangePasswordPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setChangePasswordPopup(false);
+  };
+
+  const [showChangePasswordPopup, setChangePasswordPopup] = useState(false);
+
+
 
   // Mock data cho phần thông báo và bạn bè
   const [notifications, setNotifications] = useState([
@@ -107,7 +122,7 @@ function Information() {
 
 
             <div className={clsx(styles.changePassword)}>
-              <h2>Change password</h2>
+              {/* <h2>Change password</h2>
               <label htmlFor="newPassword">New password:</label>
               <input
                 type="password"
@@ -122,10 +137,54 @@ function Information() {
                 placeholder="Verify password"
                 className={clsx(styles.input)}
               />
-              <button type="button" className={clsx(styles.changePasswordButton)}>
+              <button type="button" className={clsx(styles)}>
                 Change
-              </button>
+              </button> */}
+
+              <Button size='large' className={clsx(styles.registerButton)} onClick={handleChangePasswordClick}>
+                Change password
+              </Button>
+
             </div>
+
+            {showChangePasswordPopup && (
+              <div className={clsx(styles.registerPopup)} onClick={handleClosePopup}>
+                <div className={clsx(styles.popupContent)} onClick={(e) => e.stopPropagation()}>
+                  <h2 style={{ margin: '15px', color: '#1D72FE' }}>Change password</h2>
+                  <Formik
+                    initialValues={{ newPassword: '', confirmPassword: '' }}
+                    validationSchema={Yup.object({
+                      newPassword: Yup.string().min(6, 'Password at least 6 characters').required('Enter new password'),
+                      confirmPassword: Yup.string()
+                        .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+                        .required('Enter new password again'),
+                    })}
+                    onSubmit={(values) => {
+                      console.log('Password change form submitted', values);
+                      handleClosePopup();
+                    }}
+                  >
+                    <Form>
+                      <div className={clsx(styles.formGroup)}>
+                        <Field type="password" id="newPassword" name="newPassword" placeholder="New password" />
+                        <ErrorMessage name="newPassword" component="div" className={clsx(styles.errorMessage)} />
+                      </div>
+                      <div className={clsx(styles.formGroup)}>
+                        <Field type="password" id="confirmPassword" name="confirmPassword" placeholder="Verify new password" />
+                        <ErrorMessage name="confirmPassword" component="div" className={clsx(styles.errorMessage)} />
+                      </div>
+                      <div className={clsx(styles.formGroup)}>
+                        <Field type="password" id="confirmPassword" name="confirmPassword" placeholder="Former passowrd" />
+                        <ErrorMessage name="confirmPassword" component="div" className={clsx(styles.errorMessage)} />
+                      </div>
+                      <div className={clsx(styles.formActions)}>
+                        <Button type="submit" className={clsx(styles.changePasswordButton)}>Change</Button>
+                      </div>
+                    </Form>
+                  </Formik>
+                </div>
+              </div>
+            )}
           </div>
 
 
@@ -138,7 +197,7 @@ function Information() {
               {notifications.map((notification) => (
                 <li
                   key={notification.id}
-                  className={clsx(styles.notificationItem)} 
+                  className={clsx(styles.notificationItem)}
                   onClick={() => handleNotificationClick(notification.id)}
                 >
                   {notification.name}

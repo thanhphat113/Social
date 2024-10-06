@@ -98,10 +98,10 @@ function Login() {
             <Formik
               initialValues={{ firstName: '', lastName: '', email: '', password: '' }}
               validationSchema={Yup.object({
-                firstName: Yup.string().required('Vui lòng nhập tên'),
-                lastName: Yup.string().required('Vui lòng nhập họ'),
-                email: Yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),
-                password: Yup.string().min(6, 'Mật khẩu ít nhất 6 ký tự').required('Vui lòng nhập mật khẩu'),
+                firstName: Yup.string().required('Enter first name'),
+                lastName: Yup.string().required('Enter last name'),
+                email: Yup.string().email('Email not valid').required('Enter email'),
+                password: Yup.string().min(6, 'Password at least 6 characters').required('Enter password'),
               })}
               onSubmit={(values) => {
                 console.log('Register form submitted', values);
@@ -112,32 +112,32 @@ function Login() {
                 <div className={clsx(styles.regisName)}>
               
                   <div className={clsx(styles.formGroup)}>
-                    <Field type="text" id="lastName" name="lastName" placeholder="Nhập họ" />
+                    <Field type="text" id="lastName" name="lastName" placeholder="Last Name" />
                     <ErrorMessage name="lastName" component="div" className={clsx(styles.errorMessage)} />
                   </div>
 
                   <div className={clsx(styles.formGroup)}>
-                    <Field type="text" id="firstName" name="firstName" placeholder="Nhập tên" />
+                    <Field type="text" id="firstName" name="firstName" placeholder="First Name" />
                     <ErrorMessage name="firstName" component="div" className={clsx(styles.errorMessage)} />
                   </div>
 
                 </div>
                 <div className={clsx(styles.formGroup)}>
-                  <Field type="email" id="email" name="email" placeholder="Nhập email" />
+                  <Field type="email" id="email" name="email" placeholder="Email" />
                   <ErrorMessage name="email" component="div" className={clsx(styles.errorMessage)} />
                 </div>
                 <div className={clsx(styles.formGroup)}>
-                  <Field type="password" id="password" name="password" placeholder="Nhập mật khẩu" />
+                  <Field type="password" id="password" name="password" placeholder="Password" />
                   <ErrorMessage name="password" component="div" className={clsx(styles.errorMessage)} />
                 </div>
 
                 <div className={clsx(styles.formGroup)}>
-                  <Field type="password" id="password" name="password" placeholder="Nhập lại mật khẩu" />
+                  <Field type="password" id="password" name="password" placeholder="Re-write password" />
                   <ErrorMessage name="password" component="div" className={clsx(styles.errorMessage)} />
                 </div>
 
                 <div className={clsx(styles.additionalActions)}>
-                  <Button type="submit" className={clsx(styles.registerButton)}>Đăng ký</Button>
+                  <Button type="submit" className={clsx(styles.registerButton)}>Sign in</Button>
                 </div>
 
               </Form>
