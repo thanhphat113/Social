@@ -1,9 +1,4 @@
-img {
-    border: 1px solid black;
-    border-radius: 50%;
-    width: 7rem;
-    height: 7rem;
-}
+
 
 .wrapper {
     padding: 1rem 0.5rem;
@@ -20,6 +15,13 @@ img {
         min-height: 3rem;
 		width: 35rem;
     }
+
+	img {
+		border: 1px solid black;
+		border-radius: 50%;
+		width: 7rem;
+		height: 7rem;
+	}
 }
 
 .isread {
