@@ -15,7 +15,7 @@
 
     .information {
         display: flex;
-        padding: 0 1rem;
+        padding: 0.5rem 1rem;
         align-items: center;
         gap: 1rem;
         cursor: pointer;
@@ -24,8 +24,8 @@
             font-style: oblique;
         }
         img {
-            width: 5.5rem;
-            height: 5.5rem;
+            width: 4.5rem;
+            height: 4.5rem;
             border-radius: 50%;
             border: 1px solid #333;
         }
