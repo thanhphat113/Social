@@ -1,0 +1,129 @@
+@import '../../components/GlobalStyles/GlobalStyles.scss';
+
+.container {
+  display: flex;
+  justify-content: space-around;
+  align-items: first baseline;
+  height: 100vh;
+  flex-direction: row;
+  position: relative;
+  background-color: #FFFFFF;
+}
+
+.leftContent {
+  margin-top: 25px;
+  width: 20%;
+  background-color: #F2F4F7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.infoList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.infoList li {
+  padding: 5px;
+  margin: 15px;
+  height: 30px;
+  font-size: 2rem;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  background-color: transparent;
+  border-radius: 5px;
+}
+
+.infoList li:hover {
+  background-color: #fdfdfd85;
+}
+
+.rightContent {
+  margin-top: 25px;
+  width: 70%;
+  background-color: #F2F4F7;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.basicInfo {
+  width: 100%;
+}
+
+.username {
+  display: flex;
+  justify-content: space-between;
+}
+
+.firstName,
+.lastName {
+  width: 49%;
+}
+
+.email,
+.bio {
+  margin: 10px 0;
+}
+
+label {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  margin-top: 15px;
+  display: block;
+}
+
+.input{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.textarea {
+  max-width: 100%;
+  min-width: 100%;
+  min-height: 100px;
+  max-height: 200px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  
+}
+
+.changePassword {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.changePasswordButton {
+  background-color: #42B72A;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.changePasswordButton:hover {
+  background-color: #36A420;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.875rem; 
+  margin-top: 0.25rem; 
+}
