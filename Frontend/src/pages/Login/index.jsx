@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { useNavigate }from 'react-router-dom';
 import * as Yup from 'yup';
 import clsx from 'clsx'; // Import clsx
 import styles from './Login.module.scss'; // Import các class từ file SCSS
 import Button from '../../components/Button';
 
-function Login() {
+function Login( {onLogin} ) {
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State để toggle hiển thị mật khẩu
+  const nevigate = useNavigate()
 
   const initialValues = {
     email: '',
@@ -15,12 +17,14 @@ function Login() {
   };
 
   const validationSchema = Yup.object({
-    email: Yup.string().email('Email không hợp lệ').required(),
-    password: Yup.string().min(6, 'Mật khẩu ít nhất 6 ký tự').required(),
+    // email: Yup.string().email('Email không hợp lệ').required(),
+    // password: Yup.string().min(6, 'Mật khẩu ít nhất 6 ký tự').required(),
   });
 
   const handleSubmit = (values) => {
-    console.log('Login form submitted', values);
+    nevigate("/")
+    onLogin()
+    // console.log('Login form submitted', values);
   };
 
   const handleRegisterClick = () => {

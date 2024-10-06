@@ -30,7 +30,7 @@ function AccountIcon(props) {
                         </div>
                     </Link>
                     <Link
-                        to="/profile"
+                        to="/information"
                         onClick={() => handleClick("profile")}
                     >
                         <div className={styles.choise}>
