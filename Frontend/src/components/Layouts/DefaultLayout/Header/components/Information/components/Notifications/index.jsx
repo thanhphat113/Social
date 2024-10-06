@@ -62,9 +62,7 @@ function Notifications({ title, nameicon, onToggle, isActive }) {
         <div className={styles.wrapper}>
             <CustomTooltip title={title}>
                 <i
-                    className={clsx(nameicon, 
-					{ [styles.active]: isActive }
-					)}
+                    className={clsx(nameicon, { [styles.active]: isActive })}
                     onClick={() => {
                         onToggle("A");
                     }}
