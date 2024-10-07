@@ -18,6 +18,10 @@
 .content{
     width:70%;
 }
+.sideBar{
+    width: 30%;
+}
+
 @media (max-width: 768px){
     .container{
         padding:10px 0;
@@ -27,5 +31,8 @@
     }
     .main{
         flex-direction: column-reverse;
+    }
+    .sideBar{
+        width: 100%;
     }
 }

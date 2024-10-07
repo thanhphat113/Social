@@ -1,7 +1,24 @@
 .connection {
     width:33%;
+    height: max-content;
     padding:5px;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .connectionName{
+        width: 100%;
+        margin-top:8px;
+        font-size: 1.2rem;
+        text-align: center;
+        font-weight: 600;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    img{
+        border-radius:5px;
+    }
 }
 .wrapper{
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
@@ -42,8 +59,11 @@
 
 @media (max-width: 768px){
     .connection {
-        width:33%;
+        width:25%;
         padding:15px;
         cursor: pointer;
+        .connectionName{
+            font-size: 1rem;
+        }
     }
 }

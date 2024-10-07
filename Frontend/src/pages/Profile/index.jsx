@@ -3,6 +3,8 @@ import styles from './Profile.module.scss'
 import Button from '../../components/Button';
 import Connections from '../../components/Connections';
 import SubHeader from '../../components/SubHeader';
+import PostedPhotos from '../../components/PostedPhotos';
+
 
 const user = {
     username:'Nguyễn Trí Dũng',
@@ -11,44 +13,60 @@ const user = {
     friends:[{
         username:'Negav',
         chungFriends:5,
-        avatar:null,
+        profilePicture:null,
         location:'HCM'
     },
     {
         username:'Hieuthuhai',
         chungFriends:10,
-        avatar:null,
+        profilePicture:null,
         location:'Bình Dương'
     },
     {
         username:'Hurrykang',
         chungFriends:6,
-        avatar:null,
+        profilePicture:null,
         location:'An Giang'
     },
     {
         username:'Anh Tú Atus',
         chungFriends:3,
         location:'An Giang',
-        avatar:null,
+        profilePicture:null,
     },
     {
         username:'Erik',
         chungFriends:8,
-        avatar:null,
+        profilePicture:null,
         location:'HCM'
     },
     {
         username:'Pháp Kiều',
         chungFriends:10,
-        avatar:null,
+        profilePicture:null,
         location:'HCM'
     },],
     job:'Student',
     location:'niu dót',
-    createdDate:'Nov 26, 2019',
-    avatar:null,
+    dateUpdated:'Nov 26, 2019',
+    profilePicture:null,
     coverPhoto:null,
+    totalPhotos:4,
+    photos:[
+        {
+            photo:null,
+        },
+        {
+            photo:null,
+        },
+        {
+            photo:null,
+        },
+        {
+            photo:null,
+        },
+
+    ]
 }
 
 
@@ -75,9 +93,12 @@ function Profile() {
                         content
                     </div>
                 </div>
-                <Connections 
-                type='user'
-                data={{ connections: user.friends, totalConnections: user.totalFriends }}/>
+                <div className={clsx(styles.sideBar)}>
+                    <Connections 
+                    type='user'
+                    data={{ connections: user.friends, totalConnections: user.totalFriends }}/>
+                    <PostedPhotos data={{totalPhotos: user.totalPhotos,photos: user.photos}}/>
+                </div>
             </div>
         </div>
      );

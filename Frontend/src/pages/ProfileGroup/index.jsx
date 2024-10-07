@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import styles from './ProfileGroup.module.scss'
 import Connections from '../../components/Connections';
 import SubHeader from '../../components/SubHeader';
+import PostedPhotos from '../../components/PostedPhotos';
+
 
 
 const group = {
@@ -10,42 +12,58 @@ const group = {
     members:[{
         username:'Negav',
         chungFriends:5,
-        avatar:null,
+        profilePicture:null,
         location:'HCM'
     },
     {
         username:'Hieuthuhai',
         chungFriends:10,
-        avatar:null,
+        profilePicture:null,
         location:'Bình Dương'
     },
     {
         username:'Hurrykang',
         chungFriends:6,
-        avatar:null,
+        profilePicture:null,
         location:'An Giang'
     },
     {
         username:'Anh Tú Atus',
         chungFriends:3,
         location:'An Giang',
-        avatar:null,
+        profilePicture:null,
     },
     {
         username:'Erik',
         chungFriends:8,
-        avatar:null,
+        profilePicture:null,
         location:'HCM'
     },
     {
         username:'Pháp Kiều',
         chungFriends:10,
-        avatar:null,
+        profilePicture:null,
         location:'HCM'
     },],
     isPublic:true,
-    createdDate:'Nov 27, 2019',
+    dateUpdated:'Nov 27, 2019',
     coverPhoto:null,
+    totalPhotos:4,
+    photos:[
+        {
+            photo:null,
+        },
+        {
+            photo:null,
+        },
+        {
+            photo:null,
+        },
+        {
+            photo:null,
+        },
+
+    ]
 }
 
 function ProfileGroup() {
@@ -67,10 +85,14 @@ function ProfileGroup() {
                         content
                     </div>
                 </div>
-                <Connections
-                type='group'
-                data={{ connections: group.members, totalConnections: group.totalMembers }}
-                />
+                <div className={clsx(styles.sideBar)}>
+                    <Connections
+                    type='group'
+                    data={{ connections: group.members, totalConnections: group.totalMembers }}
+                    />
+                    <PostedPhotos data={{totalPhotos: group.totalPhotos,photos: group.photos}}/>
+                </div>
+                
              </div>
     </div>         
      );

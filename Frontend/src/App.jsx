@@ -12,10 +12,11 @@ import Profile from "./pages/Profile";
 // import ProfileGroup from "./pages/ProfileGroup";
 import Login from "./pages/Login/index.jsx";
 import Information from "./pages/Information/index.jsx";
+import ProfileGroup from "./pages/ProfileGroup/index.jsx";
 
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
     
     return (
         <Router>

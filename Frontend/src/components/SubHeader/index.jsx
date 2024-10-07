@@ -33,7 +33,7 @@ function SubHeader({type='user', data,children}) {
                             <div className={clsx(styles.avatar)}>
                                 <Avatar 
                                 shape='circle'
-                                src={data.avatar}
+                                src={data.profilePicture}
                                 size={avatarSize}
                                 className={clsx(styles.avatarShadow)}
                                 />
@@ -76,7 +76,7 @@ function SubHeader({type='user', data,children}) {
                                 )}
                                 <div>
                                     <FaCalendarAlt />
-                                    <p>Created at {data.createdDate}</p>
+                                    <p>Created at {data.dateUpdated}</p>
                                 </div>
                             </div>
                         </div>
@@ -123,7 +123,7 @@ SubHeader.propTypes = {
         job: PropTypes.string,
         location: PropTypes.string,
         coverPhoto: PropTypes.string,
-        avatar: PropTypes.string,
+        profilePicture: PropTypes.string,
         isPublic: PropTypes.bool,
         createdDate: PropTypes.string.isRequired,
         tickBlue: PropTypes.bool,

@@ -49,6 +49,7 @@ function Connection({item}) {
             >
             <div className={clsx(styles.connection)}>
                 <Avatar shape="square" size={'100%'} src={item.avatar} />
+                    <h1 className={clsx(styles.connectionName)}>{item.username}</h1>
             </div>
             </Tippy>
         )

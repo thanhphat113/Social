@@ -1,6 +1,4 @@
-.sideBar{
-    width: 30%;
-    .sideBarWrapper{
+.sideBarWrapper{
         display: flex;
         background-color: white;
         flex-wrap: wrap;
@@ -22,15 +20,11 @@
             margin: 5px 0px;
         }
     }
-}
 .avatarWrapper {
     display: flex;
     flex-wrap: wrap;  
 }
 @media (max-width: 768px){
-    .sideBar{
-        width: 100%;
-    }
     .sideBarWrapper {
         margin-top:0;
         h2 {

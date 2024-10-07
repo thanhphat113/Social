@@ -5,21 +5,19 @@ import PropTypes from 'prop-types';
 function Connections({type='user',data}) {
     return ( 
     <>
-        <div className={clsx(styles.sideBar)}>
-                <div className ={clsx(styles.sideBarWrapper)}>
-                    <h1>{type==='user'?'Bạn bè':'Thành viên'}</h1>
-                    <p style={{color:'#cfcece',paddingLeft: '5px'}}>{data.totalConnections} người</p>
-                    <div className={clsx(styles.avatarWrapper)}>
-                        {data.connections.map((item, index) => (
-                        <Connection
-                            key={index}
-                            item={item}
-                        >
-                        </Connection>
-                        ))}
-                    <h2>Xem tất cả</h2>
-                </div>         
-            </div>
+        <div className ={clsx(styles.sideBarWrapper)}>
+            <h1>{type==='user'?'Bạn bè':'Thành viên'}</h1>
+            <p style={{color:'#cfcece',paddingLeft: '5px'}}>{data.totalConnections} người</p>
+            <div className={clsx(styles.avatarWrapper)}>
+                {data.connections.map((item, index) => (
+                <Connection
+                    key={index}
+                    item={item}
+                >
+                </Connection>
+                ))}
+            </div> 
+            <h2>Xem tất cả</h2>        
         </div>
     </>
      );
