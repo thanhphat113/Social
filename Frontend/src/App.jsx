@@ -16,7 +16,7 @@ import ProfileGroup from "./pages/ProfileGroup/index.jsx";
 
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     
     return (
         <Router>
