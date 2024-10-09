@@ -4,7 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { useState,createContext } from "react";
+import { useState } from "react";
 
 import MessagePage from "./pages/Message";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
@@ -12,7 +12,6 @@ import Profile from "./pages/Profile";
 // import ProfileGroup from "./pages/ProfileGroup";
 import Login from "./pages/Login/index.jsx";
 import Information from "./pages/Information/index.jsx";
-import ProfileGroup from "./pages/ProfileGroup/index.jsx";
 
 
 function App() {
