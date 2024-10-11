@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iDIHzqu3Lxo=",
+  "dgSpecHash": "uCg/IOyQj98=",
   "success": true,
-  "projectFilePath": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/SocialMedia/Backend/Backend.csproj",
+  "projectFilePath": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/Social/Backend/Backend.csproj",
   "expectedPackageFiles": [
     "/Users/lythanhphat9523/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/lythanhphat9523/.nuget/packages/microsoft.aspnetcore.antiforgery/2.2.0/microsoft.aspnetcore.antiforgery.2.2.0.nupkg.sha512",

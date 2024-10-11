@@ -10241,11 +10241,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/SocialMedia/Backend/Backend.csproj",
+      "projectUniqueName": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/Social/Backend/Backend.csproj",
       "projectName": "Backend",
-      "projectPath": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/SocialMedia/Backend/Backend.csproj",
+      "projectPath": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/Social/Backend/Backend.csproj",
       "packagesPath": "/Users/lythanhphat9523/.nuget/packages/",
-      "outputPath": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/SocialMedia/Backend/obj/",
+      "outputPath": "/Users/lythanhphat9523/Desktop/Học lập trình/ASP.NET/Social/Backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/lythanhphat9523/.nuget/NuGet/NuGet.Config"
