@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login/index.jsx";
 import Information from "./pages/Information/index.jsx";
 import ProfileGroup from "./pages/ProfileGroup/index.jsx";
+import Home from "./pages/Home/Home";
 
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
                 <DefaultLayout>
                     <Routes>
                         <Route path="/message" element={<MessagePage />} />
-                        <Route path="/" element={<MessagePage />} />
+                        <Route path="/" element={<Home />} />
                         <Route path="/group" element={<MessagePage />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/information" element={<Information />} />
