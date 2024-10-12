@@ -1,20 +1,52 @@
-import { BrowserRouter as Router,Routes,Route } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
+import { useState,createContext } from "react";
+
 import MessagePage from "./pages/Message";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
-import Home from "./pages/Home/Home"
+import Profile from "./pages/Profile";
+// import ProfileGroup from "./pages/ProfileGroup";
+import Login from "./pages/Login/index.jsx";
+import Information from "./pages/Information/index.jsx";
+import ProfileGroup from "./pages/ProfileGroup/index.jsx";
+import Home from "./pages/Home/Home";
+
 
 function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    
     return (
-        // <Router>
-        // <DefaultLayout>
-        //         <Routes>
-        //             <Route path="/message" element={<MessagePage />} />
-        //             <Route path="/" element={<MessagePage />} />
-        //             <Route path="/group" element={<MessagePage />} />
-        //         </Routes>
-        // </DefaultLayout>
-        //     </Router>
-        <Home />
+        <Router>
+            {isAuthenticated ? (
+                <DefaultLayout>
+                    <Routes>
+                        <Route path="/message" element={<MessagePage />} />
+                        <Route path="/" element={<Home />} />
+                        <Route path="/group" element={<MessagePage />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/information" element={<Information />} />
+                    </Routes>
+                </DefaultLayout>
+            ) : (
+                <Routes>
+                    <Route
+                        path="/login"
+                        element={
+                            <Login onLogin={() => {
+                                setIsAuthenticated(true)
+                                
+                                }
+                                } />
+                        }
+                    />
+                    <Route path="*" element={<Navigate to="/login" />} />
+                </Routes>
+            )}
+        </Router>
     );
 }
 
