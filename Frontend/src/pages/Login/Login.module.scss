@@ -1,0 +1,165 @@
+@import '../../components/GlobalStyles/GlobalStyles.scss';
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+}
+
+.logo {
+  font-size: 6rem;
+  font-weight: bold;
+  position: absolute;
+  color: #1D72FE;
+  top: 5%;
+  left: 15%;
+}
+
+
+.loginBox, .registerBox {
+  background-color:$background-color;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  transition: filter 0.3s ease-in-out;
+  position: absolute;
+  top: 15%;
+  right: 15%;
+}
+
+.blurBackground {
+  filter: blur(5px);
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.formGroup input {
+  width: 100%;
+  height: 50px;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.passwordWrapper {
+  position: relative;
+
+  input {
+    width: 100%;
+    padding-right: 2.5rem; /* Chừa khoảng trống cho icon */
+  }
+
+  .iconEye {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #aaa;
+
+    &:hover {
+      color: #333;
+    }
+  }
+}
+
+.errorMessage {
+  color: red;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.forgotPassword {
+  color: #3498db; /* Màu chữ */
+  text-decoration: none; /* Bỏ gạch chân */
+  font-size: 14px; /* Kích thước chữ */
+  font-weight: bold; /* Đậm chữ */
+  transition: color 0.3s ease; /* Hiệu ứng hover mượt */
+
+  &:hover {
+    color: #1abc9c; /* Màu chữ khi hover */
+    text-decoration: underline; /* Thêm gạch chân khi hover */
+  }
+}
+
+
+.formActions {
+  margin-top: 1.5rem;
+}
+
+.loginButton{
+  width: 100%;
+  font-size: large !important;
+  margin-bottom: 8px;
+}
+
+.additionalActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.registerButton {
+  width: 80%;
+  font-size: large !important;
+  background-color: #42B72A !important;
+  border: none;
+  cursor: pointer;
+}
+
+.registerButton:hover {
+  background-color: #36A420 !important;
+}
+
+
+
+
+
+
+
+.registerPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Đảm bảo popup ở trên cùng */
+}
+
+.popupContent {
+  background-color: $background-color;
+  display: flex;
+  max-width: 400px;
+  max-height: fit-content;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1010; /* Đảm bảo nội dung popup ở trên cùng */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+
+.regisName{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}

@@ -1,0 +1,38 @@
+@import '../../components/GlobalStyles/GlobalStyles.scss';
+
+.container{
+    background-color: $background-color;
+    padding: 10px 100px;
+    display:flex;
+    flex-wrap: wrap;
+}
+.wrapper{
+    display: flex;
+    background-color: white;
+    margin: 1rem;
+    border-radius:10px;
+}
+.main{
+    display: flex;
+}
+.content{
+    width:70%;
+}
+.sideBar{
+    width: 30%;
+}
+
+@media (max-width: 768px){
+    .container{
+        padding:10px 0;
+    }
+    .content{
+        width:100%;
+    }
+    .main{
+        flex-direction: column-reverse;
+    }
+    .sideBar{
+        width: 100%;
+    }
+}

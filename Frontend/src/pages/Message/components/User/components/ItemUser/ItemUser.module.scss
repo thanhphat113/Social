@@ -1,0 +1,43 @@
+.wrapper{
+	display:flex;
+	flex-direction: column;
+	padding:1rem 1rem;
+	gap:1rem;
+	img{
+		width: 7rem;
+		height: 7rem;
+		border-radius: 50%;
+		border: 0.5px solid #333;
+	}
+
+	.item{
+		cursor: pointer;
+		display: flex; 
+		padding:1rem 0.5rem;
+		gap:1rem;
+		.content{
+			flex:1;
+			p{
+				width: 20rem;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				opacity: 0.5;
+			}
+		}
+
+		span{
+			width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: rgb(87, 228, 228);
+            display: inline-block;
+		}
+
+		&:hover{
+			background-color: #d3cfcf;
+			border-radius: 10px;
+		}
+	}
+
+}

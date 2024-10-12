@@ -1,26 +1,19 @@
 import clsx from "clsx";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
 import styles from "./Menu.module.scss";
 import { CustomTooltip } from "../../../../../GlobalStyles";
 
-function Menu() {
-    const [page, setPage] = useState("home");
-
-    useEffect(() => {
-        console.log(page);
-    }, [page]);
-
+function Menu({ type , onHandleClick}) {
     return (
         <div className={clsx(styles.content)}>
             <CustomTooltip title="Trang chủ">
                 <Link
                     to="/"
-                    className={clsx(styles.choice,
-                        {[styles.active] : page ==='home'}
-                    )}
+                    className={clsx(styles.choice, {
+                        [styles.active]: type === "home",
+                    })}
                     onClick={() => {
-                        setPage("home");
+                        onHandleClick("home");
                     }}
                 >
                     <i className="fa-solid fa-house-chimney"></i>
@@ -29,14 +22,25 @@ function Menu() {
             <CustomTooltip title="Nhóm">
                 <Link
                     to="/group"
-                    className={clsx(styles.choice,
-                        {[styles.active] : page ==='group'}
-                    )}
+                    className={clsx(styles.choice, {
+                        [styles.active]: type === "group",
+                    })}
                     onClick={() => {
-                        setPage("group");
+                        onHandleClick("group");
                     }}
                 >
                     <i className="fa-solid fa-user-group"></i>
+                </Link>
+            </CustomTooltip>
+            <CustomTooltip title="Tin nhắn">
+                <Link
+                    to="/message"
+                    className={clsx(styles.choice, {
+                        [styles.active]: type === 'message',
+                    })}
+                    onClick={() => onHandleClick('message')}
+                >
+                    <i className="fa-solid fa-message"></i>
                 </Link>
             </CustomTooltip>
         </div>

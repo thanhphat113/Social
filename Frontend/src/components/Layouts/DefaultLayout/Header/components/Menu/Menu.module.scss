@@ -1,11 +1,11 @@
 .choice{
-	width: 120px;
+	width: 12rem;
 	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 10px;
-	font-size: 20px;
+	border-radius: 1rem;
+	font-size: 2rem;
 	&:hover{
 		background-color: var(--background);
 	}
@@ -13,10 +13,11 @@
 
 .active{
 	color:#41788d;
-	border-bottom: 3px solid #41788d;
+	border-bottom: 0.3rem solid #41788d;
 }
 
 
 .content{
 	display: flex;
+	gap: 0.8rem;
 }

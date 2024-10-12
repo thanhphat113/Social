@@ -1,0 +1,36 @@
+
+
+.wrapper {
+    padding: 1rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+	border-radius: 10px;
+
+    &:hover {
+        background-color: var(--background);
+    }
+    p {
+        word-wrap: break-word;
+        min-height: 3rem;
+		width: 35rem;
+    }
+
+	img {
+		border: 1px solid black;
+		border-radius: 50%;
+		width: 7rem;
+		height: 7rem;
+	}
+}
+
+.isread {
+    padding-top: 1rem;
+    span {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: rgb(87, 228, 228);
+        display: inline-block;
+    }
+}

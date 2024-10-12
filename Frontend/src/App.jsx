@@ -4,6 +4,7 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
+
 import { useState,createContext } from "react";
 
 import MessagePage from "./pages/Message";
@@ -25,7 +26,9 @@ function App() {
                 <DefaultLayout>
                     <Routes>
                         <Route path="/message" element={<MessagePage />} />
-                        <Route path="/" element={<Home />} />
+
+                        <Route path="/" element={<MessagePage />} />
+
                         <Route path="/group" element={<MessagePage />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/information" element={<Information />} />
