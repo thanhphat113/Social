@@ -4,7 +4,8 @@ import {
     Route,
     Navigate,
 } from "react-router-dom";
-import { useState } from "react";
+
+import { useState,createContext } from "react";
 
 import MessagePage from "./pages/Message";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
@@ -12,6 +13,8 @@ import Profile from "./pages/Profile";
 // import ProfileGroup from "./pages/ProfileGroup";
 import Login from "./pages/Login/index.jsx";
 import Information from "./pages/Information/index.jsx";
+import ProfileGroup from "./pages/ProfileGroup/index.jsx";
+import Home from "./pages/Home/Home";
 
 
 function App() {
@@ -23,7 +26,9 @@ function App() {
                 <DefaultLayout>
                     <Routes>
                         <Route path="/message" element={<MessagePage />} />
+
                         <Route path="/" element={<MessagePage />} />
+
                         <Route path="/group" element={<MessagePage />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/information" element={<Information />} />
