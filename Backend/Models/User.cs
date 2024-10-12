@@ -51,7 +51,7 @@ public partial class User
 
     public virtual Media? ProfilePictureNavigation { get; set; }
 
-    public virtual ICollection<ReactsPost> ReactsPosts { get; set; } = new List<ReactsPost>();
+    public virtual ReactsComment? ReactsComment { get; set; }
 
     public virtual ICollection<Relationship> RelationshipFromUsers { get; set; } = new List<Relationship>();
 
@@ -70,6 +70,4 @@ public partial class User
     public virtual ICollection<GroupChat> GroupChats { get; set; } = new List<GroupChat>();
 
     public virtual ICollection<Media> Media { get; set; } = new List<Media>();
-
-    public virtual ICollection<React> Reacts { get; set; } = new List<React>();
 }

@@ -25,7 +25,7 @@ public partial class Comment
 
     public virtual Post? Post { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public virtual ICollection<ReactsComment> ReactsComments { get; set; } = new List<ReactsComment>();
 
-    public virtual ICollection<React> Reacts { get; set; } = new List<React>();
+    public virtual User User { get; set; } = null!;
 }
