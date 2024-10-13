@@ -13,7 +13,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login/index.jsx";
 import Information from "./pages/Information/index.jsx";
 import ProfileGroup from "./pages/ProfileGroup/index.jsx";
-import Home from "./pages/Home/Home";
+import Home from "./pages/Home";
 
 
 function App() {
