@@ -10,10 +10,14 @@ import axios from "axios";
 import Login from "./pages/Login";
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
-import Home from "./pages/Home/Home";
+import Home from "./pages/Home";
 import Information from "./pages/Information";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
+// import ProfileGroup from "./pages/ProfileGroup";
+// import Login from "./pages/Login";
+import ProfileGroup from "./pages/ProfileGroup/index.jsx";
+
 
 export const AccountContext = createContext();
 

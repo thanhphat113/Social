@@ -1,10 +1,13 @@
 import { useState } from 'react'; 
-import { FaHeart, FaRegHeart, FaRegComment, FaRegShareSquare, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaCloud, FaRegComment, FaRegShareSquare, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { IoIosCloudOutline } from "react-icons/io";
 import styles from './PostCard.module.scss'; 
+import 'animate.css';
 
 function PostCard({ author, time, status, imageUrls }) {
   const [liked, setLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
 
   const handleLikeClick = () => {
     setLiked(!liked);
@@ -22,9 +25,7 @@ function PostCard({ author, time, status, imageUrls }) {
     );
   }
 
-  const numberOfImages = () => {
-    
-  }
+
 
   return (
     <>
@@ -100,12 +101,12 @@ function PostCard({ author, time, status, imageUrls }) {
               </a>
             </div>
           </div>
-
+          
           <div className={styles.postFooterButtons}>
             {liked ? (
-              <FaHeart className={`${styles.reactionIconActive}`} onClick={handleLikeClick} />
+              <FaCloud className={`${styles.reactionIconActive}`} onClick={handleLikeClick} />
             ) : (
-              <FaRegHeart className={styles.reactionIcon} onClick={handleLikeClick} />
+              <FaCloud className={`${styles.reactionIcon} bounce-animation`} onClick={handleLikeClick} />
             )}
             <FaRegComment className={styles.postComment} />
             <FaRegShareSquare className={styles.postShare} />
