@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Backend.Repositories
-{
-	public interface IRepositories<T>
+namespace Backend.Repositories;
+	public interface IRepositories<T> where T : class
 	{
 		Task<List<T>> GetAll();
     	Task<List<T>> GetListById(int id);
@@ -13,4 +12,3 @@ namespace Backend.Repositories
     	Task<bool> Update(T product);
     	Task<bool> Delete(int id);
 	}
-}

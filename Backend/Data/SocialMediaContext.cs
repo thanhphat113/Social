@@ -23,6 +23,8 @@ public partial class SocialMediaContext : DbContext
 
     public virtual DbSet<Comment> Comments { get; set; }
 
+    public virtual DbSet<EfmigrationsHistory> EfmigrationsHistories { get; set; }
+
     public virtual DbSet<GroupChat> GroupChats { get; set; }
 
     public virtual DbSet<HistorySearch> HistorySearches { get; set; }
@@ -43,7 +45,7 @@ public partial class SocialMediaContext : DbContext
 
     public virtual DbSet<PrivacySetting> PrivacySettings { get; set; }
 
-    public virtual DbSet<React> Reacts { get; set; }
+    public virtual DbSet<ReactsComment> ReactsComments { get; set; }
 
     public virtual DbSet<ReactsPost> ReactsPosts { get; set; }
 
@@ -197,6 +199,16 @@ public partial class SocialMediaContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Comments)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("fk_comments_user_id");
+        });
+
+        modelBuilder.Entity<EfmigrationsHistory>(entity =>
+        {
+            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
+
+            entity.ToTable("__EFMigrationsHistory");
+
+            entity.Property(e => e.MigrationId).HasMaxLength(150);
+            entity.Property(e => e.ProductVersion).HasMaxLength(32);
         });
 
         modelBuilder.Entity<GroupChat>(entity =>
@@ -512,99 +524,54 @@ public partial class SocialMediaContext : DbContext
                 .HasColumnName("privacy_name");
         });
 
-        modelBuilder.Entity<React>(entity =>
+        modelBuilder.Entity<ReactsComment>(entity =>
         {
-            entity.HasKey(e => e.ReactId).HasName("PRIMARY");
+            entity.HasKey(e => e.UserId).HasName("PRIMARY");
 
-            entity.ToTable("reacts");
+            entity.ToTable("reacts_comment");
 
-            entity.Property(e => e.ReactId)
+            entity.HasIndex(e => e.CommentId, "fk_reacts_comment_comment_id");
+
+            entity.Property(e => e.UserId)
+                .ValueGeneratedNever()
                 .HasColumnType("int(11)")
-                .HasColumnName("react_id");
-            entity.Property(e => e.ReactIcon)
-                .HasMaxLength(25)
-                .HasColumnName("react_icon");
-            entity.Property(e => e.ReactName)
-                .HasMaxLength(50)
-                .HasColumnName("react_name");
+                .HasColumnName("user_id");
+            entity.Property(e => e.CommentId)
+                .HasColumnType("int(11)")
+                .HasColumnName("comment_id");
 
-            entity.HasMany(d => d.Comments).WithMany(p => p.Reacts)
-                .UsingEntity<Dictionary<string, object>>(
-                    "ReactsComment",
-                    r => r.HasOne<Comment>().WithMany()
-                        .HasForeignKey("CommentId")
-                        .HasConstraintName("fk_reacts_comment_comment_id"),
-                    l => l.HasOne<React>().WithMany()
-                        .HasForeignKey("ReactId")
-                        .HasConstraintName("fk_reacts_comment_react_id"),
-                    j =>
-                    {
-                        j.HasKey("ReactId", "CommentId")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("reacts_comment");
-                        j.HasIndex(new[] { "CommentId" }, "fk_reacts_comment_comment_id");
-                        j.IndexerProperty<int>("ReactId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("react_id");
-                        j.IndexerProperty<int>("CommentId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("comment_id");
-                    });
+            entity.HasOne(d => d.Comment).WithMany(p => p.ReactsComments)
+                .HasForeignKey(d => d.CommentId)
+                .HasConstraintName("fk_reacts_comment_comment_id");
 
-            entity.HasMany(d => d.Users).WithMany(p => p.Reacts)
-                .UsingEntity<Dictionary<string, object>>(
-                    "ReactsUser",
-                    r => r.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_reacts_user_user_id"),
-                    l => l.HasOne<React>().WithMany()
-                        .HasForeignKey("ReactId")
-                        .HasConstraintName("fk_reacts_user_react_id"),
-                    j =>
-                    {
-                        j.HasKey("ReactId", "UserId")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("reacts_user");
-                        j.HasIndex(new[] { "UserId" }, "fk_reacts_user_user_id");
-                        j.IndexerProperty<int>("ReactId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("react_id");
-                        j.IndexerProperty<int>("UserId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("user_id");
-                    });
+            entity.HasOne(d => d.User).WithOne(p => p.ReactsComment)
+                .HasForeignKey<ReactsComment>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_user_cloud");
         });
 
         modelBuilder.Entity<ReactsPost>(entity =>
         {
-            entity.HasKey(e => e.ReactPostId).HasName("PRIMARY");
-
-            entity.ToTable("reacts_post");
+            entity
+                .HasNoKey()
+                .ToTable("reacts_post");
 
             entity.HasIndex(e => e.PostId, "fk_reacts_post_post_id");
 
             entity.HasIndex(e => e.UserId, "fk_reacts_post_user_id");
 
-            entity.Property(e => e.ReactPostId)
-                .HasColumnType("int(11)")
-                .HasColumnName("react_post_id");
             entity.Property(e => e.PostId)
                 .HasColumnType("int(11)")
                 .HasColumnName("post_id");
-            entity.Property(e => e.ReactType)
-                .HasMaxLength(50)
-                .HasColumnName("react_type");
             entity.Property(e => e.UserId)
                 .HasColumnType("int(11)")
                 .HasColumnName("user_id");
 
-            entity.HasOne(d => d.Post).WithMany(p => p.ReactsPosts)
+            entity.HasOne(d => d.Post).WithMany()
                 .HasForeignKey(d => d.PostId)
                 .HasConstraintName("fk_reacts_post_post_id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.ReactsPosts)
+            entity.HasOne(d => d.User).WithMany()
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("fk_reacts_post_user_id");
         });

@@ -31,7 +31,5 @@ public partial class Post
 
     public virtual PrivacySetting? Privacy { get; set; }
 
-    public virtual ICollection<ReactsPost> ReactsPosts { get; set; } = new List<ReactsPost>();
-
     public virtual ICollection<SharePost> SharePosts { get; set; } = new List<SharePost>();
 }
