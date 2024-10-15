@@ -1,11 +1,12 @@
+import { Outlet } from "react-router-dom";
 import Header from "./Header";
 
-function DefaultLayout( {children} ) {
+function DefaultLayout() {
 	return ( 
 		<div>
 			<Header />
 			<div className="container">
-				{children}
+				<Outlet/>
 			</div>
 		</div>
 	 );

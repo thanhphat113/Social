@@ -18,7 +18,6 @@ import Profile from "./pages/Profile";
 // import Login from "./pages/Login";
 import ProfileGroup from "./pages/ProfileGroup/index.jsx";
 
-
 export const AccountContext = createContext();
 
 function App() {
@@ -39,23 +38,22 @@ function App() {
     // }, []);
 
     return (
-        <Router>
-            <DefaultLayout>
+        <>
+            <Router>
                 <Routes>
-                    <Route path="/message" element={<Message />} />
-                    <Route path="/" element={<Home />} />
-                    {/* <Route path="/group" element={<GroupList />} /> */}
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/information" element={<Information />} />
-                </Routes>
-            </DefaultLayout>
-            {/* <Routes>
-                    <Route
-                        path="/login"
-                        element={<Login/>} />
+                    <Route element={<DefaultLayout />}>
+                        <Route path="/message" element={<Message />} />
+                        <Route path="/" element={<Home />} />
+                        {/* <Route path="/group" element={<GroupList />} /> */}
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/information" element={<Information />} />
+                    </Route>
+
+                    <Route path="/login" element={<Login />} />
                     <Route path="*" element={<Login></Login>} />
-                </Routes> */}
-        </Router>
+                </Routes>
+            </Router>
+        </>
     );
 }
 
