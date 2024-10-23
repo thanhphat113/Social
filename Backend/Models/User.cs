@@ -17,7 +17,7 @@ public partial class User
 
     public string? Bio { get; set; }
 
-    public string Location { get; set; } = null!;
+    public string? Location { get; set; } = null!;
 
     public int? ProfilePicture { get; set; }
 
