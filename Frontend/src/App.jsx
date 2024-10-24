@@ -10,10 +10,13 @@ import { createContext, useState, useEffect } from "react";
 import Login from "./pages/Login";
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
-import Home from "./pages/Home/Home";
+import Home from "./pages/Home";
 import Information from "./pages/Information";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
+// import ProfileGroup from "./pages/ProfileGroup";
+// import Login from "./pages/Login";
+import ProfileGroup from "./pages/ProfileGroup/index.jsx";
 
 export const AccountContext = createContext();
 
@@ -35,18 +38,14 @@ function App() {
     // }, []);
 
     return (
-        <Router>
-            <DefaultLayout>
+        <>
+            <Router>
                 <Routes>
                     <Route path="/message" element={<Message />} />
                     <Route path="/" element={<Home />} />
                     {/* <Route path="/group" element={<GroupList />} /> */}
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/information" element={<Information />} />
-                    <Route
-                        path="/login"
-                        element={<Login/>} />
-                    
                 </Routes>
             </DefaultLayout>
             {/* <Routes>
@@ -54,8 +53,9 @@ function App() {
                         path="/login"
                         element={<Login/>} />
                     <Route path="*" element={<Login></Login>} />
-                </Routes> */}
-        </Router>
+                </Routes>
+            </Router>
+        </>
     );
 }
 
