@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Backend",
+    "\\Backend\\Controllers",
+    "\\Backend\\Data",
+    "\\Backend\\Models",
+    "\\Backend\\Repositories",
+    "\\Backend\\Services"
+  ],
+  "SelectedNode": "\\Social.sln",
+  "PreviewInSolutionExplorer": false
+}

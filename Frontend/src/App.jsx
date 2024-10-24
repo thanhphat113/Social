@@ -5,7 +5,7 @@ import {
     Navigate,
 } from "react-router-dom";
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 
 import Login from "./pages/Login";
 import Message from "./pages/Message";
@@ -43,6 +43,10 @@ function App() {
                     {/* <Route path="/group" element={<GroupList />} /> */}
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/information" element={<Information />} />
+                    <Route
+                        path="/login"
+                        element={<Login/>} />
+                    
                 </Routes>
             </DefaultLayout>
             {/* <Routes>
