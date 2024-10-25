@@ -12,7 +12,7 @@ import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
 import Home from "./pages/Home";
 import Information from "./pages/Information";
-import DefaultLayout from "./components/Layouts/DefaultLayout";
+// import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
 // import ProfileGroup from "./pages/ProfileGroup";
 // import Login from "./pages/Login";
@@ -47,8 +47,8 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/information" element={<Information />} />
                 </Routes>
-            </DefaultLayout>
-            {/* <Routes>
+           
+             <Routes>
                     <Route
                         path="/login"
                         element={<Login/>} />
