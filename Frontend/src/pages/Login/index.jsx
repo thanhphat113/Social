@@ -2,14 +2,18 @@ import { useState, } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useNavigate }from 'react-router-dom';
 import * as Yup from 'yup';
-import clsx from 'clsx'; // Import clsx
-import styles from './Login.module.scss'; // Import các class từ file SCSS
+import clsx from 'clsx';
+import styles from './Login.module.scss'; 
 import Button from '../../components/Button';
+import { login } from '~/components/Redux/Actions/AuthAction';
+import { useDispatch } from 'react-redux';
+import { registerUser } from '~/apis/index.js';
 
-function Login( {onLogin} ) {
+function Login () {
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State để toggle hiển thị mật khẩu
+  const [showPassword, setShowPassword] = useState(false); 
   const nevigate = useNavigate()
+  const dispatch = useDispatch();
 
   const initialValues = {
     email: '',
@@ -21,10 +25,17 @@ function Login( {onLogin} ) {
     // password: Yup.string().min(6, 'Mật khẩu ít nhất 6 ký tự').required(),
   });
 
-  const handleSubmit = (values) => {
-    nevigate("/")
+  const handleSubmit = async (values) => {
+    // nevigate("/")
+    await dispatch(login(values.email, values.password));
     // onLogin()
     // console.log('Login form submitted', values);
+  };
+
+  const handleRegisterSubmit = async (values) => {
+    const data = await registerUser(values);
+    console.log(data);
+
   };
 
   const handleRegisterClick = () => {
@@ -109,7 +120,8 @@ function Login( {onLogin} ) {
               })}
               onSubmit={(values) => {
                 console.log('Register form submitted', values);
-                handleClosePopup();
+                handleRegisterSubmit(values);
+                // handleClosePopup();
               }}
             >
               <Form>
@@ -136,7 +148,7 @@ function Login( {onLogin} ) {
                 </div>
 
                 <div className={clsx(styles.formGroup)}>
-                  <Field type="password" id="password" name="password" placeholder="Re-write password" />
+                  <Field type="password" id="re-password" name="re-password" placeholder="Re-write password" />
                   <ErrorMessage name="password" component="div" className={clsx(styles.errorMessage)} />
                 </div>
 
