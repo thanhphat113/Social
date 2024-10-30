@@ -66,7 +66,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Sử dụng chính sách CORS mới
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
