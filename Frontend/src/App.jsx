@@ -45,15 +45,15 @@ function App() {
                     <Route path="/" element={<Home />} />
                     {/* <Route path="/group" element={<GroupList />} /> */}
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/information" element={<Information />} />
-                </Routes>
+                    <Route path="/information/:userId" element={<Information />} />
+                    </Routes>
            
-             <Routes>
+                {/* <Routes>
                     <Route
                         path="/login"
                         element={<Login/>} />
                     <Route path="*" element={<Login></Login>} />
-                </Routes>
+                </Routes> */}
             </Router>
         </>
     );

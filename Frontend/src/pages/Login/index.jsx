@@ -27,7 +27,8 @@ function Login () {
 
   const handleSubmit = async (values) => {
     // nevigate("/")
-    await dispatch(login(values.email, values.password));
+    const { email, password } = values; 
+    await dispatch(login({email,password}));
     // onLogin()
     // console.log('Login form submitted', values);
   };

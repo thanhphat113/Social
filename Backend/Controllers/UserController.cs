@@ -89,7 +89,7 @@ namespace Backend.Controllers
                     return StatusCode(500, "Lỗi khi cập nhật người dùng");
                 }
 
-                return NoContent();
+                return StatusCode(200,"Updated");
             }
             catch (Exception ex)
             {

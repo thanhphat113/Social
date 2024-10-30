@@ -3,16 +3,66 @@ import clsx from 'clsx';
 import styles from './Information.module.scss';
 import Button from '../../components/Button';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import * as Yup from 'yup';
+import { fetchUserInfo } from '../../apis';
+import { updateUser } from '../../apis';
+import { Password } from '@mui/icons-material';
 
 function Information() {
-  // Mặc định là "User information"
   const [selectedContent, setSelectedContent] = useState('User information');
+  const { userId } = useParams();
+  const [userInfo, setUserInfo] = useState(null);
+  const [editedUserInfo, setEditedUserInfo] = useState(null);
+  const [isChanged, setIsChanged] = useState(false);
+  const [showChangePasswordPopup, setChangePasswordPopup] = useState(false);
 
-  const handleSelectContent = (content) => {
-    setSelectedContent(content);
+  useEffect(() => {
+    fetchUserInfo(userId)
+      .then((data) => {
+        const userData = {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          bio: data.bio,
+          password: data.password,
+        };
+        setUserInfo(userData);
+        setEditedUserInfo(userData);
+      })
+      .catch((error) => {
+        console.error("Error fetching user information:", error);
+      });
+  }, [userId]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedUserInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setIsChanged(true);
   };
 
+  const handleSaveChanges = () => {
+    console.log("Saving changes:", editedUserInfo);
+    const newUserInfo = { ... editedUserInfo, password: userInfo.password }
+    updateUser(userId, newUserInfo)
+      .then((response) => {
+        if (response.status === 200) {
+          alert("User information updated successfully!");
+          setUserInfo(newUserInfo);
+          setIsChanged(false);
+        } else {
+          alert("Failed to update user information. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating user information:", error);
+        alert("An error occurred while updating. Please check the console for details.");
+      });
+  };
   const handleChangePasswordClick = () => {
     setChangePasswordPopup(true);
   };
@@ -21,7 +71,16 @@ function Information() {
     setChangePasswordPopup(false);
   };
 
-  const [showChangePasswordPopup, setChangePasswordPopup] = useState(false);
+  const handleChangePass = () => {
+    alert("Password changed successfully!");
+    handleClosePopup();
+  };
+
+  
+  const handleSelectContent = (content) => {
+    setSelectedContent(content);
+  };
+
 
 
 
@@ -88,7 +147,10 @@ function Information() {
                 <input
                   type="text"
                   id="firstName"
+                  name="firstName"
                   placeholder="First name"
+                  value={editedUserInfo?.firstName || ''}
+                  onChange={handleInputChange}
                   className={clsx(styles.input)}
                 />
               </div>
@@ -97,7 +159,10 @@ function Information() {
                 <input
                   type="text"
                   id="lastName"
+                  name="lastName"
                   placeholder="Last name"
+                  value={editedUserInfo?.lastName || ''}
+                  onChange={handleInputChange}
                   className={clsx(styles.input)}
                 />
               </div>
@@ -107,7 +172,10 @@ function Information() {
               <input
                 type="email"
                 id="email"
+                name="email"
                 placeholder="Email"
+                value={editedUserInfo?.email || ''}
+                onChange={handleInputChange}
                 className={clsx(styles.input)}
               />
             </div>
@@ -115,36 +183,23 @@ function Information() {
               <label htmlFor="bio">Description:</label>
               <textarea
                 id="bio"
+                name="bio"
                 placeholder="Description"
+                value={editedUserInfo?.bio || ''}
+                onChange={handleInputChange}
                 className={clsx(styles.textarea)}
               ></textarea>
             </div>
-
-
-            <div className={clsx(styles.changePassword)}>
-              {/* <h2>Change password</h2>
-              <label htmlFor="newPassword">New password:</label>
-              <input
-                type="password"
-                id="newPassword"
-                placeholder="New password"
-                className={clsx(styles.input)}
-              />
-              <label htmlFor="confirmPassword">Verify password:</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                placeholder="Verify password"
-                className={clsx(styles.input)}
-              />
-              <button type="button" className={clsx(styles)}>
-                Change
-              </button> */}
-
-              <Button size='large' className={clsx(styles.registerButton)} onClick={handleChangePasswordClick}>
+            
+            <div className={clsx(styles.buttonContainer)}>
+              <Button size="large" className={clsx(styles.registerButton)} onClick={handleChangePasswordClick}>
                 Change password
               </Button>
-
+              {isChanged && (
+                <Button size="large" className={clsx(styles.saveButton)} onClick={handleSaveChanges}>
+                  Save Changes
+                </Button>
+              )}
             </div>
 
             {showChangePasswordPopup && (
@@ -173,12 +228,8 @@ function Information() {
                         <Field type="password" id="confirmPassword" name="confirmPassword" placeholder="Verify new password" />
                         <ErrorMessage name="confirmPassword" component="div" className={clsx(styles.errorMessage)} />
                       </div>
-                      <div className={clsx(styles.formGroup)}>
-                        <Field type="password" id="confirmPassword" name="confirmPassword" placeholder="Former passowrd" />
-                        <ErrorMessage name="confirmPassword" component="div" className={clsx(styles.errorMessage)} />
-                      </div>
                       <div className={clsx(styles.formActions)}>
-                        <Button type="submit" className={clsx(styles.changePasswordButton)}>Change</Button>
+                        <Button type="submit" className={clsx(styles.changePasswordButton)} onClick={handleChangePass}>Change</Button>
                       </div>
                     </Form>
                   </Formik>
@@ -186,8 +237,6 @@ function Information() {
               </div>
             )}
           </div>
-
-
         )}
 
         {selectedContent === 'Notification' && (

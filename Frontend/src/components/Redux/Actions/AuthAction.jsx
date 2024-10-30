@@ -1,12 +1,9 @@
-import { loginStart, loginSuccess, loginFailure } from '../Slices/AuthSlice';
 import { loginUser } from '~/apis';
 
-export const login = (email, password) => async (dispatch) => {
-  dispatch(loginStart());
+export const login = (values) => async (dispatch) => {
   try {
-    const userData = await loginUser(email, password);
-    dispatch(loginSuccess(userData));
+    await dispatch(loginUser(values));
   } catch (error) {
-    dispatch(loginFailure(error));
+    console.error("Login failed: ", error);
   }
 };

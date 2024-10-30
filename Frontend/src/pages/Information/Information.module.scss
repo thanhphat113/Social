@@ -251,3 +251,14 @@ label {
   margin-bottom: 8px;
 }
 
+
+.buttonContainer{
+  display: flex;
+  justify-content: right;
+  gap: 10px;
+  width: 100%;
+}
+
+.saveButton{
+  background-color: #42B72A;
+}
