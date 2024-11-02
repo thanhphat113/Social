@@ -21,6 +21,9 @@ public class UserService
     {
         var user = await _userRepository.GetUserById(id);
         if (user == null) throw new Exception("Người dùng không tồn tại");
+        var friends = await _userRepository.GetFriends(id);
+        user.Friends = friends;
+        user.Password = null;
         return user;
     }
 

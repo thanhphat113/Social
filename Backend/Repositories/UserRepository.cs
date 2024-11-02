@@ -53,6 +53,14 @@ public class UserRepositories : IRepositories<User>
             return null; // Trả về null khi có lỗi
         }
     }
+    public async Task<List<User>> GetFriends(int userId)
+{
+    return await _context.Relationships
+        .Where(r => r.TypeRelationship == 1 &&
+                    (r.FromUserId == userId || r.ToUserId == userId))
+        .Select(r => r.FromUserId == userId ? r.ToUser : r.FromUser)
+        .ToListAsync();
+}
 
     public async Task<bool> Add(User user)
     {

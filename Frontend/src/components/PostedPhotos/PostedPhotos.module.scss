@@ -38,6 +38,7 @@ flex-wrap: wrap;
 
 @media (max-width: 768px){
 .sideBarWrapper {
+    display:block;
     margin-top:0;
     h2 {
         font-size: 2rem!important; 

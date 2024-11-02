@@ -44,7 +44,8 @@ function App() {
                     <Route path="/message" element={<Message />} />
                     <Route path="/" element={<Home />} />
                     {/* <Route path="/group" element={<GroupList />} /> */}
-                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/:userId" element={<Profile />} />
+                    <Route path="/group/:groupId" element={<ProfileGroup />} />
                     <Route path="/information/:userId" element={<Information />} />
                     </Routes>
            

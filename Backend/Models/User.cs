@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models;
 
@@ -27,6 +28,8 @@ public partial class User
     public DateTime DateCreated { get; set; }
 
     public DateTime DateUpdated { get; set; }
+    [NotMapped]
+    public List<User>? Friends { get; set; }
 
     public virtual ICollection<ChatInGroup> ChatInGroups { get; set; } = new List<ChatInGroup>();
 

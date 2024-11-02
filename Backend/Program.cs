@@ -20,8 +20,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<UserRepositories>();
 builder.Services.AddScoped<IRepositories<User>, UserRepositories>();
+builder.Services.AddScoped<GroupRepositories>();
+builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
 // Cấu hình CORS
