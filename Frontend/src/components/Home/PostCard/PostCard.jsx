@@ -1,13 +1,14 @@
 import { useState } from 'react'; 
 import { FaCloud, FaRegComment, FaRegShareSquare, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { IoIosCloudOutline } from "react-icons/io";
+import CommentPost from './../CommentPost/index';
 import styles from './PostCard.module.scss'; 
 import 'animate.css';
 
 function PostCard({ author, time, status, imageUrls }) {
   const [liked, setLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+  const [showComments, setShowComments] = useState(false);
 
   const handleLikeClick = () => {
     setLiked(!liked);
@@ -25,7 +26,9 @@ function PostCard({ author, time, status, imageUrls }) {
     );
   }
 
-
+  const handleCloseComment = () => {
+    setShowComments(false);
+  }
 
   return (
     <>
@@ -43,45 +46,45 @@ function PostCard({ author, time, status, imageUrls }) {
         </div>
 
         <div className={styles.postContent}>
-    <p className={styles.postText}>{status}</p>
-    
-    {/* Kiểm tra số lượng ảnh trong mảng imageUrls */}
-    {imageUrls.length > 0 && (
-          <div className={styles.slider}>
-            <div className={styles.containImage}>
-              {/* Hiển thị nút prev và next nếu có nhiều hơn 1 ảnh */}
-              {imageUrls.length > 1 && (
-                <>
-                  <button className={styles.prevButton} onClick={handlePrevImage}>
-                    <FaChevronLeft />
-                  </button>
-                  <button className={styles.nextButton} onClick={handleNextImage}>
-                    <FaChevronRight />
-                  </button>
-                </>
-              )}
-              <img 
-                src={imageUrls[currentImageIndex]} 
-                className={styles.postImage}
-                alt="Post"
-              />
-
-              {/* Hiển thị chấm tròn nếu có nhiều hơn 1 ảnh */}
-              {imageUrls.length > 1 && (
-                <div className={styles.dots}>
-                  {imageUrls.map((_, index) => (
-                    <span 
-                      key={index} 
-                      className={`${styles.dot} ${index === currentImageIndex ? styles.active : ''}`} 
-                      onClick={() => setCurrentImageIndex(index)}
+          <p className={styles.postText}>{status}</p>
+          
+          {/* Kiểm tra số lượng ảnh trong mảng imageUrls */}
+          {imageUrls.length > 0 && (
+                <div className={styles.slider}>
+                  <div className={styles.containImage}>
+                    {/* Hiển thị nút prev và next nếu có nhiều hơn 1 ảnh */}
+                    {imageUrls.length > 1 && (
+                      <>
+                        <button className={styles.prevButton} onClick={handlePrevImage}>
+                          <FaChevronLeft />
+                        </button>
+                        <button className={styles.nextButton} onClick={handleNextImage}>
+                          <FaChevronRight />
+                        </button>
+                      </>
+                    )}
+                    <img 
+                      src={imageUrls[currentImageIndex]} 
+                      className={styles.postImage}
+                      alt="Post"
                     />
-                  ))}
+
+                    {/* Hiển thị chấm tròn nếu có nhiều hơn 1 ảnh */}
+                    {imageUrls.length > 1 && (
+                      <div className={styles.dots}>
+                        {imageUrls.map((_, index) => (
+                          <span 
+                            key={index} 
+                            className={`${styles.dot} ${index === currentImageIndex ? styles.active : ''}`} 
+                            onClick={() => setCurrentImageIndex(index)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
 
         <div className={styles.postFooter}>
           <div className={styles.postFooterInfo}>
@@ -108,11 +111,29 @@ function PostCard({ author, time, status, imageUrls }) {
             ) : (
               <FaCloud className={`${styles.reactionIcon} bounce-animation`} onClick={handleLikeClick} />
             )}
-            <FaRegComment className={styles.postComment} />
+            <FaRegComment className={styles.postComment} onClick={() => setShowComments(!showComments)} />
             <FaRegShareSquare className={styles.postShare} />
           </div>
         </div>
       </div>
+
+      {showComments && (
+        <div className={styles.overlay}>
+          <div className={styles.postWrapper}>
+            <CommentPost
+              onClose={handleCloseComment}
+              author={author}
+              time={time}
+              status={status}
+              imageUrls={imageUrls}
+              currentImageIndex={currentImageIndex}
+              handlePrevImage={handlePrevImage}
+              handleNextImage={handleNextImage}
+            />
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
@@ -134,186 +155,6 @@ export default function PostList() {
       status: "Status 2",
       imageUrls: [
         "src/assets/img/anh/3.jpeg"
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
-      ],
-    },
-    {
-      author: "ToanLD",
-      time: "1 giờ",
-      status: "Status 2",
-      imageUrls: [
-        "src/assets/img/anh/2.jpg",
-        "src/assets/img/anh/3.jpeg",
       ],
     },
     {

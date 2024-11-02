@@ -3,7 +3,7 @@
     background-color: #fff;
     border-radius: 1rem;
     padding: 1.5rem 1.5rem 5rem;
-    box-shadow: 0 0rem 2rem rgba(0, 0, 0, 0.1);
+
     margin-bottom: 2rem;
   .inputBox {
     display: flex;
@@ -54,43 +54,6 @@
     }
   }
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(255, 255, 255, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-
-    .postWrapper {
-      background-color: rgb(255, 255, 255);
-      padding: 2rem;
-      border-radius: 1rem;
-      width: 55rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 0 4rem rgba(100, 100, 100, 0.5);
-
-
-      .closeButton {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background-color: red;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-      }
-
-    }
-
-  }
 
 }
   

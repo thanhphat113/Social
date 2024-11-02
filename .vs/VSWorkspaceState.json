@@ -3,8 +3,13 @@
     "",
     "\\Backend",
     "\\Backend\\Controllers",
-    "\\Backend\\Data"
+    "\\Backend\\Models",
+    "\\Frontend",
+    "\\Frontend\\src",
+    "\\Frontend\\src\\components",
+    "\\Frontend\\src\\components\\Home",
+    "\\Frontend\\src\\components\\Home\\PostInput"
   ],
-  "SelectedNode": "\\Backend\\Controllers\\HomeController.cs",
+  "SelectedNode": "\\Backend\\Controllers\\PostController.cs",
   "PreviewInSolutionExplorer": false
 }
