@@ -4,6 +4,11 @@ import Button from '../../components/Button';
 import Connections from '../../components/Connections';
 import SubHeader from '../../components/SubHeader';
 import PostedPhotos from '../../components/PostedPhotos';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import {  getUserProfile } from '../../components/Redux/Actions/ProfileAction';
+import { clearProfile } from '../../components/Redux/Slices/ProfileSlice';
 
 
 const user = {
@@ -71,15 +76,20 @@ const user = {
 
 
 function Profile() {
-    let data = {
-        name: user.username,
-        totalConnections: user.totalFriends,
-        connections: user.friends,
-        ...user,
-    }
-    return ( 
-        <div className={clsx(styles.container)}>
-            <SubHeader type='user' data={data}>
+    const {userId} = useParams()
+    const dispatch = useDispatch()
+    const {profile, loading, error} = useSelector((state)=>state.profile)
+    useEffect(()=>{
+        dispatch(getUserProfile(userId))
+        return ()=>{
+            dispatch(clearProfile())
+        }
+    },[dispatch,userId])
+    return (
+        <>
+        {profile &&(
+            <div className={clsx(styles.container)}>
+            <SubHeader>
                 <Button color='primary'
                     size='large'
                     className={clsx(styles.editButton)}>
@@ -94,13 +104,16 @@ function Profile() {
                     </div>
                 </div>
                 <div className={clsx(styles.sideBar)}>
-                    <Connections 
-                    type='user'
-                    data={{ connections: user.friends, totalConnections: user.totalFriends }}/>
+                    <div style={{ width: "100%" }}>
+                        <Connections />
+                    </div>
+                    
                     <PostedPhotos data={{totalPhotos: user.totalPhotos,photos: user.photos}}/>
                 </div>
             </div>
         </div>
+        )}
+        </>
      );
 }
 

@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import * as Yup from 'yup';
 import { fetchUserInfo } from '../../apis';
 import { updateUser } from '../../apis';
-import { Password } from '@mui/icons-material';
+// import { Password } from '@mui/icons-material';
 
 function Information() {
   const [selectedContent, setSelectedContent] = useState('User information');

@@ -2,14 +2,18 @@ import clsx from "clsx";
 import styles from './Connections.module.scss'
 import Connection from "../Connection";
 import PropTypes from 'prop-types';
-function Connections({type='user',data}) {
+import { useSelector } from "react-redux";
+function Connections() {
+    const {profile,isUser,isGroup,loading,error} = useSelector((state)=>state.profile)
+    let data
+    data = isUser?profile.friends:profile.members
     return ( 
     <>
         <div className ={clsx(styles.sideBarWrapper)}>
-            <h1>{type==='user'?'Bạn bè':'Thành viên'}</h1>
-            <p style={{color:'#cfcece',paddingLeft: '5px'}}>{data.totalConnections} người</p>
+            <h1>{isUser?'Bạn bè':'Thành viên'}</h1>
+            <p style={{color:'#cfcece',paddingLeft: '5px'}}>{isUser?profile.friends.length:profile.members.length} người</p>
             <div className={clsx(styles.avatarWrapper)}>
-                {data.connections.map((item, index) => (
+                {data.map((item, index) => (
                 <Connection
                     key={index}
                     item={item}
@@ -17,23 +21,10 @@ function Connections({type='user',data}) {
                 </Connection>
                 ))}
             </div> 
-            <h2>Xem tất cả</h2>        
+            {(isUser ? profile.friends.length : profile.memberCount) > 0 && <h2>Xem tất cả</h2>}       
         </div>
     </>
      );
 }
-Connections.propTypes = {
-    type: PropTypes.string.isRequired,
-    data: PropTypes.shape({
-        connections: PropTypes.arrayOf(
-            PropTypes.shape({
-                username: PropTypes.string.isRequired,
-                chungFriends: PropTypes.number.isRequired,
-                avatar: PropTypes.string,
-                location: PropTypes.string.isRequired,
-            })
-        ).isRequired,
-        totalConnections: PropTypes.number.isRequired,
-    }).isRequired,
-};
+
 export default Connections;

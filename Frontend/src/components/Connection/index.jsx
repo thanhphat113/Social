@@ -8,20 +8,23 @@ import { FaUserFriends } from "react-icons/fa"
 import { FaLocationDot } from "react-icons/fa6"
 import { AiFillMessage } from "react-icons/ai"
 import Button from "../Button";
+import { Link } from "react-router-dom";
 
 function Connection({item}) {
     const renderResult = (attrs)=>(
             <div className={clsx(styles.wrapper)}  {...attrs}>
                 <div className={clsx(styles.container)}>
-                    <Avatar shape="circle" size={'100px'} src={item.avatar}/>
+                <Link to={`/${item.userId}`}>
+                    <Avatar shape="circle" size={'100px'} src={item.profilePicture}/>
+                    </Link>
                     <div className={clsx(styles.info)}>
                         <div className={clsx(styles.name)}>
-                            {item.username}
+                            {item.lastName + " "+item.firstName}
                         </div>
-                        <div className={clsx(styles.chungFriend)}>
+                        {/* <div className={clsx(styles.chungFriend)}>
                             <FaUserFriends />
                             <p>Có {item.chungFriends} bạn chung</p>
-                        </div>
+                        </div> */}
                         <div className={clsx(styles.location)}>
                             <FaLocationDot />
                             <p>Sống tại {item.location}</p>
@@ -48,8 +51,10 @@ function Connection({item}) {
             placement="bottom" 
             >
             <div className={clsx(styles.connection)}>
-                <Avatar shape="square" size={'100%'} src={item.avatar} />
-                    <h1 className={clsx(styles.connectionName)}>{item.username}</h1>
+            <Link to={`/${item.userId}`}>
+                <Avatar shape="square" size={'100%'} src={item.profilePicture} />
+                    <h1 className={clsx(styles.connectionName)}>{item.lastName+" "+item.firstName}</h1>
+            </Link>
             </div>
             </Tippy>
         )
@@ -57,10 +62,11 @@ function Connection({item}) {
 
 Connection.propTypes = {
   item: PropTypes.shape({
-    username: PropTypes.string.isRequired,       
-    chungFriends: PropTypes.number.isRequired,   
-    avatar: PropTypes.string,                    
-    location: PropTypes.string.isRequired,       
+    userId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    lastName: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    profilePicture: PropTypes.string,
+    location: PropTypes.string,
   }).isRequired,                                 
 };
 

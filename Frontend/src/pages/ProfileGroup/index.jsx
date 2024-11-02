@@ -3,6 +3,11 @@ import styles from './ProfileGroup.module.scss'
 import Connections from '../../components/Connections';
 import SubHeader from '../../components/SubHeader';
 import PostedPhotos from '../../components/PostedPhotos';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getGroupProfile } from '../../components/Redux/Actions/ProfileAction';
+import { clearProfile } from '../../components/Redux/Slices/ProfileSlice';
 
 
 
@@ -67,6 +72,15 @@ const group = {
 }
 
 function ProfileGroup() {
+    const {groupId} = useParams()
+    const dispatch = useDispatch()
+    const {profile, loading, error} = useSelector((state)=>state.profile)
+    useEffect(()=>{
+        dispatch(getGroupProfile(groupId))
+        return ()=>{
+            dispatch(clearProfile())
+        }
+    },[dispatch,groupId])
     let data = {
         name: group.groupName,
         totalConnections: group.totalMembers,
@@ -74,9 +88,11 @@ function ProfileGroup() {
         ...group
     }
     return ( 
-        <div className={clsx(styles.container)}>
-            <SubHeader type='group' data={data}>
-                {/* Chỗ nhét các button và logic Page */}
+        <>
+        {profile &&(
+            <div className={clsx(styles.container)}>
+            <SubHeader >
+                {/* Chỗ nhét các button và logic Page nè*/}
             </SubHeader>
             <div className={clsx(styles.main)}>
                 <div className={clsx(styles.content)}>
@@ -86,15 +102,17 @@ function ProfileGroup() {
                     </div>
                 </div>
                 <div className={clsx(styles.sideBar)}>
-                    <Connections
-                    type='group'
-                    data={{ connections: group.members, totalConnections: group.totalMembers }}
-                    />
+                <div style={{ width: "100%" }}>
+                        <Connections />
+                    </div>
                     <PostedPhotos data={{totalPhotos: group.totalPhotos,photos: group.photos}}/>
                 </div>
                 
              </div>
-    </div>         
+    </div>   
+        )}
+        
+    </>      
      );
 }
 
