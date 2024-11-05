@@ -49,7 +49,7 @@ function PostInput() {
       {showPost && (
         <div className={styles.overlay}>
           <div className={styles.postWrapper}>
-            <Post onClose={handleClosePost} />
+            <Post onClose={handleClosePost} postImage={showPostWithImage}/>
           </div>
         </div>
       )}

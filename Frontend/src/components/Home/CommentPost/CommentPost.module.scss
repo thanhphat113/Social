@@ -229,7 +229,7 @@
             
             .comment {
                 display: flex;
-                align-items: center;
+                align-items: flex-start;
                 margin-top: 10px;
                 
                 .commentProfilePic {
@@ -238,14 +238,59 @@
                     border-radius: 50%;
                     background-color: #ccc;
                 }
-                
-                .commentContent {
-                    background: #f0f2f5;
-                    border-radius: 16px;
-                    padding: 8px 12px;
-                    margin-left: 10px;
-                    font-size: 14px;
+                .commentContentContainer {
+                    display: flex;
+                    flex-direction: column;
+                    .commentContent {
+                        background: #f0f2f5;
+                        border-radius: 16px;
+                        padding: 8px 12px;
+                        margin-left: 10px;
+                        font-size: 14px;
+                        height: 3.5rem;
+                    }
+
+                    .commentReact {
+                        margin-left: 3rem;
+                        cursor: pointer;
+                        
+                        span {
+                            font-size: 1.2rem;
+                            
+                            &:hover {
+                                color: #5f5fe7;
+                            }
+                        }
+                    }
                 }
+            }
+        }
+    }
+    
+    .commentInput {
+        display: flex;
+        flex-direction: row;
+        border-top: 0.3rem solid #ccc;
+        margin: 1.5rem;
+        padding-top: 2rem;
+        align-items: center;
+        
+        .commentProfilePic{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        
+        .commentContentInput {
+            height: 3.5rem;
+            width: 100%;
+            input {
+                padding: 0.8rem;
+                width: 90%;
+                margin: 0 3rem;
+                border-radius: 1rem;
+                font-size: 1.6rem
             }
         }
     }

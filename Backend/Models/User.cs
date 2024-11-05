@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Backend.Models;
 
@@ -17,7 +18,7 @@ public partial class User
 
     public string? Bio { get; set; }
 
-    public string Location { get; set; } = null!;
+    public string? Location { get; set; } = null!;
 
     public int? ProfilePicture { get; set; }
 

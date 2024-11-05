@@ -5,17 +5,19 @@ import {
     Navigate,
 } from "react-router-dom";
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
-import DefaultLayout from "./components/Layouts/DefaultLayout";
+
+import Home from "./pages/Home";
+import Information from "./pages/Information";
+// import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
 // import ProfileGroup from "./pages/ProfileGroup";
-import Login from "./pages/Login/index.jsx";
-import Information from "./pages/Information/index.jsx";
+// import Login from "./pages/Login";
 import ProfileGroup from "./pages/ProfileGroup/index.jsx";
-import Home from "./pages/Home";
+import Login from "./pages/Login/index.jsx";
 
 export const AccountContext = createContext();
 
@@ -37,23 +39,24 @@ function App() {
     // }, []);
 
     return (
-        <Router>
-            <DefaultLayout>
+        <>
+            <Router>
                 <Routes>
                     <Route path="/message" element={<Message />} />
                     <Route path="/" element={<Home />} />
                     {/* <Route path="/group" element={<GroupList />} /> */}
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/information" element={<Information />} />
-                </Routes>
-            </DefaultLayout>
-            {/* <Routes>
+                    <Route path="/information/:userId" element={<Information />} />
+                    </Routes>
+           
+                {/* <Routes>
                     <Route
                         path="/login"
                         element={<Login/>} />
                     <Route path="*" element={<Login></Login>} />
                 </Routes> */}
-        </Router>
+            </Router>
+        </>
     );
 }
 
