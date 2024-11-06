@@ -1,57 +1,70 @@
-﻿using Backend.Models;
+using Backend.Models;
 using Backend.Repositories;
+using Backend.Services;
+using Backend.Repositories.Interface;
+using Backend.Services;
 
-public class UserService
+namespace Backend.Services
 {
-    private readonly UserRepositories _userRepository;
-
-    public UserService(UserRepositories userRepository)
+    public class UserService : IService<User>
     {
-        _userRepository = userRepository;
+        private readonly IUserRepository _userRepo;
+
+        public UserService(IUserRepository repo)
+        {
+            _userRepo = repo;
+        }
+        public async Task<string> Add(User product)
+        {
+            if (await _userRepo.Add(product))
+            {
+                return "Đăng ký tài khoản thành công";
+            }
+            return "Đăng ký thất bại thất bại";
+        }
+
+        public Task<string> Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<User>> GetAll()
+        {
+            return _userRepo.GetAll();
+        }
+
+        public async Task<User> GetById(int id)
+        {
+            return await _userRepo.GetById(id);
+        }
+
+        public Task<IEnumerable<User>> GetListById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> Update(User product)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<User>> GetFriends(int id)
+        {
+            try
+            {
+                return await _userRepo.GetListFriends(id);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
+        public async Task<IEnumerable<Object>> GetListByName(string name)
+        {
+            return await _userRepo.GetUsersByName(name);
+        }
     }
 
-    // Lấy tất cả người dùng
-    public async Task<List<User>> GetAllUsers()
-    {
-        return await _userRepository.GetAll();
-    }
-
-    // Lấy thông tin người dùng
-    public async Task<User> GetUserById(int id)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new Exception("Người dùng không tồn tại");
-        var friends = await _userRepository.GetFriends(id);
-        user.Friends = friends;
-        user.Password = null;
-        return user;
-    }
-
-    // Thêm người dùng
-    public async Task<bool> AddUser(User newUser)
-    {
-        return await _userRepository.Add(newUser); // Giả định rằng bạn đã có phương thức Add trong IRepositories
-    }
-
-    // Cập nhật thông tin người dùng
-    public async Task<bool> UpdateUser(int id, User updatedUser)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new Exception("Người dùng không tồn tại");
-
-        // Cập nhật thông tin
-        user.FirstName = updatedUser.FirstName;
-        user.LastName = updatedUser.LastName;
-        user.Email = updatedUser.Email;
-
-        return await _userRepository.Update(user);
-    }
-
-    // Xóa người dùng
-    public async Task<bool> DeleteUser(int id)
-    {
-        var user = await _userRepository.GetUserById(id);
-        if (user == null) throw new Exception("Người dùng không tồn tại");
-        return await _userRepository.Delete(id); // Giả định rằng bạn đã có phương thức Delete trong IRepositories
-    }
 }

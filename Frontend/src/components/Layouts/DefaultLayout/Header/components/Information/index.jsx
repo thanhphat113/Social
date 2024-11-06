@@ -33,8 +33,6 @@ function Imformation() {
                 />
                 <AccountIcon
                     title={"Tài khoản"}
-                    img={"/public/img/Cloudy.png"}
-                    name={"thanh phat"}
                     isActive={activeId === "B"} 
                     onToggle={handleToggle} 
                 />

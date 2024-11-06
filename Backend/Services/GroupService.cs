@@ -11,14 +11,14 @@ public class GroupService
     {
         _groupRepository = groupRepository;
     }
-        public async Task<UserGroup> GetGroupById(int id)
-    {
-        var group = await _groupRepository.GetById(id);
-        if (group == null) throw new Exception("Group không tồn tại");
-        var members = await _groupRepository.GetGroupMembers(id);
-        group.Members=members;
-        return group;
-    }
+    // public async Task<UserGroup> GetGroupById(int id)
+    // {
+    //     var group = await _groupRepository.GetById(id);
+    //     if (group == null) throw new Exception("Group không tồn tại");
+    //     var members = await _groupRepository.GetGroupMembers(id);
+    //     group.Members = members;
+    //     return group;
+    // }
     public async Task<List<User>> GetGroupMembers(int groupId)
     {
         return await _groupRepository.GetGroupMembers(groupId);

@@ -3,10 +3,11 @@ import styles from './ItemPostNotification.module.scss'
 
 function ItemPostNotification( props ) {
 	const item = props.package
+
 	return ( 
 		<Link className={styles.wrapper}>
-			<img src={item.from_user_id.profile_picture}></img>
-			<p><strong>{item.from_user_id.first_name} {item.from_user_id.last_name}</strong> {item.type_id.content}</p>
+			<img src={item.profilePicture || `/public/img/default/${item.genderId !==2 ? "man" : "woman"}_default.png`}></img>
+			<p><strong>{item.lastName} {item.firstName}</strong> {item.type.content}</p>
 			<div className={styles.isread}>{ item.isRead === 0 && <span></span>}</div>
 		</Link>
 	 );

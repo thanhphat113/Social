@@ -17,15 +17,18 @@ namespace Backend.Controllers
         {
             _groupService = groupService;
         }
-        [HttpGet("{groupId}")]
-    public async Task<IActionResult> GetGroupById(int groupId){
-        try{
-            var user = await _groupService.GetGroupById(groupId);
-            return Ok(user);
-        }
-        catch (Exception ex){
-            return NotFound(ex.Message);
-        }
-    }
+        // [HttpGet("{groupId}")]
+        // public async Task<IActionResult> GetGroupById(int groupId)
+        // {
+        //     try
+        //     {
+        //         var user = await _groupService.GetGroupById(groupId);
+        //         return Ok(user);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return NotFound(ex.Message);
+        //     }
+        // }
     }
 }

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import clsx from "clsx";
 import styles from "./User.module.scss";
 import ItemUser from "./components/ItemUser";
 
 
-function User( {list} ) {
+function User() {
+    const friends = useSelector( (state) => state.user.friends)
     const [search, setSearch] = useState("");
     const [isShow, setIsShow] = useState(false);
     const [ischoice, setIsChoice] = useState("mess");
@@ -46,8 +48,8 @@ function User( {list} ) {
                 </button>
             </div>
             <div className={styles.content}>
-                {list && list.length > 0 ? (<ItemUser list={list}/>):
-					(<p style={ {paddingLeft:'10px'} }>Không có tin nhắn nào</p>
+                {friends && friends.length > 0 ? (<ItemUser/>):
+					(<p style={ {paddingLeft:'10px'} }>Không có ai để nhắn tin cả</p>
 				)}
             </div>
         </div>

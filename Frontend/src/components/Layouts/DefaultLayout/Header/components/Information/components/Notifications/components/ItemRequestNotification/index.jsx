@@ -1,26 +1,57 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { acceptRequests, deleteRequests } from "../../../../../../../../../Redux/Actions/UserAction";
 import styles from "./ItemRequestNotification.module.scss";
 
 function ItemRequestNotification(props) {
+    const [isFocus, setIsFocus] = useState(false);
+    const dispatch = useDispatch();
     const item = props.package;
+
     return (
-        <Link className={styles.wrapper}>
-            <img src={item.from_user_id.profile_picture}></img>
+        <Link
+            className={styles.wrapper}
+            onMouseEnter={() => setIsFocus(true)}
+            onMouseLeave={() => setIsFocus(false)}
+        >
+            <img
+                src={
+                    item.profilePicture ||
+                    `/public/img/default/${
+                        item.genderId !== 2 ? "man" : "woman"
+                    }_default.png`
+                }
+            ></img>
             <div className={styles.content}>
-                <p>
-                    <strong>
-                        {item.from_user_id.first_name}{" "}
-                        {item.from_user_id.last_name}
-                    </strong>{" "}
-                    {item.type_id.content}
-                </p>
-				<div className={styles.choice}>
-					<button className={styles.accept}>Chấp nhận</button>
-					<button className={styles.deny}>Từ chối</button>
-				</div>
+                {item.isAccept === false ? (
+                    <>
+                        <p>
+                            <strong>
+                                {item.firstName} {item.lastName}
+                            </strong>{" "}
+                            {`đã gửi lời mời kết bạn`}
+                        </p>
+                        <div className={styles.choice}>
+                            <button onClick={async ()=> await dispatch(acceptRequests(item.userId))} className={styles.accept}>Chấp nhận</button>
+                            <button className={styles.deny}>Từ chối</button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <p>
+                            {`Bạn đã chấp nhận lời mời kết bạn của `}
+                            <strong>
+                                {item.firstName} {item.lastName}
+                            </strong>{" "}
+                        </p>
+                        
+                    </>
+                )}
             </div>
+            {isFocus && item.isAccept && <i onClick={async () => await dispatch(deleteRequests(item.notificationId))} className="fa-regular fa-trash-can"></i>}
             <div className={styles.isread}>
-                {item.isRead === 0 && <span></span>}
+                {item.isRead === false && <span></span>}
             </div>
         </Link>
     );

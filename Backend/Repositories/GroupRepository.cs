@@ -37,21 +37,21 @@ public class GroupRepositories : IRepositories<UserGroup>
             return null;
         }
     }
-public async Task<List<User>> GetGroupMembers(int groupId)
-{
-    try
+    public async Task<List<User>> GetGroupMembers(int groupId)
     {
-        return await _context.UserInGroups
-            .Where(uig => uig.GroupId == groupId)
-            .Select(uig => uig.User)
-            .ToListAsync();
+        try
+        {
+            return await _context.UserInGroups
+                .Where(uig => uig.GroupId == groupId)
+                .Select(uig => uig.User)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return new List<User>();
+        }
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return new List<User>();
-    }
-}
     public async Task<bool> Add(UserGroup group)
     {
         try

@@ -11,13 +11,17 @@
 	min-width: 28rem;
 	overflow: hidden;
 	justify-items: center;
+	box-shadow: 0 0 1rem rgba(0,0,0,0.5);
 	align-items: center;
+	z-index: 2;
 }
 
 .showlist{
 	margin: 5rem 0 0.5rem 0 ;
 	max-height: 40rem;
 	overflow-y: auto;
+	width: 100%;
+	z-index: 2;
 }
 
 .searcharea{
@@ -30,6 +34,7 @@
 	transform-origin: right;
 	position: absolute;
     right: 0;
+	z-index: 0;
 }
 
 .icon{

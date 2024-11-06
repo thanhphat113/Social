@@ -1,120 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 using Backend.Models;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
-    {
-        private readonly UserService _userService; // Sử dụng UserService
-        private readonly JwtService _jwtService;
+	[Authorize]
+	[Route("api/[controller]")]
+	[ApiController]
+	public class UserController : ControllerBase
+	{
 
-        public UserController(UserService userService)
-        {
-            _userService = userService;
-        }
+		private readonly UserService _userContext;
+		private readonly RequestNotiService _NotiContext;
+		private readonly PostNotiService _PostContext;
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            var jwtToken = Request.Cookies["jwt"]; // Đọc JWT từ cookie
-            if (string.IsNullOrEmpty(jwtToken))
-            {
-                return Unauthorized(new { Message = "Người dùng chưa đăng nhập" });
-            }
+		public UserController(UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext)
+		{
+			_userContext = UserContext;
+			_NotiContext = NotiContext;
+			_PostContext = PostContext;
+		}
 
-            // Giải mã token và xử lý
-            var principal = _jwtService.ValidateToken(jwtToken);
-            if (principal == null)
-            {
-                return Unauthorized(new { Message = "Token không hợp lệ" });
-            }
+		[HttpGet]
+		public async Task<IActionResult> Get()
+		{
+			return Ok(await _userContext.GetAll());
+		}
 
-           
-            // Giả định rằng bạn đã có phương thức GetAll trong UserRepositories
-            var users = await _userService.GetAllUsers(); // Cần implement phương thức GetAll trong UserService
-            return Ok(users);
-        }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            try
-            {
-                var user = await _userService.GetUserById(id);
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message); // Trả về thông báo lỗi nếu không tìm thấy người dùng
-            }
-        }
+		[HttpGet("findbyid")]
+		public async Task<IActionResult> FindById()
+		{
+			var userId = GetCookie.GetUserIdFromCookie(Request);
+			Console.WriteLine("userId: " + userId);
+			var information = await _userContext.GetById(int.Parse(userId));
+			var friends = await _userContext.GetFriends(int.Parse(userId));
+			var requests = await _NotiContext.FindByUserId(int.Parse(userId));
+			var postrequests = await _PostContext.FindByUserId(int.Parse(userId));
+			return Ok(new { information = information, friends = friends, requests = requests, postrequests = postrequests });
+		}
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] User newUser)
-        {
-            if (newUser == null)
-            {
-                return BadRequest("Người dùng không hợp lệ");
-            }
+		[AllowAnonymous]
+		[HttpPost]
+		public async Task<IActionResult> Put([FromBody] User user)
+		{
+			user.GenderId ??= 0;
+			return Ok(new { result = await _userContext.Add(user) });
+		}
 
-            // Gọi phương thức thêm người dùng trong UserRepositories
-            bool userAdded = await _userService.AddUser(newUser); // Cần implement phương thức AddUser trong UserService
-            if (!userAdded)
-            {
-                return StatusCode(500, "Lỗi khi thêm người dùng vào cơ sở dữ liệu");
-            }
+		[HttpGet("findbyname")]
+		public async Task<IActionResult> GetListByName([FromQuery] string name)
+		{
+			return Ok(await _userContext.GetListByName(name));
+		}
 
-            return CreatedAtAction(nameof(GetUser), new { id = newUser.UserId }, newUser); // Giả định rằng User có thuộc tính Id
-        }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] User updatedUser)
-        {
-            if (updatedUser == null)
-            {
-                return BadRequest("Thông tin người dùng không hợp lệ" + updatedUser.UserId + updatedUser.LastName);
-            }
-
-            try
-            {
-                bool userUpdated = await _userService.UpdateUser(id, updatedUser);
-                if (!userUpdated)
-                {
-                    return StatusCode(500, "Lỗi khi cập nhật người dùng");
-                }
-
-                return StatusCode(200,"Updated");
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message); // Trả về thông báo lỗi nếu không tìm thấy người dùng
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            // Kiểm tra xem người dùng có tồn tại không
-            var existingUser = await _userService.GetUserById(id);
-            if (existingUser == null)
-            {
-                return NotFound("Người dùng không tồn tại");
-            }
-
-            // Xóa người dùng
-            bool userDeleted = await _userService.DeleteUser(id); // Cần implement phương thức DeleteUser trong UserService
-            if (!userDeleted)
-            {
-                return StatusCode(500, "Lỗi khi xóa người dùng");
-            }
-
-            return NoContent();
-        }
-    }
+		[HttpDelete("{id}")]
+		public void Delete(int id)
+		{
+		}
+	}
 }

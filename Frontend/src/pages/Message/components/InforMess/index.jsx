@@ -1,12 +1,14 @@
 import { useState } from "react";
 import clsx from "clsx";
+import { useSelector } from "react-redux";
 import styles from "./InforMess.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
 
-function InforMess() {
+function InforMess( ) {
+    const friends = useSelector((state) => state.user.friends);
+    const currentFriend = useSelector((state) => state.message.currentUser);
+    const InforCurrentFriend = friends.find((u) => u.userId === currentFriend);
     const [click, setClick] = useState(false);
-	
-
     return (
         <div className={styles.wrapper}>
             <div className={styles.container}>
@@ -16,7 +18,12 @@ function InforMess() {
                 ></img>
                 <img
                     className={clsx(styles.profile)}
-                    src="/public/img/Cloudy.png"
+                    src={
+                        InforCurrentFriend.profilePicture ||
+                        `/public/img/default/${
+                            InforCurrentFriend.genderId !== 2 ? "man" : "woman"
+                        }_default.png`
+                    }
                 ></img>
             </div>
             <div className={styles.action}>
@@ -32,11 +39,7 @@ function InforMess() {
                     ></i>
                 </CustomTooltip>
             </div>
-            {click && (
-                <input
-                    placeholder="Nhập nội dung tin nhắn"
-                ></input>
-            )}
+            {click && <input placeholder="Nhập nội dung tin nhắn"></input>}
         </div>
     );
 }

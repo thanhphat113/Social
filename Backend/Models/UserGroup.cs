@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models;
 
@@ -25,8 +24,6 @@ public partial class UserGroup
     public int CreatedByUserId { get; set; }
 
     public int? PrivacyId { get; set; }
-    [NotMapped]
-    public List<User>? Members { get; set; } = [];
 
     public virtual User CreatedByUser { get; set; } = null!;
 

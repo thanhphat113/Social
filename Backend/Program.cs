@@ -4,6 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Backend.Data;
 using Backend.Repositories;
+
+using Backend.Repositories.Repository;
+using Backend.Repositories.Interface;
 using Backend.Models;
 using Backend.Services;
 
@@ -19,14 +22,26 @@ builder.Services.AddDbContext<SocialMediaContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddScoped<UserRepositories>();
-builder.Services.AddScoped<IRepositories<User>, UserRepositories>();
 builder.Services.AddScoped<GroupRepositories>();
 builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();
-builder.Services.AddScoped<AuthService>();
+
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<ChatInMessageService>();
+builder.Services.AddScoped<RequestNotiService>();
+builder.Services.AddScoped<PostNotiService>();
+builder.Services.AddScoped<RelationshipService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
+
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<INotificationsRepository, RequestNotiRepository>();
+builder.Services.AddScoped<IPostNotiRepository, PostNotiRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IRelationshipRepository, RelationshipRepository>();
+builder.Services.AddScoped<IRepository<ChatInMessage>, ChatInMessageRepository>();
 
 //Post
 builder.Services.AddScoped<PostRepository>();
@@ -47,11 +62,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -60,9 +71,22 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "your_issuer",
-        ValidAudience = "your_audience",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_new_secret_key_with_at_least_32_characters"))
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Cookies["jwt"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+
+            return Task.CompletedTask;
+        }
     };
 });
 

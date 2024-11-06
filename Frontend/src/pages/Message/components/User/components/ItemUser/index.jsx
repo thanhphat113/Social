@@ -1,24 +1,33 @@
-import {useState,useContext} from 'react'
 import styles from "./ItemUser.module.scss";
-import { selectedItemContext } from '../../../..';
+import { useSelector,useDispatch } from "react-redux";
+import { findMessById } from "../../../../../../components/Redux/Actions/MessageActions";
+import { setCurrentUser } from "../../../../../../components/Redux/Slices/MessageSlice";
 
-function ItemUser(props) {
-	const list = props.list;
-	const selected = useContext(selectedItemContext)
-    
+function ItemUser() {
+    const friends = useSelector( (state) => state.user.friends)
+    const userId = useSelector( (state) => state.user.information.userId)
+    const dispatch =useDispatch()
+
+    const handleClick = async (value) =>{
+        const user1 = userId; // Ví dụ về user1
+        const user2 = value; 
+        await dispatch(setCurrentUser(value))
+        await dispatch(findMessById({user1,user2}))
+    }
+
     return (
         <div className={styles.wrapper}>
-            {list.map((item) => (
-                <div key={item.user_id} onClick={() => selected(item.user_id)} className={styles.item}>
-                    <img src={item.profile_picture}></img>
+            {friends.map((item) => (
+                <button key={item.userId} onClick={() => handleClick(item.userId)} className={styles.item}>
+                    <img src={item.profilePicture || `/public/img/default/${item.genderId !==2 ? "man" : "woman"}_default.png`}></img>
                     <div className={styles.content}>
                         <strong>
-                            {item.last_name} {item.first_name}
+                            {item.lastName} {item.firstName}
                         </strong>
                         <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
                     </div>
 					{item.is_read === 0 && <span></span>}
-                </div>
+                </button>
             ))}
         </div>
     );

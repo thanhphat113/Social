@@ -11,6 +11,8 @@ public partial class RequestNotification
 
     public int ToUserId { get; set; }
 
+    public bool? IsAccept { get; set; }
+
     public bool? IsRead { get; set; }
 
     public DateTime DateCreated { get; set; }

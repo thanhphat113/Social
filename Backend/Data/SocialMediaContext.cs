@@ -17,13 +17,15 @@ public partial class SocialMediaContext : DbContext
     {
     }
 
+
     public virtual DbSet<ChatInGroup> ChatInGroups { get; set; }
+
+    public virtual DbSet<GenderType> Genders { get; set; }
 
     public virtual DbSet<ChatInMessage> ChatInMessages { get; set; }
 
     public virtual DbSet<Comment> Comments { get; set; }
 
-    public virtual DbSet<EfmigrationsHistory> EfmigrationsHistories { get; set; }
 
     public virtual DbSet<GroupChat> GroupChats { get; set; }
 
@@ -41,7 +43,6 @@ public partial class SocialMediaContext : DbContext
 
     public virtual DbSet<PostNotification> PostNotifications { get; set; }
 
-    public virtual DbSet<PostNotificationToUser> PostNotificationToUsers { get; set; }
 
     public virtual DbSet<PrivacySetting> PrivacySettings { get; set; }
 
@@ -69,21 +70,9 @@ public partial class SocialMediaContext : DbContext
 
     public virtual DbSet<UserInGroup> UserInGroups { get; set; }
 
-    public async Task<bool> CanConnectAsync()
-    {
-        try
-        {
-            return await Database.CanConnectAsync();
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-//     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//         => optionsBuilder.UseMySql("server=localhost;database=SocialMedia;user=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.28-mariadb"));
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("server=localhost;database=SocialMedia;user=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.4.28-mariadb"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -213,15 +202,6 @@ public partial class SocialMediaContext : DbContext
                 .HasConstraintName("fk_comments_user_id");
         });
 
-        modelBuilder.Entity<EfmigrationsHistory>(entity =>
-        {
-            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
-
-            entity.ToTable("__EFMigrationsHistory");
-
-            entity.Property(e => e.MigrationId).HasMaxLength(150);
-            entity.Property(e => e.ProductVersion).HasMaxLength(32);
-        });
 
         modelBuilder.Entity<GroupChat>(entity =>
         {
@@ -478,7 +458,12 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.PostId)
                 .HasColumnType("int(11)")
                 .HasColumnName("post_id");
-            entity.Property(e => e.TypeId).HasColumnName("type_id");
+            entity.Property(e => e.TypeId)
+                .HasColumnType("int(11)")
+                .HasColumnName("type_id");
+            entity.Property(e => e.IsRead)
+                .HasColumnType("tinyint(1)")
+                .HasColumnName("is_read");
 
             entity.HasOne(d => d.FromUser).WithMany(p => p.PostNotifications)
                 .HasForeignKey(d => d.FromUserId)
@@ -493,34 +478,6 @@ public partial class SocialMediaContext : DbContext
                 .HasConstraintName("fk_post_notifications_type");
         });
 
-        modelBuilder.Entity<PostNotificationToUser>(entity =>
-        {
-            entity.HasKey(e => new { e.ToUserId, e.PostNotificationId })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity.ToTable("post_notification_to_user");
-
-            entity.HasIndex(e => e.PostNotificationId, "fk_post_notification_to_user_post_notification_id");
-
-            entity.Property(e => e.ToUserId)
-                .HasColumnType("int(11)")
-                .HasColumnName("to_user_id");
-            entity.Property(e => e.PostNotificationId)
-                .HasColumnType("int(11)")
-                .HasColumnName("post_notification_id");
-            entity.Property(e => e.IsRead)
-                .HasDefaultValueSql("'0'")
-                .HasColumnName("is_read");
-
-            entity.HasOne(d => d.PostNotification).WithMany(p => p.PostNotificationToUsers)
-                .HasForeignKey(d => d.PostNotificationId)
-                .HasConstraintName("fk_post_notification_to_user_post_notification_id");
-
-            entity.HasOne(d => d.ToUser).WithMany(p => p.PostNotificationToUsers)
-                .HasForeignKey(d => d.ToUserId)
-                .HasConstraintName("fk_post_notification_to_user_to_user_id");
-        });
 
         modelBuilder.Entity<PrivacySetting>(entity =>
         {
@@ -680,6 +637,9 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.FromUserId)
                 .HasColumnType("int(11)")
                 .HasColumnName("from_user_id");
+            entity.Property(e => e.IsAccept)
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("is_accept");
             entity.Property(e => e.IsRead)
                 .HasDefaultValueSql("'0'")
                 .HasColumnName("is_read");
@@ -746,7 +706,9 @@ public partial class SocialMediaContext : DbContext
 
             entity.ToTable("type_post_notifications");
 
-            entity.Property(e => e.TypeId).HasColumnName("type_id");
+            entity.Property(e => e.TypeId)
+                .HasColumnType("int(11)")
+                .HasColumnName("type_id");
             entity.Property(e => e.Content)
                 .HasMaxLength(255)
                 .HasColumnName("content");
@@ -815,6 +777,9 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.ProfilePicture)
                 .HasColumnType("int(11)")
                 .HasColumnName("profile_picture");
+            entity.Property(e => e.GenderId)
+                .HasColumnType("int(1)")
+                .HasColumnName("gender_id");
 
             entity.HasOne(d => d.CoverPhotoNavigation).WithMany(p => p.UserCoverPhotoNavigations)
                 .HasForeignKey(d => d.CoverPhoto)
@@ -823,6 +788,10 @@ public partial class SocialMediaContext : DbContext
             entity.HasOne(d => d.ProfilePictureNavigation).WithMany(p => p.UserProfilePictureNavigations)
                 .HasForeignKey(d => d.ProfilePicture)
                 .HasConstraintName("fk_profile");
+
+            entity.HasOne(d => d.Gender).WithMany(g => g.Users)
+                .HasForeignKey(d => d.GenderId)
+                .HasConstraintName("fk_gender");
 
             entity.HasMany(d => d.GroupChats).WithMany(p => p.Users)
                 .UsingEntity<Dictionary<string, object>>(
@@ -926,6 +895,10 @@ public partial class SocialMediaContext : DbContext
                 .HasForeignKey(d => d.PrivacyId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_user_groups_privacy_id");
+        });
+        modelBuilder.Entity<GenderType>(entity =>
+        {
+            entity.HasKey(e => e.GenderId);
         });
 
         modelBuilder.Entity<UserInGroup>(entity =>

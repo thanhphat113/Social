@@ -7,9 +7,9 @@ public partial class Message
 {
     public int MessagesId { get; set; }
 
-    public int? User1 { get; set; }
+    public int User1 { get; set; }
 
-    public int? User2 { get; set; }
+    public int User2 { get; set; }
 
     public int MainTopic { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Message
 
     public virtual MainTopic MainTopicNavigation { get; set; } = null!;
 
-    public virtual User? User1Navigation { get; set; }
+    public virtual User User1Navigation { get; set; }
 
-    public virtual User? User2Navigation { get; set; }
+    public virtual User User2Navigation { get; set; }
 }

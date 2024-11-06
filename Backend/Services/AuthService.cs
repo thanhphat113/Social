@@ -2,16 +2,18 @@
 using Microsoft.AspNetCore.Identity;
 using Backend.Models;
 using Microsoft.IdentityModel.Tokens;
+using Backend.Repositories.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 public class AuthService
 {
-    private readonly UserRepositories _userRepository;
+    private readonly IUserRepository _userRepository;
     private readonly JwtService _jwtService;
     private readonly PasswordHasher<User> _passwordHasher;
 
 
 
-    public AuthService(UserRepositories userRepository, JwtService jwtService)
+    public AuthService(IUserRepository userRepository, JwtService jwtService)
     {
         _userRepository = userRepository;
         _jwtService = jwtService;
@@ -21,8 +23,8 @@ public class AuthService
     // Đăng ký
     public async Task<(string jwtToken, string refreshToken)> Register(string email, string password, string lastname, string firstname)
     {
-        var existingUser = await _userRepository.GetUserByEmail(email);
-        if (existingUser != null) throw new Exception("Email đã tồn tại");
+        // var existingUser = await _userRepository.GetUserByEmail(email);
+        // if (existingUser != null) throw new Exception("Email đã tồn tại");
 
         var newUser = new User
         {
@@ -34,29 +36,34 @@ public class AuthService
         // Băm mật khẩu và lưu vào User
         newUser.Password = _passwordHasher.HashPassword(newUser, password);
 
-        bool userAdded = await _userRepository.AddUser(newUser); // Thêm await
+        bool userAdded = await _userRepository.Add(newUser); // Thêm await
 
         if (!userAdded) throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
 
-        var jwtToken = _jwtService.GenerateAccessToken(newUser);
-        var refreshToken = _jwtService.GenerateRefreshToken(newUser);
+        // var newJwtToken = _jwtService.GenerateAccessToken(user);
+        // var newRefreshToken = _jwtService.GenerateRefreshToken(user);
 
-        return (jwtToken, refreshToken);
+        // return (newJwtToken, newRefreshToken);
+        return ("", "");
     }
 
     // Đăng nhập
     public async Task<(string jwtToken, string refreshToken)> Login(string email, string password)
     {
-        User user = await _userRepository.GetUserByEmail(email); // Sử dụng await
+        User user = await _userRepository.FindToLogin(email, password); // Sử dụng await
         if (user == null) throw new Exception("Email hoặc mật khẩu không đúng");
 
         // Xác minh mật khẩu
         var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
         if (passwordVerificationResult == PasswordVerificationResult.Failed)
             throw new Exception("Email hoặc mật khẩu không đúng");
+        Console.WriteLine("Chưa chạy tạo token");
+        var jwtToken = _jwtService.GenerateJwtTokenAccess(user.UserId.ToString());
+        Console.WriteLine("Chưa chạy tạo token");
 
-        var jwtToken = _jwtService.GenerateAccessToken(user);
-        var refreshToken = _jwtService.GenerateRefreshToken(user);
+        var refreshToken = _jwtService.GenerateJwtTokenRefesh(user.UserId.ToString());
+        Console.WriteLine("Đã `chạy tạo token");
+
 
         return (jwtToken, refreshToken);
     }
@@ -69,11 +76,12 @@ public class AuthService
             throw new SecurityTokenException("Refresh token không hợp lệ hoặc đã hết hạn");
 
         var userId = int.Parse(principal.Identity.Name);
-        User user = await _userRepository.GetUserById(userId);
+        User user = await _userRepository.GetById(userId);
 
-        var newJwtToken = _jwtService.GenerateAccessToken(user);
-        var newRefreshToken = _jwtService.GenerateRefreshToken(user);
+        // var newJwtToken = _jwtService.GenerateAccessToken(user);
+        // var newRefreshToken = _jwtService.GenerateRefreshToken(user);
 
-        return (newJwtToken, newRefreshToken);
+        // return (newJwtToken, newRefreshToken);
+        return ("", "");
     }
 }
