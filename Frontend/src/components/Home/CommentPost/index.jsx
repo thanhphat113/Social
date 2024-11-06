@@ -1,36 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
+import styles from './CommentPost.Module.scss';
+import { useState } from 'react'; 
 import { FaCloud, FaRegComment, FaRegShareSquare, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import styles from './PostCard.module.scss';
-import CommentPost from './../CommentPost/index';
 
-function PostCard({ author, time, status, imageUrls }) {
+
+const commentPost = ({
+    onClose,
+    author,
+    time,
+    status,
+    imageUrls,
+    currentImageIndex,
+    handlePrevImage,
+    handleNextImage
+}) => {
+
     const [liked, setLiked] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [showComments, setShowComments] = useState(false);
-
+    
     const handleLikeClick = () => {
         setLiked(!liked);
     }
-
-    const handleNextImage = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
-        );
-    }
-
-    const handlePrevImage = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
-        );
-    }
-
-    const handleCloseComment = () => {
-        setShowComments(false);
-    }
-
+    
     return (
-        <>
-            <div className={styles.postCard}>
+        <div className={styles.postContainer}>
+            <div className={styles.postTitle}>
+                <h2></h2>
+                <button className={styles.closeButton} onClick={onClose}>X</button>
+            </div>
+            <div className={styles.contentContainer}>
                 <div className={styles.postHeader}>
                     <img
                         src={'src/assets/img/avata.png'}
@@ -46,18 +43,16 @@ function PostCard({ author, time, status, imageUrls }) {
                 <div className={styles.postContent}>
                     <p className={styles.postText}>{status}</p>
 
-                    {/* Kiểm tra số lượng ảnh trong mảng imageUrls */}
                     {imageUrls.length > 0 && (
                         <div className={styles.slider}>
                             <div className={styles.containImage}>
-                                {/* Hiển thị nút prev và next nếu có nhiều hơn 1 ảnh */}
                                 {imageUrls.length > 1 && (
                                     <>
                                         <button className={styles.prevButton} onClick={handlePrevImage}>
-                                            <FaChevronLeft />
+                                            <FaChevronLeft/>
                                         </button>
                                         <button className={styles.nextButton} onClick={handleNextImage}>
-                                            <FaChevronRight />
+                                            <FaChevronRight/>
                                         </button>
                                     </>
                                 )}
@@ -67,14 +62,12 @@ function PostCard({ author, time, status, imageUrls }) {
                                     alt="Post"
                                 />
 
-                                {/* Hiển thị chấm tròn nếu có nhiều hơn 1 ảnh */}
                                 {imageUrls.length > 1 && (
                                     <div className={styles.dots}>
                                         {imageUrls.map((_, index) => (
                                             <span
                                                 key={index}
                                                 className={`${styles.dot} ${index === currentImageIndex ? styles.active : ''}`}
-                                                onClick={() => setCurrentImageIndex(index)}
                                             />
                                         ))}
                                     </div>
@@ -83,7 +76,6 @@ function PostCard({ author, time, status, imageUrls }) {
                         </div>
                     )}
                 </div>
-
                 <div className={styles.postFooter}>
                     <div className={styles.postFooterInfo}>
                         <div className={styles.postReactions}>
@@ -104,34 +96,62 @@ function PostCard({ author, time, status, imageUrls }) {
                     </div>
 
                     <div className={styles.postFooterButtons}>
-                        <FaCloud
-                            className={`${styles.reactionIcon} ${liked ? styles.reactionIconActive : 'bounce-animation'}`}
-                            onClick={handleLikeClick}
-                        />
-                        <FaRegComment className={styles.postComment} onClick={() => setShowComments(!showComments)} />
-                        <FaRegShareSquare className={styles.postShare} />
+                        {liked ? (
+                            <FaCloud className={`${styles.reactionIconActive}`} onClick={handleLikeClick}/>
+                        ) : (
+                            <FaCloud className={`${styles.reactionIcon} bounce-animation`} onClick={handleLikeClick}/>
+                        )}
+                        <FaRegComment className={styles.postComment}/>
+                        <FaRegShareSquare className={styles.postShare}/>
+                    </div>
+                </div>
+                <div className={styles.commentSection}>
+                    <div className={styles.comment}>
+                        <div className={styles.commentProfilePic}>
+
+                        </div>
+                        <div className={styles.commentContentContainer}>
+                            <div className={styles.commentContent}>
+                                <p>
+                                    Thanh Thao Vo Tuấn Đạt kịch bản cũng giống ha 😢
+                                </p>
+                            </div>
+                            <div className={styles.commentReact}>
+                                <span>Thích</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div className={styles.comment}>
+                        <div className={styles.commentProfilePic}>
+
+                        </div>
+                        <div className={styles.commentContentContainer}>
+                            <div className={styles.commentContent}>
+                                <p>
+                                    Thanh Thao Vo Tuấn Đạt kịch bản cũng giống ha 😢
+                                </p>
+                            </div>
+                            <div className={styles.commentReact}>
+                                <span>Thích</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
+            <div className={styles.commentInput}>
+                <div className={styles.commentProfilePic}>
 
-            {showComments && (
-                <div className={styles.overlay}>
-                    <div className={styles.postWrapper}>
-                        <CommentPost
-                            onClose={handleCloseComment}
-                            author={author}
-                            time={time}
-                            status={status}
-                            imageUrls={imageUrls}
-                            currentImageIndex={currentImageIndex}
-                            handlePrevImage={handlePrevImage}
-                            handleNextImage={handleNextImage}
-                        />
-                    </div>
                 </div>
-            )}
-        </>
-    );
-}
+                <div className={styles.commentContentInput}>
+                    <input type="text" placeholder="Bình luận dưới tên Đức Toàn">
+                    </input>
+                </div>
+            </div>
 
-export default PostCard;
+        </div>
+    )
+};
+
+export default commentPost;

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Backend.Data;
 using Backend.Repositories;
 using Backend.Models;
+using Backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,15 +28,22 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
+//Post
+builder.Services.AddScoped<PostRepository>();
+builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
+
+
+
 // Cấu hình CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")  
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); 
+              .AllowCredentials();
     });
 });
 

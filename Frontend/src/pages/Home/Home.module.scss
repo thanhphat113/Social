@@ -2,12 +2,12 @@
     display: flex;
     height: 100vh; /* Đặt chiều cao của container */
     padding: 2rem;
+    background-color: #eeeeee;
 }
 
 .leftBar {
     flex: 1;
     margin-right: 2rem;
-    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow-y: auto; 
     max-height: 100%;
@@ -15,19 +15,15 @@
 
 .mainBar {
     flex: 2;
-    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow-y: auto; 
     height: calc(100vh - 4rem);
     width: 90rem;
-
 }
 
 .rightBar {
     margin-left: 2rem;
-    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    padding: 2rem;
     overflow-y: auto; 
     max-height: 100%;
 }

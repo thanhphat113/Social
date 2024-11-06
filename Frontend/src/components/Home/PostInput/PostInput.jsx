@@ -6,10 +6,21 @@ import Post from './Post.jsx';
 function PostInput() {
 
   const [showPost, setShowPost] = useState(false);
+  const [showPostWithImage, setShowPostWithImage] = useState(false);
 
   const handleInputClick = () => {
     setShowPost(true);
   }
+
+  const handleSpanClick = () => {
+    setShowPostWithImage(true);
+  }
+
+  const handleClosePost = () => {
+    setShowPost(false);
+  }
+
+  
 
   return (
     <div className={styles.postInput}>
@@ -26,10 +37,11 @@ function PostInput() {
           onClick={handleInputClick}
         />
       </div>
+
       <div className={styles.options}>
         <div className={styles.option}>
           <FaPhotoVideo className={styles.icon} />
-          <span>Ảnh/video</span>
+          <span onClick={handleSpanClick}>Ảnh/video</span>
         </div>
       </div>
 
@@ -37,7 +49,7 @@ function PostInput() {
       {showPost && (
         <div className={styles.overlay}>
           <div className={styles.postWrapper}>
-            <Post />
+            <Post onClose={handleClosePost} postImage={showPostWithImage}/>
           </div>
         </div>
       )}
