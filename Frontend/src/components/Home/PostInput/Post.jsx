@@ -128,7 +128,7 @@ const Post = ({ onClose, postImage }) => {
                         className={styles.fileInput}
                         onChange={handleFileInput}
                         multiple
-                        accept="image/*,video/*"
+                        accept="image/*,video/!*"
                     />
                     <label htmlFor="input-file-upload" className={styles.fileLabel}>
                       <div>
