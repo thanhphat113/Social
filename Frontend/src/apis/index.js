@@ -36,6 +36,14 @@ export const fetchUserInfo = async (userId) => {
     throw error.response.data;
   }
 };
+export const fetchGroupInfo = async (groupId) => {
+  try {
+    const response = await axiosInstance.get(`/api/Group/${groupId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
 
 
 export const updateUser = async (userId, userData) => {

@@ -6,14 +6,21 @@
 .left{
 	padding: 0.5rem;
 	width: var(--left-and-right-item);
-	border-right: 0.1rem solid rgba(0, 0, 0, 0.1);
+	border-right: 0.5px solid #333;
+	// flex-grow: 1;
 }
 
 .center{
 	flex: 1;
-	border-right: 0.1rem solid rgba(0, 0, 0, 0.1);
+	border-right:0.5px solid #333;
 }
 
 .right{
 	width: var(--left-and-right-item);
+}
+
+.validate{
+	height: 100%;
+	width: 100%;
+	text-align: center;
 }

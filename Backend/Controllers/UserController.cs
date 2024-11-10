@@ -1,120 +1,102 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 using Backend.Models;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
-    {
-        private readonly UserService _userService; // Sử dụng UserService
-        private readonly JwtService _jwtService;
+	[Authorize]
+	[Route("api/[controller]")]
+	[ApiController]
+	public class UserController : ControllerBase
+	{
 
-        public UserController(UserService userService)
-        {
-            _userService = userService;
-        }
+		private readonly UserService _userContext;
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            var jwtToken = Request.Cookies["jwt"]; // Đọc JWT từ cookie
-            if (string.IsNullOrEmpty(jwtToken))
-            {
-                return Unauthorized(new { Message = "Người dùng chưa đăng nhập" });
-            }
+		private readonly ChatInMessageService _detailmess;
+		private readonly GroupChatService _group;
 
-            // Giải mã token và xử lý
-            var principal = _jwtService.ValidateToken(jwtToken);
-            if (principal == null)
-            {
-                return Unauthorized(new { Message = "Token không hợp lệ" });
-            }
+		private readonly HistorySearchService _historySearchContext;
+		private readonly RequestNotiService _NotiContext;
+		private readonly PostNotiService _PostContext;
 
-           
-            // Giả định rằng bạn đã có phương thức GetAll trong UserRepositories
-            var users = await _userService.GetAllUsers(); // Cần implement phương thức GetAll trong UserService
-            return Ok(users);
-        }
+		public UserController(GroupChatService group, ChatInMessageService detailmess, UserService UserContext, MessageService mess, HistorySearchService historySearchContext, RequestNotiService NotiContext, PostNotiService PostContext)
+		{
+			_group = group;
+			_detailmess = detailmess;
+			_userContext = UserContext;
+			_NotiContext = NotiContext;
+			_PostContext = PostContext;
+			_historySearchContext = historySearchContext;
+		}
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            try
-            {
-                var user = await _userService.GetUserById(id);
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message); // Trả về thông báo lỗi nếu không tìm thấy người dùng
-            }
-        }
+		[HttpGet]
+		public async Task<IActionResult> Get()
+		{
+			return Ok(await _userContext.GetAll());
+		}
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] User newUser)
-        {
-            if (newUser == null)
-            {
-                return BadRequest("Người dùng không hợp lệ");
-            }
+		[HttpGet("friends-by-name")]
+		public async Task<IActionResult> GetFriendsByName([FromQuery] string name)
+		{
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			try
+			{
+				var friends = await _userContext.GetFriendsByName(UserId, name);
+				foreach (var item in friends)
+				{
+					item.ChatInMessages = await _detailmess.GetMessage(UserId, item.UserId);
+				}
+				return Ok(friends);
+			}
+			catch (System.Exception ex)
+			{
+				return BadRequest("Lỗi: " + ex);
+				throw;
+			}
+		}
 
-            // Gọi phương thức thêm người dùng trong UserRepositories
-            bool userAdded = await _userService.AddUser(newUser); // Cần implement phương thức AddUser trong UserService
-            if (!userAdded)
-            {
-                return StatusCode(500, "Lỗi khi thêm người dùng vào cơ sở dữ liệu");
-            }
 
-            return CreatedAtAction(nameof(GetUser), new { id = newUser.UserId }, newUser); // Giả định rằng User có thuộc tính Id
-        }
+		[HttpGet("user-login")]
+		public async Task<IActionResult> FindById()
+		{
+			var userId = GetCookie.GetUserIdFromCookie(Request);
+			if (userId == -1) return null;
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] User updatedUser)
-        {
-            if (updatedUser == null)
-            {
-                return BadRequest("Thông tin người dùng không hợp lệ" + updatedUser.UserId + updatedUser.LastName);
-            }
+			var information = await _userContext.GetById(userId);
+			var friends = await _userContext.GetFriends(userId);
+			foreach (var item in friends)
+			{
+				item.ChatInMessages = await _detailmess.GetMessage(userId, item.UserId);
+			}
+			var groupchat = await _group.FindByUserId(userId);
+			var requests = await _NotiContext.FindByUserId(userId);
+			var postrequests = await _PostContext.FindByUserId(userId);
+			var historysearch = await _historySearchContext.GetHistorySearchByUserId(userId);
+			return Ok(new { information = information, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests, historysearch = historysearch });
+		}
 
-            try
-            {
-                bool userUpdated = await _userService.UpdateUser(id, updatedUser);
-                if (!userUpdated)
-                {
-                    return StatusCode(500, "Lỗi khi cập nhật người dùng");
-                }
+		[AllowAnonymous]
+		[HttpPost]
+		public async Task<IActionResult> Put([FromBody] User user)
+		{
+			user.GenderId ??= 0;
+			return Ok(new { result = await _userContext.Add(user) });
+		}
 
-                return StatusCode(200,"Updated");
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message); // Trả về thông báo lỗi nếu không tìm thấy người dùng
-            }
-        }
+		[HttpGet("users-by-name")]
+		public async Task<IActionResult> GetListByName([FromQuery] string name)
+		{
+			return Ok(await _userContext.GetListByName(name));
+		}
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            // Kiểm tra xem người dùng có tồn tại không
-            var existingUser = await _userService.GetUserById(id);
-            if (existingUser == null)
-            {
-                return NotFound("Người dùng không tồn tại");
-            }
 
-            // Xóa người dùng
-            bool userDeleted = await _userService.DeleteUser(id); // Cần implement phương thức DeleteUser trong UserService
-            if (!userDeleted)
-            {
-                return StatusCode(500, "Lỗi khi xóa người dùng");
-            }
-
-            return NoContent();
-        }
-    }
+		[HttpDelete("{id}")]
+		public void Delete(int id)
+		{
+		}
+	}
 }

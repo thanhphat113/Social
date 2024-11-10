@@ -5,7 +5,7 @@ namespace Backend.Models;
 
 public partial class TypePostNotification
 {
-    public bool TypeId { get; set; }
+    public int TypeId { get; set; }
 
     public string TypeName { get; set; } = null!;
 

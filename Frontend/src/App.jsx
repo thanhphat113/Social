@@ -1,62 +1,86 @@
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate,
-} from "react-router-dom";
-import { createContext, useState, useEffect } from "react";
-// import axios from "axios";
-
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Login from "./pages/Login";
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
-
+import ProfileGroup from "./pages/ProfileGroup";
 import Home from "./pages/Home";
 import Information from "./pages/Information";
-// import DefaultLayout from "./components/Layouts/DefaultLayout";
+import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
-// import ProfileGroup from "./pages/ProfileGroup";
-// import Login from "./pages/Login";
-import ProfileGroup from "./pages/ProfileGroup/index.jsx";
-import Login from "./pages/Login/index.jsx";
-
-export const AccountContext = createContext();
+import Authentication from "./components/Authentication";
+import { SetUser } from "./components/Redux/Actions/UserAction";
 
 function App() {
-    // const [account, setAccount] = useState([]);
-    // const [error, setError] = useState("");
-    // const [loading,setLoading] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     axios
-    //         .get("http://localhost:5164/api/User")
-    //         .then((response) => {
-    //             setAccount(response.data);
-    //         })
-    //         .catch((error) => {
-    //             setError(error); // Xử lý lỗi
-    //             setLoading(false);
-    //         });
-    // }, []);
+    useEffect(() => {
+        const getuser = async () => {
+            const response = await dispatch(SetUser());
+            if (SetUser.fulfilled.match(response)) {
+                navigate("/");
+            }
+        };
+        getuser();
+    }, []);
 
     return (
-        <>
-            <Router>
-                <Routes>
-                    <Route path="/message" element={<Message />} />
-                    <Route path="/" element={<Home />} />
-                    {/* <Route path="/group" element={<GroupList />} /> */}
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/information/:userId" element={<Information />} />
-                    </Routes>
-           
-                {/* <Routes>
-                    <Route
-                        path="/login"
-                        element={<Login/>} />
-                    <Route path="*" element={<Login></Login>} />
-                </Routes> */}
-            </Router>
-        </>
+        <Routes>
+            <Route element={<DefaultLayout />}>
+                <Route
+                    path="/message"
+                    element={
+                        <Authentication>
+                            <Message />
+                        </Authentication>
+                    }
+                />
+                <Route
+                    path="/"
+                    element={
+                        <Authentication>
+                            <Home />
+                        </Authentication>
+                    }
+                />
+                {/* <Route
+                    path="/group"
+                    element={
+                        <Authentication>
+                            <GroupList />
+                        </Authentication>
+                    }
+                /> */}
+                <Route
+                    path="/profile"
+                    element={
+                        <Authentication>
+                            <Profile />
+                        </Authentication>
+                    }
+                />
+                <Route
+                    path="/profilegroup"
+                    element={
+                        <Authentication>
+                            <ProfileGroup />
+                        </Authentication>
+                    }
+                />
+                <Route
+                    path="/information"
+                    element={
+                        <Authentication>
+                            `<Information />
+                        </Authentication>
+                    }
+                />
+                <Route path="/login" element={<Login />} />
+                <Route path="*" element={<Login />} />
+            </Route>
+        </Routes>
     );
 }
 

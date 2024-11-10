@@ -6,13 +6,14 @@ import clsx from 'clsx';
 import styles from './Login.module.scss'; 
 import Button from '../../components/Button';
 import { login } from '~/components/Redux/Actions/AuthAction';
+import { SetUser } from '../../components/Redux/Actions/UserAction';
 import { useDispatch } from 'react-redux';
 import { registerUser } from '~/apis/index.js';
 
 function Login () {
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
   const [showPassword, setShowPassword] = useState(false); 
-  const nevigate = useNavigate()
+  const navigate = useNavigate()
   const dispatch = useDispatch();
 
   const initialValues = {
@@ -28,9 +29,20 @@ function Login () {
   const handleSubmit = async (values) => {
     // nevigate("/")
     const { email, password } = values; 
-    await dispatch(login({email,password}));
     // onLogin()
     // console.log('Login form submitted', values);
+
+    const actionResult = await dispatch(login({ email, password }));
+        if (login.fulfilled.match(actionResult)) {
+            if (actionResult.payload === true) {
+                await dispatch(SetUser());
+                navigate("/");
+            } else {
+                console.log("11");
+            }
+        } else {
+            console.log("Có lỗi xảy ra trong quá trình đăng nhập");
+        }
   };
 
   const handleRegisterSubmit = async (values) => {

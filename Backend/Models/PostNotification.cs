@@ -11,7 +11,8 @@ public partial class PostNotification
 
     public int FromUserId { get; set; }
 
-    public bool? TypeId { get; set; }
+    public int TypeId { get; set; }
+    public bool? IsRead { get; set; }
 
     public DateTime DateCreated { get; set; }
 
@@ -19,7 +20,5 @@ public partial class PostNotification
 
     public virtual Post Post { get; set; } = null!;
 
-    public virtual ICollection<PostNotificationToUser> PostNotificationToUsers { get; set; } = new List<PostNotificationToUser>();
-
-    public virtual TypePostNotification? Type { get; set; }
+    public virtual TypePostNotification Type { get; set; }
 }

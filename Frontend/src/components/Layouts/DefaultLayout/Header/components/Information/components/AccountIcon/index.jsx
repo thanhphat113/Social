@@ -1,32 +1,44 @@
-import { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext,useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { CustomTooltip } from "../../../../../../../GlobalStyles";
 import styles from "./AccountIcon.module.scss";
 import { typeContext } from "../../../..";
+import { logout } from "../../../../../../../Redux/Actions/AuthAction";
+import { SetUser } from "../../../../../../../Redux/Actions/UserAction";
 
 function AccountIcon(props) {
-    const user = props;
-    const {  handleClick } = useContext(typeContext);
+    const { handleClick } = useContext(typeContext);
+    const user = useSelector((state) => state.user.information)
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    
+    const handleClickLogout = async () => {
+        const result = await dispatch(logout());
+        if (logout.fulfilled.match(result)){
+            await dispatch(SetUser())
+            navigate("/login")
+        }
+    };
+
     return (
         <div className={styles.accounticon}>
-            <CustomTooltip title={user.title}>
+            <CustomTooltip title="Tài khoản">
                 <img
                     onClick={() => {
-                        props.onToggle('B')
-                        // setIsClicked(!isClicked);
+                        props.onToggle("B");
                     }}
                     className={styles.circle}
-                    src={user.img}
+                    src={ user.profilePicture || `/public/img/default/${user.genderId!==2 ? "man" : "woman"}_default.png`}
+                    alt="profile"
                 ></img>
             </CustomTooltip>
             {props.isActive && (
                 <div className={styles.content}>
                     <Link to="/profile" onClick={() => handleClick("profile")}>
                         <div className={styles.account}>
-                            <img src={user.img}></img>
-                            <span>{user.name}</span>
+                            <img src={user.profilePicture || `/public/img/default/${user.genderId!==2 ? "man" : "woman"}_default.png`} alt="profile"></img>
+                            <span>{user.lastName + " " + user.firstName}</span>
                         </div>
                     </Link>
                     <Link
@@ -38,12 +50,13 @@ function AccountIcon(props) {
                             <span>Thông tin cá nhân</span>
                         </div>
                     </Link>
-                    <Link>
-                        <div className={styles.choise}>
-                            <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                            <span>Đăng xuất</span>
-                        </div>
-                    </Link>
+                    <button
+                        className={styles.choise}
+                        onClick={() => handleClickLogout()}
+                    >
+                        <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Đăng xuất</span>
+                    </button>
                 </div>
             )}
         </div>

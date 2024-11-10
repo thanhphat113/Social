@@ -40,8 +40,9 @@ namespace Backend.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest) // Đổi sang async Task<IActionResult>
+        public async Task<IActionResult> Login([FromBody] Login loginRequest) // Đổi sang async Task<IActionResult>
         {
+            Console.WriteLine("Đây là: " + loginRequest.Email + " " + loginRequest.Password);
             try
             {
                 var (jwtToken, refreshToken) = await _authService.Login(loginRequest.Email, loginRequest.Password);
@@ -61,6 +62,7 @@ namespace Backend.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] string refreshToken) // Đổi sang async Task<IActionResult>

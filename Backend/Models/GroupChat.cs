@@ -7,7 +7,7 @@ public partial class GroupChat
 {
     public int GroupChatId { get; set; }
 
-    public string GroupChatName { get; set; } = null!;
+    public string? GroupChatName { get; set; } = null!;
 
     public string? CoverPhoto { get; set; }
 

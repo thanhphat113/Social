@@ -5,35 +5,38 @@ import styles from './SubHeader.module.scss'
 import Avatar from "../Avatar";
 import { FaCameraRotate, FaLocationDot } from "react-icons/fa6";
 import Button from "../Button";
-import { TickBlueIcon } from "../Icon";
-import { FaBriefcase, FaCalendarAlt,FaLock,FaUserFriends } from "react-icons/fa";
+// import { TickBlueIcon } from "../Icon";
+import {  FaCalendarAlt,FaLock,FaUserFriends } from "react-icons/fa";
 import { BiWorld } from "react-icons/bi";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
-function SubHeader({type='user', data,children}) {
+function SubHeader({children}) {
+    const {profile, isUser, isGroup, loading, error} = useSelector((state)=>state.profile)
     const [isActive, setIsActive] = useState(0)
     const handleClick = (index) => {
         setIsActive(index)
       }
+      console.log(profile)
     const avatarSize = window.innerWidth <= 768 ? '100px' : '120px'
     return ( 
         <div className={clsx(styles.subHeader)}>
                 <div className={clsx(styles.wrapper)}>
                     <div className={clsx(styles.coverPhoto)}>
                         <Image
-                        src={data.coverPhoto}
+                        src={profile.coverPhoto}
                         />
                         <Button color='secondary' size='large' className={clsx(styles.coverButton)}>
                         <FaCameraRotate className={clsx(styles.icon)} />
                         Đổi ảnh bìa</Button>
                     </div>
                     <div className={clsx(styles.info)}>
-                        {type==='user' ? (
+                        {isUser ? (
                         <div className={clsx(styles.avatarHolder)}>
                             <div className={clsx(styles.avatar)}>
                                 <Avatar 
                                 shape='circle'
-                                src={data.profilePicture}
+                                src={profile.profilePicture}
                                 size={avatarSize}
                                 className={clsx(styles.avatarShadow)}
                                 />
@@ -44,39 +47,38 @@ function SubHeader({type='user', data,children}) {
                             )}
                         <div className={clsx(styles.detail)}>
                             <div className={clsx(styles.userName)}>
-                                <h1>{data.name}</h1>
-                                {(type==='user'&& data.tickBlue) && <TickBlueIcon size='1.7rem'/>}
+                                <h1>{isUser?(profile.firstName+" "+profile.lastName):profile.groupName}</h1>
+                                {/* {(isUser&& data.tickBlue) && <TickBlueIcon size='1.7rem'/>} */}
                             </div>
-                            {type==='user'&&(
-                                <p>{data.totalConnections} friends</p>
+                            {isUser &&(
+                                <p>{profile.friends.length} friends</p>
                             )}
                             <div className={clsx(styles.description)}>
-                                {type==='user'?(
+                                {isUser?(
                                 <>
                                     <div>
-                                        <FaBriefcase />
-                                        <p>{data.job}</p>
+                                        <p style={{ fontSize: '18px' }}>{profile.bio}</p>
                                     </div>
                                     <div>
                                         <FaLocationDot />
-                                        <p>{data.location}</p>
+                                        <p>{profile.location}</p>
                                     </div>
                                 </>
                                 ):(
                                 <>
                                     <div>
-                                        {data.isPublic?(<BiWorld />):(<FaLock />)}
-                                        <p>{data.isPublic ?'Public':'Private'}</p>
+                                        {profile.privacy?(<BiWorld />):(<FaLock />)}
+                                        <p>{profile.isPublic ?'Public':'Private'}</p>
                                     </div>
                                     <div>
                                         <FaUserFriends />
-                                        <p>{data.totalConnections} members</p>
+                                        <p>{profile.membersCount} members</p>
                                     </div>
                                 </>
                                 )}
                                 <div>
                                     <FaCalendarAlt />
-                                    <p>Created at {data.dateUpdated}</p>
+                                    <p>Created at {profile.dateCreated}</p>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +97,7 @@ function SubHeader({type='user', data,children}) {
                          className={`${styles.item} ${isActive === 1 ? styles.active : ''}`}>About</a>
                         <a
                          onClick={() => handleClick(2)} 
-                         className={`${styles.item} ${isActive === 2 ? styles.active : ''}`}>Members {data.totalConnections?data.totalConnections:0}</a>
+                         className={`${styles.item} ${isActive === 2 ? styles.active : ''}`}>Review</a>
                         <a
                          onClick={() => handleClick(3)} 
                          className={`${styles.item} ${isActive === 3 ? styles.active : ''}`}>Media</a>
@@ -115,19 +117,6 @@ function SubHeader({type='user', data,children}) {
      );
 }
 SubHeader.propTypes = {
-    type: PropTypes.string,
-    data: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        totalConnections: PropTypes.number.isRequired,
-        connections: PropTypes.array.isRequired,
-        job: PropTypes.string,
-        location: PropTypes.string,
-        coverPhoto: PropTypes.string,
-        profilePicture: PropTypes.string,
-        isPublic: PropTypes.bool,
-        createdDate: PropTypes.string.isRequired,
-        tickBlue: PropTypes.bool,
-    }).isRequired,
     children: PropTypes.node,
 };
 
