@@ -35,7 +35,14 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
+builder.Services.AddScoped<HistorySearchService>();
+builder.Services.AddScoped<GroupChatService>();
 
+
+
+builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
+builder.Services.AddScoped<IHistorySearchRepository, HistorySearchRepository>();
+builder.Services.AddScoped<IChatInMessRepository, ChatInMessageRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<INotificationsRepository, RequestNotiRepository>();
 builder.Services.AddScoped<IPostNotiRepository, PostNotiRepository>();

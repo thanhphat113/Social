@@ -28,11 +28,9 @@ namespace Backend.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Accept([FromQuery] int otheruser)
 		{
-			var userId = int.Parse(GetCookie.GetUserIdFromCookie(Request));
-			Console.WriteLine("User1: " + userId + " User2: " + otheruser);
+			var userId = GetCookie.GetUserIdFromCookie(Request);
 			if (await _RelaContext.Accept(userId, otheruser))
 			{
-				Console.WriteLine("hâhhahahhaha");
 				if (await _NotiContext.Accept(userId, otheruser)) { Console.WriteLine("Chấp nhận rồi"); }
 				else Console.WriteLine("Chưa chấp nhận rồi");
 				return await Get(userId);
@@ -45,14 +43,14 @@ namespace Backend.Controllers
 		public async Task<ActionResult> Get([FromQuery] int id)
 		{
 			var userId = GetCookie.GetUserIdFromCookie(Request);
-			var requests = await _NotiContext.FindByUserId(int.Parse(userId));
+			var requests = await _NotiContext.FindByUserId(userId);
 			return Ok(requests);
 		}
 
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> delete(int id)
 		{
-			var userId = int.Parse(GetCookie.GetUserIdFromCookie(Request));
+			var userId = GetCookie.GetUserIdFromCookie(Request);
 			try
 			{
 				if (await _NotiContext.Delete(id)) return await Get(userId);

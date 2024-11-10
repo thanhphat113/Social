@@ -10,7 +10,7 @@ const Store = configureStore({
     reducer: {
         auth: authReducer,
         user: UserReducer,
-        friend: FriendReducer,
+        friends: FriendReducer,
         message: MessageReducer,
         profile: ProfileReducer
     },

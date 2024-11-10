@@ -28,7 +28,7 @@ namespace Backend.Services
 			}
 		}
 
-		public Task<bool> Add(Relationship value)
+		public Task<Relationship> Add(Relationship value)
 		{
 			throw new NotImplementedException();
 		}
@@ -48,7 +48,7 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<IEnumerable<Relationship>> GetListByType(int condition, string type)
+		public Task<IEnumerable<Relationship>> GetListById(int userid)
 		{
 			throw new NotImplementedException();
 		}

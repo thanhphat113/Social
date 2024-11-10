@@ -1,45 +1,65 @@
-.wrapper{
-	display:flex;
-	flex-direction: column;
-	padding:1rem 1rem;
-	gap:1rem;
-	img{
-		width: 7rem;
-		height: 7rem;
-		border-radius: 50%;
-		border: 0.5px solid #333;
-	}
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1rem;
+    gap: 1rem;
+    img {
+        width: 7rem;
+        height: 7rem;
+        border-radius: 50%;
+        border: 0.5px solid #333;
+    }
 
-	.item{
-		cursor: pointer;
-		display: flex; 
-		padding:1rem 0.5rem;
-		gap:1rem;
-		border:none;
-		background: none;
-		.content{
-			flex:1;
-			p{
-				width: 20rem;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				opacity: 0.5;
-			}
-		}
+    .item {
+        cursor: pointer;
+        display: flex;
+        padding: 1rem 0.5rem;
+        gap: 1rem;
+        border: none;
+        background: none;
+        .content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-top: 1.3rem;
+            strong {
+                text-align: start;
+            }
+            .lastmess {
+                display: flex;
+                width: 100%;
+                p {
+                    text-align: start;
+                    width: 80%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    opacity: 0.5;
+                    font-size: 1.3rem;
+                }
+                small {
+                    opacity: 0.5;
+                }
+            }
 
-		span{
-			width: 2rem;
-            height: 2rem;
+            .NotRead {
+                opacity: 1;
+                font-size: medium;
+				font-weight: bolder;
+            }
+        }
+
+        span {
+            width: 1.5rem;
+            height: 1.5rem;
             border-radius: 50%;
             background-color: rgb(87, 228, 228);
             display: inline-block;
-		}
+        }
 
-		&:hover{
-			background-color: #d3cfcf;
-			border-radius: 10px;
-		}
-	}
-
+        &:hover {
+            background-color: #d3cfcf;
+            border-radius: 10px;
+        }
+    }
 }

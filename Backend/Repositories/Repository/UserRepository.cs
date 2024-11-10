@@ -26,7 +26,7 @@ public class UserRepository : IUserRepository
 		}
 	}
 
-	public async Task<IEnumerable<User>> GetListByType(int condition, string type)
+	public async Task<IEnumerable<User>> GetListById(int userid)
 	{
 		throw new NotImplementedException();
 	}
@@ -42,7 +42,7 @@ public class UserRepository : IUserRepository
 			return null;
 		}
 	}
-	public async Task<bool> Add(User user)
+	public async Task<User> Add(User user)
 	{
 		try
 		{
@@ -52,12 +52,12 @@ public class UserRepository : IUserRepository
 			await _context.Users.AddAsync(user);
 			await _context.SaveChangesAsync();
 
-			return true;
+			return user;
 		}
 		catch (Exception ex)
 		{
 			Console.WriteLine("Đây là lỗi: " + ex.Message);
-			return false;
+			throw;
 		}
 	}
 	public async Task<bool> Update(User value)
@@ -140,8 +140,22 @@ public class UserRepository : IUserRepository
 					u.LastName,
 					u.FirstName,
 					u.ProfilePicture,
-					u.GenderId
+					u.GenderId,
 				})
 				.ToListAsync();
+	}
+
+	public async Task<IEnumerable<User>> GetFriendByName(int userid, string name)
+	{
+		var users = await _context.Relationships
+				.Where(u => u.FromUserId == userid || u.ToUserId == userid)
+				.Where(u => u.TypeRelationship == 2)
+				.Where(u => u.FromUserId == userid ?
+						(u.ToUser.FirstName.Contains(name) || u.ToUser.LastName.Contains(name)) :
+						(u.FromUser.FirstName.Contains(name) || u.FromUser.LastName.Contains(name)))
+				.Select(u => u.FromUserId == userid ? u.ToUser : u.FromUser)
+				.ToListAsync();
+
+		return users;
 	}
 }

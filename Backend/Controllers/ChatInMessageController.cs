@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Backend.Services;
 using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -15,16 +11,20 @@ namespace Backend.Controllers
 	public class ChatInMessageController : ControllerBase
 	{
 		private readonly ChatInMessageService _mess;
+		private readonly MessageService _message;
+		private readonly UserService _userContext;
 
-		public ChatInMessageController(ChatInMessageService chat)
+		public ChatInMessageController(UserService userContext, ChatInMessageService chat, MessageService message)
 		{
+			_userContext = userContext;
 			_mess = chat;
+			_message = message;
 		}
 
 		[HttpGet]
-		public ActionResult<IEnumerable<string>> Get()
+		public async Task<IActionResult> Get([FromQuery] int user1, [FromQuery] int user2)
 		{
-			return new string[] { "value1", "value2" };
+			return Ok(await _mess.GetMessage(user1, user2));
 		}
 
 		[HttpGet("{id}")]
@@ -36,17 +36,40 @@ namespace Backend.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] ChatInMessage mess)
 		{
-			return Ok(await _mess.Add(mess));
+			Console.WriteLine($"Received otheruser: {mess.Otheruser}");
+			Console.WriteLine($"Received userid: {mess.FromUser}");
+			Console.WriteLine($"Received MessagesId: {mess.MessagesId}");
+
+			if (mess.MessagesId == -1)
+			{
+				var item = await _message.Add(new() { User1 = mess.FromUser, User2 = mess.Otheruser });
+				if (item == null) return BadRequest("Lỗi việc tạo chat mới");
+				mess.MessagesId = item.MessagesId;
+			}
+
+			var result = await _mess.Add(mess);
+
+			if (result == null)
+				return BadRequest("Lỗi việc tạo tin nhắn mới");
+
+			return Ok(result);
 		}
 
 		[HttpPut("{id}")]
-		public void Put(int id, [FromBody] string value)
+		public async Task<IActionResult> Put(int id)
 		{
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			if (!await _mess.ReadMess(id)) return BadRequest("Không thể thực hiện tác vụ");
+
+			var friends = await _userContext.GetFriends(UserId);
+			return Ok(friends);
 		}
 
 		[HttpDelete("{id}")]
-		public void Delete(int id)
+		public async Task<IActionResult> Delete(int id)
 		{
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			return Ok(await _mess.Delete(id));
 		}
 	}
 }

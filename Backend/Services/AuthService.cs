@@ -36,9 +36,9 @@ public class AuthService
         // Băm mật khẩu và lưu vào User
         newUser.Password = _passwordHasher.HashPassword(newUser, password);
 
-        bool userAdded = await _userRepository.Add(newUser); // Thêm await
+        var userAdded = await _userRepository.Add(newUser); // Thêm await
 
-        if (!userAdded) throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
+        if (userAdded == null) throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
 
         // var newJwtToken = _jwtService.GenerateAccessToken(user);
         // var newRefreshToken = _jwtService.GenerateRefreshToken(user);

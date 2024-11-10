@@ -26,12 +26,6 @@ namespace Backend.Controllers
 			return "value";
 		}
 
-		[HttpGet("/chatinmess")]
-		public async Task<IActionResult> Get([FromQuery] int user1, [FromQuery] int user2)
-		{
-			return Ok(await _mess.GetMessage(user1, user2));
-		}
-
 		[HttpPost]
 		public void Post([FromBody] string value)
 		{

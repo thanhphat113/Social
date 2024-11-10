@@ -26,13 +26,15 @@ public partial class User
 
     public int? GenderId { get; set; }
 
+    public bool? IsOnline { get; set; } = false;
+
     public DateTime DateCreated { get; set; }
 
     public DateTime DateUpdated { get; set; }
 
     [JsonIgnore]
     public virtual ICollection<ChatInGroup> ChatInGroups { get; set; } = new List<ChatInGroup>();
-    [JsonIgnore]
+    // [JsonIgnore]
     public virtual ICollection<ChatInMessage> ChatInMessages { get; set; } = new List<ChatInMessage>();
     [JsonIgnore]
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();

@@ -9,14 +9,17 @@ namespace Backend.Services
     public class UserService : IService<User>
     {
         private readonly IUserRepository _userRepo;
+        private readonly IChatInMessRepository _mess;
 
-        public UserService(IUserRepository repo)
+
+        public UserService(IUserRepository repo, IChatInMessRepository mess)
         {
             _userRepo = repo;
+            _mess = mess;
         }
         public async Task<string> Add(User product)
         {
-            if (await _userRepo.Add(product))
+            if (await _userRepo.Add(product) != null)
             {
                 return "Đăng ký tài khoản thành công";
             }
@@ -64,6 +67,29 @@ namespace Backend.Services
         public async Task<IEnumerable<Object>> GetListByName(string name)
         {
             return await _userRepo.GetUsersByName(name);
+        }
+
+        public async Task<IEnumerable<User>> FriendsWithChat(int UserId, IEnumerable<User> friends)
+        {
+            foreach (var item in friends)
+            {
+                item.ChatInMessages = await _mess.GetMessage(UserId, item.UserId);
+            }
+            return friends;
+        }
+
+        public async Task<IEnumerable<User>> GetFriendsByName(int userid, string name)
+        {
+            try
+            {
+                var friends = await _userRepo.GetFriendByName(userid, name);
+                var results = await FriendsWithChat(userid, friends);
+                return results;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 

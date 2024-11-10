@@ -1,0 +1,79 @@
+.wrapper {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 100;
+
+    .content {
+        opacity: 1;
+        background-color: white;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem 2.5rem;
+        p {
+            font-size: larger;
+        }
+        .title {
+            text-align: center;
+            position: relative; /* Để pseudo-element có thể được căn chỉnh đúng */
+            padding: 10px 0 ;
+			font-weight: bold;
+			font-size: 3rem;
+
+            &::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                width: 105%;
+                height: 2px;
+                background-color: rgba(0, 0, 0, 0.3);
+                transform: translateX(-50%);
+            }
+        }
+    }
+
+    .action {
+        text-align: end;
+		margin-bottom: 1rem;
+		font-size: larger;
+        .cancel {
+            margin-left: 1rem;
+            border: none;
+            background: none;
+            &:hover {
+                text-decoration-line: underline;
+            }
+        }
+        .accept {
+            background-color: rgba(20, 203, 216, 0.5);
+            height: 3.5rem;
+            border-radius: 10px;
+            border: none;
+
+            &:hover {
+                animation: bounce 1s infinite;
+            }
+        }
+    }
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0); /* Vị trí ban đầu */
+    }
+    50% {
+        transform: translateY(-6px); /* Nảy lên 10px */
+    }
+    100% {
+        transform: translateY(0); /* Quay lại vị trí ban đầu */
+    }
+}

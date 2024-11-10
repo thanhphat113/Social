@@ -34,7 +34,7 @@ namespace Backend.Repositories.Repository
 			return true;
 		}
 
-		public Task<bool> Add(Relationship value)
+		public Task<Relationship> Add(Relationship value)
 		{
 			throw new NotImplementedException();
 		}
@@ -54,7 +54,7 @@ namespace Backend.Repositories.Repository
 			throw new NotImplementedException();
 		}
 
-		public Task<IEnumerable<Relationship>> GetListByType(int condition, string type)
+		public Task<IEnumerable<Relationship>> GetListById(int user)
 		{
 			throw new NotImplementedException();
 		}

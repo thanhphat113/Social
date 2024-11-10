@@ -33,7 +33,7 @@ namespace Backend.Repositories.Repository
 			return true;
 		}
 
-		public Task<bool> Add(RequestNotification value)
+		public Task<RequestNotification> Add(RequestNotification value)
 		{
 			throw new NotImplementedException();
 		}
@@ -83,7 +83,7 @@ namespace Backend.Repositories.Repository
 				.FirstOrDefaultAsync(r => r.NotificationId == id);
 		}
 
-		public Task<IEnumerable<RequestNotification>> GetListByType(int condition, string type)
+		public Task<IEnumerable<RequestNotification>> GetListById(int userid)
 		{
 			throw new NotImplementedException();
 		}

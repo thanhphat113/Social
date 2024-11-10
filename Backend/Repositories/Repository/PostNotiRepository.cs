@@ -17,7 +17,7 @@ namespace Backend.Repositories.Repository
 			_context = context;
 		}
 
-		public Task<bool> Add(PostNotification value)
+		public Task<PostNotification> Add(PostNotification value)
 		{
 			throw new NotImplementedException();
 		}
@@ -56,7 +56,7 @@ namespace Backend.Repositories.Repository
 			throw new NotImplementedException();
 		}
 
-		public Task<IEnumerable<PostNotification>> GetListByType(int condition, string type)
+		public Task<IEnumerable<PostNotification>> GetListById(int userid)
 		{
 			throw new NotImplementedException();
 		}

@@ -4,54 +4,38 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Repositories.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Services
 {
-	public class MessageService : IService<Message>
+	public class MessageService : IMessageRepository
 	{
 		private readonly IMessageRepository _messRepo;
 		public MessageService(IMessageRepository mess)
 		{
 			_messRepo = mess;
 		}
-		public Task<string> Add(Message product)
-		{
-			throw new NotImplementedException();
-		}
 
-		public Task<string> Delete(int id)
-		{
-			throw new NotImplementedException();
-		}
 
-		public Task<IEnumerable<Message>> GetAll()
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<Message> GetById(int id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<Message>> GetListById(int id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<IEnumerable<ChatInMessage>> GetMessage(int user1, int user2)
+		public async Task<Message> Add(Message value)
 		{
 			try
 			{
-				return await _messRepo.GetMessage(user1, user2);
+				return await _messRepo.Add(value);
 			}
-			catch
+			catch (System.Exception ex)
 			{
 				return null;
+				throw;
 			}
 		}
 
-		public Task<string> Update(Message product)
+		public Task<Message> FindBy2User(int user1, int user2)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<bool> Update(Message value)
 		{
 			throw new NotImplementedException();
 		}

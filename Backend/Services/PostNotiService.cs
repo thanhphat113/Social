@@ -15,7 +15,7 @@ namespace Backend.Services
 			_repo = repo;
 		}
 
-		public Task<bool> Add(PostNotification product)
+		public Task<PostNotification> Add(PostNotification product)
 		{
 			throw new NotImplementedException();
 		}
@@ -54,7 +54,7 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<IEnumerable<PostNotification>> GetListByType(int condition, string type)
+		public Task<IEnumerable<PostNotification>> GetListById(int userid)
 		{
 			throw new NotImplementedException();
 		}

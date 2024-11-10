@@ -63,13 +63,13 @@
 
         &::before {
             content: "";
-            width: 90%; /* Độ dài của viền trên */
-            height: 0.6px; /* Độ dày của viền */
-            background-color: #333; /* Màu của viền */
+            width: 90%; 
+            height: 0.6px; 
+            background-color: #333; 
             position: absolute;
-            top: 0; /* Đặt nó ở đầu của .content */
-            left: 50%; /* Đặt nó ở giữa theo chiều ngang */
-            transform: translateX(-50%); /* Căn giữa nó */
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
         }
 		.item {
 			&:hover{

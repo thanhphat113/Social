@@ -1,32 +1,116 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { getFriendList } from '../Actions/FriendActions';
+import { createSlice } from "@reduxjs/toolkit";
+import { SetUser } from "../Actions/UserAction";
+import { deleteMess } from "../Actions/MessageActions";
+import { addMess, readMess } from "../Actions/MessageActions";
 
 const FriendSlice = createSlice({
-    name: 'friend',
+    name: "friends",
     initialState: {
-        friends: [],
-		isLoad: false,
-		isError: false
+        searchFriends: [],
+        allFriends: [],
+        isLoad: false,
+        isError: false,
     },
-    reducers: {},
-	extraReducers: (builder) => {
-		builder 
-			.addCase(getFriendList.fulfilled,(state, action) => {
-				state.friends = action.payload	
-				state.isLoad = false
-				state.isError = false
-			})
-			.addCase(getFriendList.pending,(state) => {
-				state.friends = []
-				state.isLoad = true
-				state.isError = false
-			})
-			.addCase(getFriendList.rejected,(state) => {
-				state.friends = []	
-				state.isLoad = false
-				state.isError = true
-			})
-	}
+    reducers: {
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(SetUser.fulfilled, (state, action) => {
+                const infor = action.payload;
+                const sortFriends = infor?.friends.sort((a, b) => {
+                    const latestA = a.chatInMessages.reduce((latest, message) => {    
+                        return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
+                      }, null);
+                    
+                      const latestB = b.chatInMessages.reduce((latest, message) => {
+                        return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
+                      }, null);
+
+                      return new Date(latestB?.dateCreated) - new Date(latestA?.dateCreated)
+                });
+
+                state.allFriends = sortFriends || [];
+                state.isLoad = false;
+                state.isError = false;
+            })
+            .addCase(SetUser.pending, (state) => {
+                state.allFriends = [];
+                state.isLoad = true;
+                state.isError = false;
+            })
+            .addCase(SetUser.rejected, (state) => {
+                state.allFriends = [];
+                state.isLoad = false;
+                state.isError = true;
+            })
+            .addCase(deleteMess.fulfilled, (state, action) => {
+                const { friendId, chatId, isDelete } = action.payload;
+
+                const indexFriend = state.allFriends.findIndex(
+                    (i) => i.userId === friendId
+                );
+
+                const indexChat = state.allFriends[
+                    indexFriend
+                ].chatInMessages.findIndex((i) => i.chatId === chatId);
+
+                if (isDelete) {
+                    state.allFriends[indexFriend].chatInMessages[
+                        indexChat
+                    ].content = "Tin nhắn đã thu hồi";
+                    state.allFriends[indexFriend].chatInMessages[
+                        indexChat
+                    ].isRecall = true;
+                }
+
+                state.isLoad = false;
+                state.isError = false;
+            })
+            .addCase(deleteMess.pending, (state) => {
+                state.isLoad = true;
+                state.isError = false;
+            })
+            .addCase(deleteMess.rejected, (state) => {
+                state.isLoad = false;
+                state.isError = true;
+            })
+            .addCase(addMess.fulfilled, (state, action) => {
+                const { friendId, message } = action.payload;
+                console.log(message);
+
+                const index = state.allFriends.findIndex(
+                    (i) => i.userId === friendId
+                );
+
+                if (index !== -1) {
+                    state.allFriends[index].chatInMessages.push(message);
+                }
+
+                state.allFriends.sort((a, b) => {
+                    const latestA = a.chatInMessages.reduce((latest, message) => {    
+                        return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
+                      }, null);
+                    
+                      const latestB = b.chatInMessages.reduce((latest, message) => {
+                        return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
+                      }, null);
+    
+                      return new Date(latestB.dateCreated) - new Date(latestA.dateCreated)
+                });
+
+                state.isLoad = false;
+                state.isError = false;
+            })
+            .addCase(addMess.rejected, (state, action) => {
+                console.log(action.payload);
+            })
+            .addCase(readMess.fulfilled, (state, action) => {
+                state.allFriends = action.payload;
+            })
+            .addCase(readMess.rejected, (state, action) => {
+                console.log(action.payload);
+            });
+    },
 });
 
 export default FriendSlice.reducer;

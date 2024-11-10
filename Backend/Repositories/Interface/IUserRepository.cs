@@ -13,5 +13,6 @@ namespace Backend.Repositories.Interface
 
 		public Task<User> FindToLogin(string email, string password);
 		public Task<IEnumerable<Object>> GetUsersByName(string name);
+		public Task<IEnumerable<User>> GetFriendByName(int userid, string name);
 	}
 }

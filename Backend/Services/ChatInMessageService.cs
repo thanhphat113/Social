@@ -1,34 +1,36 @@
 
 using Backend.Models;
 using Backend.Repositories.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace Backend.Services
 {
-	public class ChatInMessageService : IService<ChatInMessage>
+	public class ChatInMessageService : IChatInMessRepository
 	{
-		private readonly IRepository<ChatInMessage> _chatRepo;
+		private readonly IChatInMessRepository _chatRepo;
 
-		public ChatInMessageService(IRepository<ChatInMessage> chatRepo)
+		public ChatInMessageService(IChatInMessRepository chatRepo)
 		{
 			_chatRepo = chatRepo;
 		}
 
-		public async Task<string> Add(ChatInMessage mess)
+		public async Task<ChatInMessage> Add(ChatInMessage mess)
 		{
-			if (await _chatRepo.Add(mess))
+			try
 			{
-				return "Thêm thành công";
+				return await _chatRepo.Add(mess);
 			}
-			else
+			catch (System.Exception ex)
 			{
-				return "Thêm thất bại";
+				Console.WriteLine("Lỗi: " + ex);
+				throw;
 			}
 		}
 
-		public Task<string> Delete(int id)
+		public async Task<bool> Delete(int id)
 		{
-			throw new NotImplementedException();
+			return await _chatRepo.Delete(id);
 		}
 
 		public Task<IEnumerable<ChatInMessage>> GetAll()
@@ -46,7 +48,32 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<string> Update(ChatInMessage product)
+		public async Task<ICollection<ChatInMessage>> GetMessage(int user1, int user2)
+		{
+			try
+			{
+				return await _chatRepo.GetMessage(user1, user2);
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		public async Task<bool> ReadMess(int user1)
+		{
+			try
+			{
+				return await _chatRepo.ReadMess(user1);
+			}
+			catch (System.Exception ex)
+			{
+				return false;
+				throw;
+			}
+		}
+
+		public Task<bool> Update(ChatInMessage product)
 		{
 			throw new NotImplementedException();
 		}

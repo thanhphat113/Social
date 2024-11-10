@@ -7,17 +7,14 @@ import styles from "./DetailMessage.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
 import {
     addMess,
-    findMessById,
+    deleteMess,
 } from "../../../../components/Redux/Actions/MessageActions";
+import Validate from "../../../../components/Validate";
 
 function DetailMessage({ onShow }) {
-    const friends = useSelector((state) => state.user.friends);
+    const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
     const currentFriendId = useSelector((state) => state.message.currentUser);
-    const InforCurrentFriend = friends.find(
-        (u) => u.userId === currentFriendId
-    );
-    const { messageId, message } = useSelector((state) => state.message);
 
     const dispatch = useDispatch();
     const [isSending, setIsSending] = useState(false);
@@ -25,7 +22,20 @@ function DetailMessage({ onShow }) {
     const [hoveredMessageId, setHoveredMessageId] = useState(null);
     const [mess, setMess] = useState("");
 
+
+    const [typeShow, setTypeShow] = useState();
+    const [targetMess, setTargetMess] = useState([]);
+
     const messagesEndRef = useRef(null);
+
+    const InforCurrentFriend = friends.find(
+        (u) => u.userId === currentFriendId
+    );
+
+    const messageId = InforCurrentFriend?.chatInMessages[0].messagesId || -1;
+
+    const message = InforCurrentFriend?.chatInMessages;
+
 
     useEffect(() => {
         setMess("");
@@ -40,21 +50,19 @@ function DetailMessage({ onShow }) {
             const MessagesId = messageId;
             const FromUser = userid;
             const Content = mess;
+            const Otheruser = currentFriendId;
+            console.log("Đây là: " + Otheruser);
 
-            if (isSending) return; // Ngăn không cho gửi thêm tin nhắn nếu đang gửi
+            if (isSending) return;
 
             setIsSending(true);
 
             const response = await dispatch(
-                addMess({ MessagesId, FromUser, Content })
+                addMess({ MessagesId, FromUser, Content, Otheruser })
             );
+
             if (addMess.fulfilled.match(response)) {
-                await dispatch(
-                    findMessById({ user1: userid, user2: currentFriendId })
-                );
                 setMess("");
-            } else {
-                console.log("Lỗi chat");
             }
 
             setIsSending(false);
@@ -66,6 +74,15 @@ function DetailMessage({ onShow }) {
             handleSendMessage();
         }
     };
+
+    const onAccept = () => {
+        dispatch(deleteMess({id: targetMess, Otheruser:currentFriendId}))
+        setTypeShow(null);
+    }
+
+    const onCancel = () => {
+        setTypeShow(null)
+    }
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
@@ -95,10 +112,10 @@ function DetailMessage({ onShow }) {
                                 }_default.png`
                             }
                         ></img>
-                        <h2>
+                        <strong>
                             {InforCurrentFriend.lastName}{" "}
                             {InforCurrentFriend.firstName}
-                        </h2>
+                        </strong>
                     </div>
                 </CustomTooltip>
                 <div className={styles.action}>
@@ -143,27 +160,46 @@ function DetailMessage({ onShow }) {
                                     {hoveredMessageId === mess.chatId &&
                                         userid === mess.fromUser && (
                                             <>
-                                                <CustomTooltip title="Thu hồi">
-                                                    <i
-                                                        className={clsx(
-                                                            styles.delete,
-                                                            "fa-solid fa-trash-can"
-                                                        )}
-                                                    ></i>
-                                                </CustomTooltip>
-                                                <CustomTooltip title="Chỉnh sửa">
-                                                    <i
-                                                        className={clsx(
-                                                            styles.update,
-                                                            "fa-solid fa-pencil"
-                                                        )}
-                                                    ></i>
-                                                </CustomTooltip>
+                                                {!mess.isRecall && (
+                                                    <>
+                                                        {" "}
+                                                        <CustomTooltip title="Thu hồi">
+                                                            <i
+                                                                className={clsx(
+                                                                    styles.delete,
+                                                                    "fa-solid fa-rotate-left"
+                                                                )}
+                                                                onClick={() => {
+                                                                    setTypeShow("recall")
+                                                                    setTargetMess(mess.chatId)
+                                                                    }}
+                                                                
+                                                            ></i>
+                                                        </CustomTooltip>
+                                                        <CustomTooltip title="Chỉnh sửa">
+                                                            <i
+                                                                className={clsx(
+                                                                    styles.update,
+                                                                    "fa-solid fa-pencil"
+                                                                )}
+                                                            ></i>
+                                                        </CustomTooltip>
+                                                    </>
+                                                )}
                                             </>
                                         )}
                                     <CustomTooltip title={formattedTime}>
                                         <div className={styles.mess}>
-                                            <p> {mess.content}</p>
+                                            <p
+                                                className={clsx({
+                                                    [styles.recall]:
+                                                        mess.isRecall,
+                                                })}
+                                            >
+                                                {!mess.isRecall
+                                                    ? mess.content
+                                                    : "Bạn đã thu hồi tin nhắn"}
+                                            </p>
                                         </div>
                                     </CustomTooltip>
                                 </div>
@@ -187,6 +223,8 @@ function DetailMessage({ onShow }) {
                     className="fa-solid fa-paper-plane"
                 ></i>
             </div>
+
+            {typeShow === "recall" && <Validate onAccept = { onAccept } onCancel={ onCancel } message={"Bạn có chắc chắn muốn thu hồi tin nhắn này?"} />}
         </div>
     );
 }

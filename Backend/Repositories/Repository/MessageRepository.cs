@@ -12,40 +12,25 @@ namespace Backend.Repositories.Repository
 		{
 			_context = context;
 		}
-		public Task<bool> Add(Message value)
+
+		public async Task<Message> Add(Message value)
 		{
-			throw new NotImplementedException();
+			var item = await FindBy2User(value.User1, value.User2);
+
+			if (item == null) _context.Messages.Add(value);
+			await _context.SaveChangesAsync();
+
+			return value;
 		}
 
-		public Task<bool> Delete(int id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<Message>> GetAll()
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<Message> GetById(int id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<Message>> GetListByType(int condition, string type)
-		{
-			throw new NotImplementedException();
-		}
-
-		public async Task<IEnumerable<ChatInMessage>> GetMessage(int user1, int user2)
+		public async Task<Message> FindBy2User(int user1, int user2)
 		{
 			return await _context.Messages
-						.Where(m => m.User1 == user1 || m.User2 == user1)
-						.Where(m => m.User1 == user2 || m.User2 == user2)
-						.SelectMany(m => m.ChatInMessages)
-						.ToListAsync();
-		}
+					.FirstOrDefaultAsync(u =>
+						(u.User1 == user1 && u.User2 == user2) ||
+						(u.User1 == user2 && u.User2 == user1));
 
+		}
 
 		public Task<bool> Update(Message value)
 		{
