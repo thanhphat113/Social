@@ -29,7 +29,7 @@ public class PostRepository : IRepositories<Post>
 
     public async Task<Post> GetById(int id)
     {
-        return await _context.Posts.FindAsync(id); 
+        return await _context.Posts.FindAsync(id);
     }
 
     public async Task<bool> Add(Post post)
@@ -50,7 +50,6 @@ public class PostRepository : IRepositories<Post>
     {
         try
         {
-            post.MediaFiles = mediaFiles;
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();
             return true;

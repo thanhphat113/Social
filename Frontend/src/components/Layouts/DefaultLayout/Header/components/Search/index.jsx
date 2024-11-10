@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useSelector } from "react-redux";
 import clsx from "clsx";
 import styles from "./Search.module.scss";
 import ShowList from "./components/ShowList";
@@ -7,15 +8,38 @@ import axios from "axios";
 function Search() {
     const [isClick, setIsClick] = useState(false);
     const [search, setSearch] = useState("");
-    const [searchs, setSearchs] = useState([]);
+    const history = useSelector((state) => state.user.historysearch);
+    const [fakeSearchs, setFakeSearch] = useState([])
+
+    const lists = fakeSearchs.length > 0 ? fakeSearchs : history
+
+
+    const containerRef = useRef(null);
+
+
+    const handleClickOutside = (event) => {
+        if (containerRef.current && !containerRef.current.contains(event.target)) {
+            setIsClick(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
 
     useEffect( () => {
         const fetchData = async () => {
-            if (search) { 
+            if (search !== "") {
                 const results = await GetListByName();
                 if (results) {
-                    setSearchs(results); 
+                    setFakeSearch(results);
                 }
+            }else{
+                setFakeSearch([])
             }
         };
         fetchData();
@@ -24,9 +48,9 @@ function Search() {
     const GetListByName = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:5164/api/User/findbyname`,{
+                `http://localhost:5164/api/User/users-by-name`,{
                 params: { name: search },
-                withCredentials: true 
+                withCredentials: true
             });
             return response.data;
         } catch {
@@ -35,7 +59,7 @@ function Search() {
     };
 
     return (
-        <div className={clsx(styles.wrapper)}>
+        <div className={clsx(styles.wrapper)} ref={containerRef}>
             <img
                 src="/public/img/Cloudy.png"
                 alt="logo"
@@ -54,7 +78,6 @@ function Search() {
                     onChange={(e) => setSearch(e.target.value)}
                     value={search}
                     onFocus={() => setIsClick(true)}
-                    onBlur={() => setIsClick(false)}
                     className={clsx(styles.searcharea, {
                         [styles.clicked]: isClick,
                     })}
@@ -62,10 +85,10 @@ function Search() {
                 />
                 {isClick && (
                     <div className={styles.showlist}>
-                        {searchs && searchs.length > 0 ? (
-                            <ShowList list={searchs} type={true} />
+                        {lists && lists.length > 0 ? (
+                            <ShowList list={lists} history={history} type={true} key="1" />
                         ) : (
-                            <p style={{ paddingLeft: "10px" }}>
+                            <p style={{ paddingLeft: "10px" }} key="2">
                                 Không có tìm kiếm nào gần đây
                             </p>
                         )}

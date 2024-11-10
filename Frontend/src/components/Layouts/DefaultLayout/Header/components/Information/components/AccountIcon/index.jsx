@@ -35,14 +35,14 @@ function AccountIcon(props) {
             </CustomTooltip>
             {props.isActive && (
                 <div className={styles.content}>
-                    <Link to="/profile" onClick={() => handleClick("profile")}>
+                    <Link to={`/${user.userId}`} onClick={() => handleClick("profile")}>
                         <div className={styles.account}>
                             <img src={user.profilePicture || `/public/img/default/${user.genderId!==2 ? "man" : "woman"}_default.png`} alt="profile"></img>
                             <span>{user.lastName + " " + user.firstName}</span>
                         </div>
                     </Link>
                     <Link
-                        to="/information"
+                        to={`/information/${user.userId}`}
                         onClick={() => handleClick("profile")}
                     >
                         <div className={styles.choise}>
