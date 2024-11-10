@@ -15,7 +15,11 @@ public class PostRepository : IRepositories<Post>
     {
         try
         {
-            return await _context.Posts.ToListAsync();
+            return await _context.Posts
+                .Include(p => p.CreatedByUser)
+                .Include(p => p.Media)
+                .OrderByDescending(p => p.DateCreated)
+                .ToListAsync();
         }
         catch (Exception e)
         {
@@ -25,7 +29,7 @@ public class PostRepository : IRepositories<Post>
 
     public async Task<Post> GetById(int id)
     {
-        return await _context.Posts.FindAsync(id); // Tìm bài đăng theo ID
+        return await _context.Posts.FindAsync(id); 
     }
 
     public async Task<bool> Add(Post post)
@@ -39,6 +43,21 @@ public class PostRepository : IRepositories<Post>
         catch
         {
             return false; // Trả về false nếu có lỗi xảy ra
+        }
+    }
+
+    public async Task<bool> AddPostWithMedia(Post post, List<Media> mediaFiles)
+    {
+        try
+        {
+            post.MediaFiles = mediaFiles;
+            await _context.Posts.AddAsync(post);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 

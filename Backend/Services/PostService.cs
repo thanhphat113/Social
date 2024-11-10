@@ -2,6 +2,7 @@
 
 using Backend.Models;
 using Backend.Repositories;
+using Backend.DTO;
 
 public class PostService
 {
@@ -12,9 +13,28 @@ public class PostService
         _postRepository = postRepository;
     }
 
-    public async Task<List<Post>> GetAllPost()
+    public async Task<List<PostDTO>> GetAllPost()
     {
-        return await _postRepository.GetAll();
+        var posts = await _postRepository.GetAll();
+        
+        return posts.Select(post => new PostDTO
+        {
+            PostId = post.PostId,
+            Content = post.Content,
+            DateCreated = post.DateCreated,
+            CreatedByUser = new UserDTO
+            {
+                UserId = post.CreatedByUser.UserId,
+                Name = $"{post.CreatedByUser.FirstName} {post.CreatedByUser.LastName}",
+                Email = post.CreatedByUser.Email
+            },
+            ImageUrls = post.Media.Select(m => m.Src).ToList()
+        }).ToList();
+    }
+    
+    public async Task<bool> AddPostWithMedia(Post post, List<Media> mediaFiles)
+    {
+        return await _postRepository.AddPostWithMedia(post, mediaFiles);
     }
 
     public async Task<Post> GetPostById(int id)
