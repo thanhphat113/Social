@@ -6,7 +6,6 @@ import { addMess, readMess } from "../Actions/MessageActions";
 const FriendSlice = createSlice({
     name: "friends",
     initialState: {
-        searchFriends: [],
         allFriends: [],
         isLoad: false,
         isError: false,
@@ -26,7 +25,7 @@ const FriendSlice = createSlice({
                         return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
                       }, null);
 
-                      return new Date(latestB?.dateCreated) - new Date(latestA?.dateCreated)
+                      return new Date(latestB.dateCreated) - new Date(latestA.dateCreated)
                 });
 
                 state.allFriends = sortFriends || [];

@@ -5,21 +5,37 @@ using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Repositories.Interface;
 
+using Backend.Services.Interface;
+
 namespace Backend.Services
 {
-	public class RequestNotiService : INotificationsRepository
+	public class RequestNotiService : INotificationsService
 	{
-		private readonly INotificationsRepository _Repo;
-		public RequestNotiService(INotificationsRepository Repo)
+		private readonly IUnitOfWork _unit;
+		public RequestNotiService(IUnitOfWork unit)
 		{
-			_Repo = Repo;
+			_unit = unit;
 		}
 
 		public async Task<bool> Accept(int user1, int user2)
 		{
 			try
 			{
-				return await _Repo.Accept(user1, user2);
+				var item = await _unit.RequestNotification.GetByConditionAsync(r =>
+							(r.FromUserId == user1 && r.ToUserId == user2) ||
+					 		(r.FromUserId == user2 && r.ToUserId == user1));
+				if (item == null) return false;
+
+				item.IsAccept = true;
+				item.IsRead = true;
+
+				var relation = await _unit.Relationship.GetByConditionAsync(r =>
+							(r.FromUserId == user1 && r.ToUserId == user2) ||
+					 		(r.FromUserId == user2 && r.ToUserId == user1));
+
+				relation.TypeRelationship = 2;
+
+				return await _unit.CompleteAsync();
 			}
 			catch (Exception e)
 			{
@@ -37,7 +53,8 @@ namespace Backend.Services
 		{
 			try
 			{
-				return await _Repo.Delete(id);
+				_unit.RequestNotification.DeleteAsync(r => r.NotificationId == id);
+				return await _unit.CompleteAsync();
 			}
 			catch
 			{
@@ -50,7 +67,17 @@ namespace Backend.Services
 		{
 			try
 			{
-				return await _Repo.FindByUserId(id);
+				var items = await _unit.RequestNotification.FindAsync(r => r.ToUserId == id, u => new
+				{
+					u.FromUser.UserId,
+					u.FromUser.LastName,
+					u.FromUser.FirstName,
+					u.FromUser.GenderId,
+					u.IsAccept,
+					u.NotificationId,
+					u.IsRead
+				});
+				return items;
 			}
 			catch
 			{

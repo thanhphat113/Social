@@ -6,20 +6,22 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Services
 {
-	public class ChatInMessageService : IChatInMessRepository
+	public class ChatInMessageService
 	{
-		private readonly IChatInMessRepository _chatRepo;
+		private readonly IUnitOfWork _unit;
 
-		public ChatInMessageService(IChatInMessRepository chatRepo)
+		public ChatInMessageService(IUnitOfWork unit)
 		{
-			_chatRepo = chatRepo;
+			_unit = unit;
 		}
 
 		public async Task<ChatInMessage> Add(ChatInMessage mess)
 		{
 			try
 			{
-				return await _chatRepo.Add(mess);
+				var item = await _unit.ChatInMessage.AddAsync(mess);
+				await _unit.CompleteAsync();
+				return item;
 			}
 			catch (System.Exception ex)
 			{
@@ -30,7 +32,18 @@ namespace Backend.Services
 
 		public async Task<bool> Delete(int id)
 		{
-			return await _chatRepo.Delete(id);
+			await _unit.ChatInMessage.DeleteAsync(c => c.ChatId == id);
+			return await _unit.CompleteAsync();
+		}
+
+		public async Task<bool> Recall(int id)
+		{
+			var item = await _unit.ChatInMessage.GetByIdAsync(id);
+
+			item.IsRecall = true;
+			item.Content = "Tin nhắn đã thu hồi";
+
+			return await _unit.CompleteAsync();
 		}
 
 		public Task<IEnumerable<ChatInMessage>> GetAll()
@@ -48,23 +61,14 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<ICollection<ChatInMessage>> GetMessage(int user1, int user2)
+		public async Task<bool> ReadMess(int Id)
 		{
 			try
 			{
-				return await _chatRepo.GetMessage(user1, user2);
-			}
-			catch
-			{
-				return null;
-			}
-		}
+				var item = await _unit.ChatInMessage.GetByIdAsync(Id);
+				item.IsRead = true;
 
-		public async Task<bool> ReadMess(int user1)
-		{
-			try
-			{
-				return await _chatRepo.ReadMess(user1);
+				return await _unit.CompleteAsync();
 			}
 			catch (System.Exception ex)
 			{

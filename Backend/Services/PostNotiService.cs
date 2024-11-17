@@ -5,14 +5,16 @@ using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Repositories.Interface;
 
+using Backend.Services.Interface;
+
 namespace Backend.Services
 {
-	public class PostNotiService : IPostNotiRepository
+	public class PostNotiService : IPostNotiService
 	{
-		private readonly IPostNotiRepository _repo;
-		public PostNotiService(IPostNotiRepository repo)
+		private readonly IUnitOfWork _unit;
+		public PostNotiService(IUnitOfWork unit)
 		{
-			_repo = repo;
+			_unit = unit;
 		}
 
 		public Task<PostNotification> Add(PostNotification product)
@@ -35,7 +37,15 @@ namespace Backend.Services
 		{
 			try
 			{
-				return await _repo.FindByUserId(userid); ;
+				var item = await _unit.PostNotification.FindAsync(p => p.Post.CreatedByUserId == userid, u => new
+				{
+					u.PostNotificationId,
+					u.PostId,
+					u.FromUser,
+					u.Type,
+					u.IsRead
+				});
+				return item;
 			}
 			catch (Exception e)
 			{

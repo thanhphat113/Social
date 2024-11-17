@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 
-namespace Backend.Repositories.Interface
+namespace Backend.Services.Interface
 {
-	public interface IChatInMessRepository : IRepository<ChatInMessage>
+	public interface IChatInMessService : IService<ChatInMessage>
 	{
 		public Task<ICollection<ChatInMessage>> GetMessage(int user1, int user2);
 		public Task<bool> ReadMess(int user1);

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 
-namespace Backend.Repositories.Interface
+namespace Backend.Services.Interface
 {
-	public interface IGroupChatRepository : IRepository<GroupChat>
+	public interface IGroupChatService : IService<GroupChat>
 	{
 		Task<IEnumerable<GroupChat>> FindByUserId(int UserId);
 	}

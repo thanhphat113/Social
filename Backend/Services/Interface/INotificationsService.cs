@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 
-namespace Backend.Repositories.Interface
+namespace Backend.Services.Interface
 {
-	public interface INotificationsRepository : IRepository<RequestNotification>
+	public interface INotificationsService : IService<RequestNotification>
 	{
 		Task<IEnumerable<Object>> FindByUserId(int userid);
 		Task<bool> Accept(int user1, int user2);

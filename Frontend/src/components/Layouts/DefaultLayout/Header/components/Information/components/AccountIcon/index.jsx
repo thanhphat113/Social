@@ -1,4 +1,4 @@
-import { useContext,useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CustomTooltip } from "../../../../../../../GlobalStyles";
@@ -9,15 +9,16 @@ import { SetUser } from "../../../../../../../Redux/Actions/UserAction";
 
 function AccountIcon(props) {
     const { handleClick } = useContext(typeContext);
-    const user = useSelector((state) => state.user.information)
+    const user = useSelector((state) => state.user.information);
+    const profilePicture = useSelector((state) => state.user.profilePicture);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleClickLogout = async () => {
         const result = await dispatch(logout());
-        if (logout.fulfilled.match(result)){
-            await dispatch(SetUser())
-            navigate("/login")
+        if (logout.fulfilled.match(result)) {
+            await dispatch(SetUser());
+            navigate("/login");
         }
     };
 
@@ -29,15 +30,35 @@ function AccountIcon(props) {
                         props.onToggle("B");
                     }}
                     className={styles.circle}
-                    src={ user.profilePicture || `/public/img/default/${user.genderId!==2 ? "man" : "woman"}_default.png`}
+                    src={
+                        profilePicture.src
+                            ? `/public/img/Picture/${profilePicture.src}`
+                            : `/public/img/default/${
+                                  user.genderId !== 2 ? "man" : "woman"
+                              }_default.png`
+                    }
                     alt="profile"
                 ></img>
             </CustomTooltip>
             {props.isActive && (
                 <div className={styles.content}>
-                    <Link to={`/${user.userId}`} onClick={() => handleClick("profile")}>
+                    <Link
+                        to={`/${user.userId}`}
+                        onClick={() => handleClick("profile")}
+                    >
                         <div className={styles.account}>
-                            <img src={user.profilePicture || `/public/img/default/${user.genderId!==2 ? "man" : "woman"}_default.png`} alt="profile"></img>
+                            <img
+                                src={
+                                    profilePicture.src
+                                        ? `/public/img/Picture/${profilePicture.src}`
+                                        : `/public/img/default/${
+                                              user.genderId !== 2
+                                                  ? "man"
+                                                  : "woman"
+                                          }_default.png`
+                                }
+                                alt="profile"
+                            ></img>
                             <span>{user.lastName + " " + user.firstName}</span>
                         </div>
                     </Link>

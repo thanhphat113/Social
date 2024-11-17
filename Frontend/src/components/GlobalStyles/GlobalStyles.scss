@@ -40,6 +40,20 @@ body {
     margin:0;
 }
 
+.have-line{
+    position: relative;
+    &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 105%;
+        height: 2px;
+        background-color: rgba(0, 0, 0, 0.3);
+        transform: translateX(-50%);
+    }
+}
+
 a {
 	color:black;
     text-decoration: none;

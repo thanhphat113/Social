@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 
-namespace Backend.Repositories.Interface
+namespace Backend.Services.Interface
 {
-	public interface IRelationshipRepository : IRepository<Relationship>
+	public interface IRelationshipService : IService<Relationship>
 	{
 		Task<bool> Accept(int user1, int user2);
 	}

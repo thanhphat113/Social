@@ -38,6 +38,7 @@ public partial class SocialMediaContext : DbContext
     public virtual DbSet<Message> Messages { get; set; }
 
     public virtual DbSet<Post> Posts { get; set; }
+    public virtual DbSet<UserMedia> UserMedia { get; set; }
 
     public virtual DbSet<PostMedia> PostMedia { get; set; }
 
@@ -243,9 +244,9 @@ public partial class SocialMediaContext : DbContext
 
             entity.ToTable("history_search");
 
-            entity.HasIndex(e => e.FromUser, "from_user");
+            entity.HasIndex(e => e.FromUserId, "from_user");
 
-            entity.HasIndex(e => e.OtherUser, "other_user");
+            entity.HasIndex(e => e.OtherUserId, "other_user");
 
             entity.Property(e => e.HistoryId)
                 .HasColumnType("int(11)")
@@ -254,19 +255,19 @@ public partial class SocialMediaContext : DbContext
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime")
                 .HasColumnName("date_search");
-            entity.Property(e => e.FromUser)
+            entity.Property(e => e.FromUserId)
                 .HasColumnType("int(11)")
                 .HasColumnName("from_user");
-            entity.Property(e => e.OtherUser)
+            entity.Property(e => e.OtherUserId)
                 .HasColumnType("int(11)")
                 .HasColumnName("other_user");
 
-            entity.HasOne(d => d.FromUserNavigation).WithMany(p => p.HistorySearchFromUserNavigations)
-                .HasForeignKey(d => d.FromUser)
+            entity.HasOne(d => d.FromUser).WithMany(p => p.HistorySearchFromUserNavigations)
+                .HasForeignKey(d => d.FromUserId)
                 .HasConstraintName("history_search_ibfk_2");
 
-            entity.HasOne(d => d.OtherUserNavigation).WithMany(p => p.HistorySearchOtherUserNavigations)
-                .HasForeignKey(d => d.OtherUser)
+            entity.HasOne(d => d.OtherUser).WithMany(p => p.HistorySearchOtherUserNavigations)
+                .HasForeignKey(d => d.OtherUserId)
                 .HasConstraintName("history_search_ibfk_1");
         });
 
@@ -293,8 +294,6 @@ public partial class SocialMediaContext : DbContext
 
             entity.ToTable("media");
 
-            entity.HasIndex(e => e.PostId, "fk_media_post_id");
-
             entity.HasIndex(e => e.MediaType, "fk_type_media");
 
             entity.Property(e => e.MediaId)
@@ -303,9 +302,6 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.MediaType)
                 .HasColumnType("int(11)")
                 .HasColumnName("media_type");
-            entity.Property(e => e.PostId)
-                .HasColumnType("int(11)")
-                .HasColumnName("post_id");
             entity.Property(e => e.Src)
                 .HasMaxLength(255)
                 .HasColumnName("src");
@@ -314,10 +310,6 @@ public partial class SocialMediaContext : DbContext
                 .HasForeignKey(d => d.MediaType)
                 .HasConstraintName("fk_type_media");
 
-            entity.HasOne(d => d.Post).WithMany(p => p.Media)
-                .HasForeignKey(d => d.PostId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_media_post_id");
         });
 
         modelBuilder.Entity<Message>(entity =>
@@ -342,6 +334,12 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.User1)
                 .HasColumnType("int(11)")
                 .HasColumnName("user_1");
+            entity.Property(e => e.NickName1)
+                .HasMaxLength(255)
+                .HasColumnName("nickname_1");
+            entity.Property(e => e.NickName2)
+                .HasMaxLength(255)
+                .HasColumnName("nickname_2");
             entity.Property(e => e.User2)
                 .HasColumnType("int(11)")
                 .HasColumnName("user_2");
@@ -412,11 +410,51 @@ public partial class SocialMediaContext : DbContext
                 .HasConstraintName("fk_posts_privacy_id");
         });
 
+        modelBuilder.Entity<UserMedia>(entity =>
+        {
+            entity.HasKey(ui => new { ui.MediaId, ui.UserId });
+            entity.ToTable("user_media");
+
+            entity.HasIndex(e => e.MediaId, "fk_user_media_media_id");
+
+            entity.HasIndex(e => e.UserId, "fk_user_media_user_id");
+
+            entity.Property(e => e.MediaId)
+                .HasColumnType("int(11)")
+                .HasColumnName("media_id");
+            entity.Property(e => e.UserId)
+                .HasColumnType("int(11)")
+                .HasColumnName("user_id");
+            entity.Property(e => e.IsProfilePicture)
+                .HasColumnType("tinyint(1)")
+                .HasColumnName("is_profile_picture");
+            entity.Property(e => e.IsCoverPicture)
+                .HasColumnType("tinyint(1)")
+                .HasColumnName("is_cover_picture");
+
+            entity.HasOne(d => d.Media).WithMany(m => m.UserMedia)
+                .HasForeignKey(d => d.MediaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_user_media_media_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserMedia)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_user_media_user_id");
+
+            entity.HasIndex(ui => new { ui.UserId, ui.IsProfilePicture })
+            .IsUnique()
+            .HasFilter("[is_profile_picture] = 1");
+
+            entity.HasIndex(ui => new { ui.UserId, ui.IsCoverPicture })
+            .IsUnique()
+            .HasFilter("[is_cover_picture] = 1");
+        });
+
         modelBuilder.Entity<PostMedia>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("post_media");
+            entity.HasKey(ui => new { ui.MediaId, ui.PostId });
+            entity.ToTable("post_media");
 
             entity.HasIndex(e => e.MediaId, "fk_media");
 
@@ -429,12 +467,12 @@ public partial class SocialMediaContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("post_id");
 
-            entity.HasOne(d => d.Media).WithMany()
+            entity.HasOne(d => d.Media).WithMany(m => m.PostMedia)
                 .HasForeignKey(d => d.MediaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_media");
 
-            entity.HasOne(d => d.Post).WithMany()
+            entity.HasOne(d => d.Post).WithMany(p => p.PostMedia)
                 .HasForeignKey(d => d.PostId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_post");
@@ -738,15 +776,12 @@ public partial class SocialMediaContext : DbContext
                 .HasColumnName("type_name");
         });
 
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PRIMARY");
 
             entity.ToTable("users");
-
-            entity.HasIndex(e => e.CoverPhoto, "fk_cover");
-
-            entity.HasIndex(e => e.ProfilePicture, "fk_profile");
 
             entity.HasIndex(e => e.Email, "idx_username").IsUnique();
 
@@ -756,9 +791,6 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.Bio)
                 .HasColumnType("text")
                 .HasColumnName("bio");
-            entity.Property(e => e.CoverPhoto)
-                .HasColumnType("int(11)")
-                .HasColumnName("cover_photo");
             entity.Property(e => e.DateCreated)
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("timestamp")
@@ -768,7 +800,8 @@ public partial class SocialMediaContext : DbContext
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("timestamp")
                 .HasColumnName("date_updated");
-            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Email)
+                .HasColumnName("email");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(255)
                 .HasColumnName("first_name");
@@ -781,9 +814,6 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
-            entity.Property(e => e.ProfilePicture)
-                .HasColumnType("int(11)")
-                .HasColumnName("profile_picture");
             entity.Property(e => e.GenderId)
                 .HasColumnType("int(1)")
                 .HasColumnName("gender_id");
@@ -791,13 +821,7 @@ public partial class SocialMediaContext : DbContext
                 .HasColumnType("tinyint(1)")
                 .HasColumnName("is_online");
 
-            entity.HasOne(d => d.CoverPhotoNavigation).WithMany(p => p.UserCoverPhotoNavigations)
-                .HasForeignKey(d => d.CoverPhoto)
-                .HasConstraintName("fk_cover");
 
-            entity.HasOne(d => d.ProfilePictureNavigation).WithMany(p => p.UserProfilePictureNavigations)
-                .HasForeignKey(d => d.ProfilePicture)
-                .HasConstraintName("fk_profile");
 
             entity.HasOne(d => d.Gender).WithMany(g => g.Users)
                 .HasForeignKey(d => d.GenderId)
@@ -825,30 +849,6 @@ public partial class SocialMediaContext : DbContext
                         j.IndexerProperty<int>("GroupChatId")
                             .HasColumnType("int(11)")
                             .HasColumnName("group_chat_id");
-                    });
-
-            entity.HasMany(d => d.Media).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserMedia",
-                    r => r.HasOne<Media>().WithMany()
-                        .HasForeignKey("MediaId")
-                        .HasConstraintName("fk_user_media_media_id"),
-                    l => l.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_user_media_user_id"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "MediaId")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("user_media");
-                        j.HasIndex(new[] { "MediaId" }, "fk_user_media_media_id");
-                        j.IndexerProperty<int>("UserId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("user_id");
-                        j.IndexerProperty<int>("MediaId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("media_id");
                     });
         });
 
@@ -906,9 +906,18 @@ public partial class SocialMediaContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_user_groups_privacy_id");
         });
+
         modelBuilder.Entity<GenderType>(entity =>
         {
             entity.HasKey(e => e.GenderId);
+            entity.ToTable("gender_type");
+
+            entity.Property(e => e.GenderId)
+                .HasColumnType("int(11)")
+                .HasColumnName("gender_id");
+            entity.Property(e => e.GenderName)
+                .HasColumnType("text")
+                .HasColumnName("gender_name");
         });
 
         modelBuilder.Entity<UserInGroup>(entity =>

@@ -5,10 +5,12 @@ using System.Text;
 using Backend.Data;
 using Backend.Repositories;
 
+
 using Backend.Repositories.Repository;
 using Backend.Repositories.Interface;
 using Backend.Models;
 using Backend.Services;
+using Backend.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,7 @@ builder.Services.AddScoped<RequestNotiService>();
 builder.Services.AddScoped<PostNotiService>();
 builder.Services.AddScoped<RelationshipService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
@@ -39,21 +42,16 @@ builder.Services.AddScoped<HistorySearchService>();
 builder.Services.AddScoped<GroupChatService>();
 
 
-
-builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
-builder.Services.AddScoped<IHistorySearchRepository, HistorySearchRepository>();
-builder.Services.AddScoped<IChatInMessRepository, ChatInMessageRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<INotificationsRepository, RequestNotiRepository>();
-builder.Services.AddScoped<IPostNotiRepository, PostNotiRepository>();
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-builder.Services.AddScoped<IRelationshipRepository, RelationshipRepository>();
-builder.Services.AddScoped<IRepository<ChatInMessage>, ChatInMessageRepository>();
+builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
-builder.Services.AddScoped<PostRepository>();
-builder.Services.AddScoped<PostService>();
-builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
+// builder.Services.AddScoped<PostRepository>();
+// builder.Services.AddScoped<PostService>();
+// builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
+
 
 
 
@@ -106,7 +104,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 

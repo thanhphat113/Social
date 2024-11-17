@@ -5,6 +5,8 @@ import UserReducer from "../Slices/UserSlice";
 import FriendReducer from "../Slices/FriendSlice"
 import MessageReducer from "../Slices/MessageSlice"
 import ProfileReducer from "../Slices/ProfileSlice"
+import GroupChatReducer from "../Slices/GroupChatSlice"
+
 
 const Store = configureStore({
     reducer: {
@@ -12,7 +14,8 @@ const Store = configureStore({
         user: UserReducer,
         friends: FriendReducer,
         message: MessageReducer,
-        profile: ProfileReducer
+        profile: ProfileReducer,
+        groupchat: GroupChatReducer
     },
 });
 
