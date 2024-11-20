@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import styles from './Post.module.scss';
 import Button from 'react-bootstrap/Button';
+import {useAuth} from './../AuthContext.jsx';
 import { FaPhotoVideo } from "react-icons/fa";
 import axios from 'axios';
 
 const Post = ({ onClose, postImage }) => {
+  const {currentUser, token} = useAuth();
+  
   const [text, setText] = useState("Bạn đang nghĩ gì thế?");
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
@@ -14,6 +17,13 @@ const Post = ({ onClose, postImage }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if(!currentUser || !token) {
+      alert("Vui lòng đăng nhập để đăng bài");
+      return;
+    }
+    
+    
     const formData = new FormData();
     formData.append('Content', text);
 

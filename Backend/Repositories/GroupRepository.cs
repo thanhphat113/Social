@@ -2,8 +2,9 @@ using Backend.Data;
 using Backend.Models;
 using Backend.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Backend.Repositories.Interface;
 
-public class GroupRepositories : IRepositories<UserGroup>
+public class GroupRepositories /*: IRepository<UserGroup>*/
 {
     private readonly SocialMediaContext _context;
 

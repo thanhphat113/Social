@@ -10,7 +10,11 @@ using Backend.Repositories.Interface;
 using Backend.Models;
 using Backend.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+//var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    WebRootPath = "wwwroot" // Đặt WebRootPath tại đây
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
@@ -23,7 +27,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<GroupRepositories>();
-builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();
+/*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MessageService>();
@@ -53,7 +57,7 @@ builder.Services.AddScoped<IRepository<ChatInMessage>, ChatInMessageRepository>(
 //Post
 builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<PostService>();
-builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
+/*builder.Services.AddScoped<IRepositories<Post>, PostRepository>();*/
 
 
 
@@ -114,5 +118,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles();
 
 app.Run();
