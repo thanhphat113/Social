@@ -4,15 +4,15 @@ import { createSlice } from "@reduxjs/toolkit";
 const MessageSlice = createSlice({
     name: "message",
     initialState: {
-        currentUser: null,
-		message: [],
+        currentUserId: null,
+		currentMessage: [],
 		messageId: null,
 		isLoad: false,
 		isError: false
     },
     reducers: {
 		setCurrentUser:( (state,action) => {
-			state.currentUser = action.payload
+			state.currentUserId = action.payload
 		})
 	}
 });

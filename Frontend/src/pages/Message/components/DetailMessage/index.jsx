@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import moment from "moment";
@@ -7,6 +7,7 @@ import styles from "./DetailMessage.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
 import {
     addMess,
+    recallMess,
     deleteMess,
 } from "../../../../components/Redux/Actions/MessageActions";
 import Validate from "../../../../components/Validate";
@@ -14,7 +15,7 @@ import Validate from "../../../../components/Validate";
 function DetailMessage({ onShow }) {
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
-    const currentFriendId = useSelector((state) => state.message.currentUser);
+    const currentFriendId = useSelector((state) => state.message.currentUserId);
 
     const dispatch = useDispatch();
     const [isSending, setIsSending] = useState(false);
@@ -22,20 +23,40 @@ function DetailMessage({ onShow }) {
     const [hoveredMessageId, setHoveredMessageId] = useState(null);
     const [mess, setMess] = useState("");
 
-
     const [typeShow, setTypeShow] = useState();
     const [targetMess, setTargetMess] = useState([]);
 
     const messagesEndRef = useRef(null);
+    const listRef = useRef(null);
+    const scrollPosition = useRef(0);
 
     const InforCurrentFriend = friends.find(
         (u) => u.userId === currentFriendId
     );
 
+    useEffect(() => {
+        scrollPosition.current = 0;
+    }, [currentFriendId]);
+
+    useEffect(() => {
+        if (scrollPosition.current === 0) {
+            scrollToBottom();
+        } else {
+            listRef.current.scrollTop = scrollPosition.current;
+        }
+    }, [friends]);
+
+    const handleCall = () => {
+        window.open("/call", "_blank", "width=400,height=600");
+      };
+
+    const toggleListVisibility = () => {
+        scrollPosition.current = listRef.current.scrollTop;
+    };
+
     const messageId = InforCurrentFriend?.chatInMessages[0].messagesId || -1;
 
     const message = InforCurrentFriend?.chatInMessages;
-
 
     useEffect(() => {
         setMess("");
@@ -76,16 +97,24 @@ function DetailMessage({ onShow }) {
     };
 
     const onAccept = () => {
-        dispatch(deleteMess({id: targetMess, Otheruser:currentFriendId}))
+        typeShow === "recall"
+            ? dispatch(
+                  recallMess({ id: targetMess, Otheruser: currentFriendId })
+              )
+            : dispatch(
+                  deleteMess({ id: targetMess, Otheruser: currentFriendId })
+              );
         setTypeShow(null);
-    }
+    };
 
     const onCancel = () => {
-        setTypeShow(null)
-    }
+        setTypeShow(null);
+    };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+        console.log("trong croll:" + scrollPosition.current);
+        scrollPosition.current === 0 &&
+            messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
     };
 
     const groupedMessages = message.reduce((acc, message) => {
@@ -104,12 +133,13 @@ function DetailMessage({ onShow }) {
                     <div className={styles.information}>
                         <img
                             src={
-                                InforCurrentFriend.profilePicture ||
-                                `/public/img/default/${
-                                    InforCurrentFriend.genderId !== 2
-                                        ? "man"
-                                        : "woman"
-                                }_default.png`
+                                InforCurrentFriend.profilePicture
+                                    ? `/public/img/Picture/${InforCurrentFriend.profilePicture.src}`
+                                    : `/public/img/default/${
+                                          InforCurrentFriend.genderId !== 2
+                                              ? "man"
+                                              : "woman"
+                                      }_default.png`
                             }
                         ></img>
                         <strong>
@@ -120,7 +150,7 @@ function DetailMessage({ onShow }) {
                 </CustomTooltip>
                 <div className={styles.action}>
                     <CustomTooltip title="Gọi">
-                        <i className="fa-solid fa-phone"></i>
+                        <i onClick={() => handleCall()} className="fa-solid fa-phone"></i>
                     </CustomTooltip>
                     <CustomTooltip title="Gọi video">
                         <i className="fa-solid fa-video"></i>
@@ -133,9 +163,9 @@ function DetailMessage({ onShow }) {
                     </CustomTooltip>
                 </div>
             </div>
-            <div className={styles.content}>
+            <div ref={listRef} className={clsx(styles.content)}>
                 {Object.keys(groupedMessages).map((date) => (
-                    <div key={date} className={styles.chatzone}>
+                    <div key={date} className={clsx(styles.chatzone)}>
                         <small>{date}</small>
                         {groupedMessages[date].map((mess) => {
                             const formattedTime = moment(
@@ -160,7 +190,7 @@ function DetailMessage({ onShow }) {
                                     {hoveredMessageId === mess.chatId &&
                                         userid === mess.fromUser && (
                                             <>
-                                                {!mess.isRecall && (
+                                                {!mess.isRecall ? (
                                                     <>
                                                         {" "}
                                                         <CustomTooltip title="Thu hồi">
@@ -170,26 +200,40 @@ function DetailMessage({ onShow }) {
                                                                     "fa-solid fa-rotate-left"
                                                                 )}
                                                                 onClick={() => {
-                                                                    setTypeShow("recall")
-                                                                    setTargetMess(mess.chatId)
-                                                                    }}
-                                                                
-                                                            ></i>
-                                                        </CustomTooltip>
-                                                        <CustomTooltip title="Chỉnh sửa">
-                                                            <i
-                                                                className={clsx(
-                                                                    styles.update,
-                                                                    "fa-solid fa-pencil"
-                                                                )}
+                                                                    toggleListVisibility();
+                                                                    setTypeShow(
+                                                                        "recall"
+                                                                    );
+                                                                    setTargetMess(
+                                                                        mess.chatId
+                                                                    );
+                                                                }}
                                                             ></i>
                                                         </CustomTooltip>
                                                     </>
+                                                ) : (
+                                                    <CustomTooltip title="Xoá">
+                                                        <i
+                                                            className={clsx(
+                                                                styles.update,
+                                                                "fa-solid fa-trash"
+                                                            )}
+                                                            onClick={() => {
+                                                                toggleListVisibility();
+                                                                setTypeShow(
+                                                                    "delete"
+                                                                );
+                                                                setTargetMess(
+                                                                    mess.chatId
+                                                                );
+                                                            }}
+                                                        ></i>
+                                                    </CustomTooltip>
                                                 )}
                                             </>
                                         )}
                                     <CustomTooltip title={formattedTime}>
-                                        <div className={styles.mess}>
+                                        <div className={clsx(styles.mess)}>
                                             <p
                                                 className={clsx({
                                                     [styles.recall]:
@@ -224,7 +268,13 @@ function DetailMessage({ onShow }) {
                 ></i>
             </div>
 
-            {typeShow === "recall" && <Validate onAccept = { onAccept } onCancel={ onCancel } message={"Bạn có chắc chắn muốn thu hồi tin nhắn này?"} />}
+            {typeShow && (
+                <Validate
+                    onAccept={onAccept}
+                    onCancel={onCancel}
+                    message={`Bạn có chắc chắn muốn ${typeShow === "recall" ? `thu hồi` : `xoá`} tin nhắn này?`}
+                />
+            )}
         </div>
     );
 }

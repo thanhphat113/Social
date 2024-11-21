@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,51 +11,41 @@ namespace Backend.Controllers
 	public class HistorySearchController : ControllerBase
 	{
 		private readonly HistorySearchService _service;
+
 		public HistorySearchController(HistorySearchService service)
 		{
 			_service = service;
 		}
 
 		[HttpGet]
-		public async Task<ActionResult> Get([FromQuery] int userid)
+		public async Task<ActionResult> GetById()
 		{
-			var result = await _service.GetHistorySearchByUserId(userid);
-			return Ok(result);
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			return Ok(await _service.GetHistorySearchByUserId(UserId));
 		}
 
 
 		[HttpPost]
 		public async Task<ActionResult> Post([FromBody] HistorySearch value)
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
-			if (await _service.Add(value) != null)
-			{
-				return await Get(userId);
-			}
-			return null;
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			value.FromUserId = UserId;
+			Console.WriteLine("Đây là đối tượng: " + value.OtherUserId + " " + value.FromUserId);
+			return Ok(await _service.Add(value));
 		}
 
-		[HttpPut("{id}")]
-		public async Task<ActionResult> Put(int id)
+		[HttpPut("{OtherUserId}")]
+		public async Task<ActionResult> Put(int OtherUserId)
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
-			Console.WriteLine("Id là:" + id);
-			if (await _service.UpdateTime(id))
-			{
-				return await Get(userId);
-			}
-			return null;
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			return Ok(await _service.UpdateTime(UserId, OtherUserId));
 		}
 
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> Delete(int id)
 		{
 			var userId = GetCookie.GetUserIdFromCookie(Request);
-			if (await _service.Delete(id))
-			{
-				return await Get(userId);
-			}
-			return null;
+			return Ok(await _service.Delete(id));
 		}
 	}
 }

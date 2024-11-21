@@ -3,40 +3,28 @@ import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import styles from "./User.module.scss";
 import ItemUser from "./components/ItemUser";
-import { findFriend } from "../../../../components/Redux/Slices/UserSlice";
-import axios from "axios";
 
 function User() {
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.userid);
 
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState('');
     const [isShow, setIsShow] = useState(false);
     const [ischoice, setIsChoice] = useState("mess");
-    const [isLoading, setIsLoading] = useState(false);
     const [findFriend, setFindFriend] = useState([]);
 
     const list = findFriend.length > 0 ? findFriend : friends;
 
+    const handleSearch = () => {
+        setFindFriend(friends.filter(user =>
+            (user.firstName.toLowerCase() + ' ' + user.lastName.toLowerCase()).includes(search.toLowerCase()) // So sánh tên có phân biệt dấu
+        ));
+    }
+    
     useEffect(() => {
         search !== "" ? handleSearch() : setFindFriend([]);
     }, [search]);
 
-    const handleSearch = async () => {
-        if (isLoading) return;
-        setIsLoading(true);
-        try {
-            const response = await axios.get(
-                `http://localhost:5164/api/User/friends-by-name`,
-                { params: { name: search }, withCredentials: true }
-            );
-            return setFindFriend(response.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const handleClick = () => {
         setSearch("");

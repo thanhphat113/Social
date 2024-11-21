@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Backend.Models;
@@ -19,10 +20,8 @@ public partial class User
     public string? Bio { get; set; }
 
     public string? Location { get; set; }
-
-    public int? ProfilePicture { get; set; }
-
-    public int? CoverPhoto { get; set; }
+    [NotMapped]
+    public virtual Media? ProfilePicture { get; set; } = null;
 
     public int? GenderId { get; set; }
 
@@ -35,11 +34,12 @@ public partial class User
     [JsonIgnore]
     public virtual ICollection<ChatInGroup> ChatInGroups { get; set; } = new List<ChatInGroup>();
     // [JsonIgnore]
+
     public virtual ICollection<ChatInMessage> ChatInMessages { get; set; } = new List<ChatInMessage>();
+
     [JsonIgnore]
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-    [JsonIgnore]
-    public virtual Media? CoverPhotoNavigation { get; set; }
+
     [JsonIgnore]
     public virtual GenderType? Gender { get; set; }
     [JsonIgnore]
@@ -54,8 +54,7 @@ public partial class User
     public virtual ICollection<PostNotification> PostNotifications { get; set; } = new List<PostNotification>();
     [JsonIgnore]
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
-    [JsonIgnore]
-    public virtual Media? ProfilePictureNavigation { get; set; }
+
     [JsonIgnore]
     public virtual ReactsComment? ReactsComment { get; set; }
     [JsonIgnore]
@@ -75,5 +74,5 @@ public partial class User
     [JsonIgnore]
     public virtual ICollection<GroupChat> GroupChats { get; set; } = new List<GroupChat>();
     [JsonIgnore]
-    public virtual ICollection<Media> Media { get; set; } = new List<Media>();
+    public virtual ICollection<UserMedia> UserMedia { get; set; } = new List<UserMedia>();
 }

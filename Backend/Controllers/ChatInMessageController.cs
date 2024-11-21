@@ -21,11 +21,11 @@ namespace Backend.Controllers
 			_message = message;
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> Get([FromQuery] int user1, [FromQuery] int user2)
-		{
-			return Ok(await _mess.GetMessage(user1, user2));
-		}
+		// [HttpGet]
+		// public async Task<IActionResult> Get([FromQuery] int user1, [FromQuery] int user2)
+		// {
+		// 	return Ok(await _mess.GetMessage(user1, user2));
+		// }
 
 		[HttpGet("{id}")]
 		public ActionResult<string> Get(int id)
@@ -36,15 +36,11 @@ namespace Backend.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] ChatInMessage mess)
 		{
-			Console.WriteLine($"Received otheruser: {mess.Otheruser}");
-			Console.WriteLine($"Received userid: {mess.FromUser}");
-			Console.WriteLine($"Received MessagesId: {mess.MessagesId}");
-
 			if (mess.MessagesId == -1)
 			{
 				var item = await _message.Add(new() { User1 = mess.FromUser, User2 = mess.Otheruser });
 				if (item == null) return BadRequest("Lỗi việc tạo chat mới");
-				mess.MessagesId = item.MessagesId;
+				mess.MessagesId = (int)item.MessagesId;
 			}
 
 			var result = await _mess.Add(mess);
@@ -69,7 +65,7 @@ namespace Backend.Controllers
 		public async Task<IActionResult> Delete(int id)
 		{
 			var UserId = GetCookie.GetUserIdFromCookie(Request);
-			return Ok(await _mess.Delete(id));
+			return Ok(await _mess.Recall(id));
 		}
 	}
 }

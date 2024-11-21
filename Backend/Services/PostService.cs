@@ -1,4 +1,4 @@
-﻿namespace Backend.Services;
+﻿// namespace Backend.Services;
 
 using Backend.Models;
 using Backend.Repositories;
@@ -51,14 +51,14 @@ public class PostService
         }
 
         var mediaList = new List<MediaDTO>();
-        if(mediaFiles != null && mediaFiles.Any())
+        if (mediaFiles != null && mediaFiles.Any())
         {
-            foreach(var file in mediaFiles)
+            foreach (var file in mediaFiles)
             {
                 var fileName = Path.GetFileName(file.FileName);
                 var filePath = Path.Combine(_hostEnvironment.WebRootPath, "media", fileName);
 
-                using(var fileStream = new FileStream(filePath, FileMode.Create))
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(fileStream);
                 }

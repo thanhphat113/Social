@@ -25,7 +25,7 @@ public partial class Post
 
     public virtual UserGroup? Group { get; set; }
 
-    public virtual ICollection<Media> Media { get; set; } = new List<Media>();
+    public virtual ICollection<PostMedia> PostMedia { get; set; }
 
     public virtual ICollection<PostNotification> PostNotifications { get; set; } = new List<PostNotification>();
 

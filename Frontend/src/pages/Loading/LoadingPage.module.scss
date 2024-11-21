@@ -1,0 +1,72 @@
+/* Container bao bọc các giọt mưa */
+.rainContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 9999;
+    background-image: url("/public/img/default/loadingbg.jpg");
+    background-size: contain;
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .loadingText {
+        font-size: 120px;
+        color: aliceblue;
+        position: relative;
+        span {
+            display: inline-block;
+            -webkit-text-stroke: 2px rgba(0, 0, 0, 0.3);
+            animation: bounce 4s ease-in-out infinite;
+            animation-delay: calc(0.1s * var(--i));
+			animation-fill-mode: both;
+
+            @for $i from 0 through 9 {
+                &:nth-child(#{$i + 1}) {
+                    --i: #{($i)};
+                }
+            }
+        }
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    25% {
+        transform: translateY(-30px);
+    }
+    50% {
+        transform: translateY(0);
+    }
+    75% {
+        transform: translateY(-30px);
+    }
+
+}
+
+.rain {
+    position: absolute;
+    top: -100px;
+    width: 1px;
+    height: 8px;
+    background-color: rgb(238, 243, 246);
+    animation: fall 0.5s linear infinite;
+}
+
+/* Tạo hiệu ứng mưa rơi xuống */
+@keyframes fall {
+    0% {
+        transform: translateY(-100px); /* Bắt đầu từ trên cùng */
+    }
+    100% {
+        transform: translateY(110vh); /* Dừng lại ở dưới cùng */
+    }
+}

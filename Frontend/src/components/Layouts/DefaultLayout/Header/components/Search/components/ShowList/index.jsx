@@ -7,19 +7,45 @@ import {
     deleteHistory,
     updateHistory,
 } from "../../../../../../../Redux/Actions/HistorySearchAction";
+import axios from "axios";
+import { useState } from "react";
 
 function ShowList(props) {
     const list = props.list;
+    console.log(list);
     const history = props.history;
-    const user = useSelector((state) => state.user.information);
+    console.log(history);
     const dispatch = useDispatch();
 
-    const handleClick = async (FromUser, OtherUser, HistoryId) => {
-        const result = history.some((item) => item.userId === OtherUser);
-        result
-            ? await dispatch(updateHistory(HistoryId))
-            : await dispatch(addHistory({ FromUser, OtherUser }));
-    };
+    async function selectItem(userId) {
+        const index = history.findIndex((u) => u.userId === userId);
+
+        if (index >= 0) {
+            const [element] = history.splice(index, 1);
+            history.unshift(element);
+            console.log("Đã chạy vào đây");
+            await dispatch(updateHistory(userId));
+        } else {
+            try {
+                const response = await axios.post(
+                    "http://localhost:5164/api/HistorySearch",
+                    { OtherUserId: userId },
+                    { withCredentials: true }
+                );
+                const user = list.find((u) => u.userId === userId);
+                history.unshift({
+                    historyId: response.data.historyId,
+                    userId: user.userId,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    profilePicture: user.profilePicture,
+                    genderId: user.genderId,
+                });
+            } catch (ex) {
+                console.log(ex);
+            }
+        }
+    }
 
     return (
         <div>
@@ -28,15 +54,16 @@ function ShowList(props) {
                     to={`/${item.userId}`}
                     className={clsx(styles.wrapper)}
                     key={item.userId}
-                    onClick={() => handleClick(user.userId, item.userId, item.historyId)}
+                    onClick={() => selectItem(item.userId)}
                 >
                     <img
                         className={clsx(styles.profile)}
                         src={
-                            item.profilePicture ||
-                            `/public/img/default/${
-                                item.genderId !== 2 ? "man" : "woman"
-                            }_default.png`
+                            item.profilePicture?.src
+                                ? `/public/img/Picture/${item.profilePicture.src}`
+                                : `/public/img/default/${
+                                      item.genderId !== 2 ? "man" : "woman"
+                                  }_default.png`
                         }
                     ></img>
                     <p className={clsx(styles.name)}>
@@ -47,11 +74,15 @@ function ShowList(props) {
                         className={clsx(styles.delete)}
                         onClick={async (e) => {
                             e.preventDefault();
-                            // e.stopPropagation();
-                            await dispatch(deleteHistory(item.historyId));
+                            e.stopPropagation();
+                            const isDelete = (await dispatch(deleteHistory(item.historyId))).payload;
+                            if (isDelete) {
+                                const result = history.filter(h => h.historyId !== item.historyId)
+                                props.setHistory(result)
+                            }
                         }}
                     >
-                        <i className="fa-solid fa-x"></i>
+                        {props.search === "" && <i className="fa-solid fa-x"></i>}
                     </div>
                 </Link>
             ))}

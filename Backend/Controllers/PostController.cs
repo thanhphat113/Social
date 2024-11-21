@@ -22,7 +22,7 @@ namespace Backend.Controllers
         {
             _postService = postService;
             _logger = logger;
-    }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAllPosts()

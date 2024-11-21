@@ -1,6 +1,6 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import Login from "./pages/Login";
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
@@ -11,20 +11,22 @@ import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
 import Authentication from "./components/Authentication";
 import { SetUser } from "./components/Redux/Actions/UserAction";
+import LoadingPage from "./pages/Loading/index.jsx";
+
 
 function App() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const getuser = async () => {
-            const response = await dispatch(SetUser());
-            if (SetUser.fulfilled.match(response)) {
-                navigate("/");
-            }
+            await dispatch(SetUser());
+            setLoading(false);
         };
         getuser();
     }, []);
+
+    if(loading){ return(<LoadingPage/>)}
 
     return (
         <Routes>

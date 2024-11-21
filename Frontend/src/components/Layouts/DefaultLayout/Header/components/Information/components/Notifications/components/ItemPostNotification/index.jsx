@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 function ItemPostNotification( props ) {
 	const item = props.package
-	console.log(item)
 	const navigate = useNavigate()
 
 	return ( 
@@ -12,9 +11,9 @@ function ItemPostNotification( props ) {
 		to={`post/${item.postId}`}>
 			<img onClick={async(e) =>{
 				e.preventDefault(),
-				navigate(`/${item.userId}`)
-			}} src={item.profilePicture || `/public/img/default/${item.genderId !==2 ? "man" : "woman"}_default.png`}></img>
-			<p><strong>{item.lastName} {item.firstName}</strong> {item.type.content}</p>
+				navigate(`/${item.fromUser.userId}`)
+			}} src={item.fromUser.profilePicture ? `/public/img/Picture/${item.fromUser.profilePicture.src}`:`/public/img/default/${item.genderId !==2 ? "man" : "woman"}_default.png`}></img>
+			<p><strong>{item.fromUser.lastName} {item.fromUser.firstName}</strong> {item.type.content}</p>
 			<div className={styles.isread}>{ item.isRead === 0 && <span></span>}</div>
 		</Link>
 	 );

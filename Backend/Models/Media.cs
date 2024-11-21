@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Backend.Models;
 
@@ -7,7 +8,6 @@ public partial class Media
 {
     public int MediaId { get; set; }
 
-    public int? PostId { get; set; }
 
     public string Src { get; set; } = null!;
 
@@ -15,11 +15,10 @@ public partial class Media
 
     public virtual TypeMedia? MediaTypeNavigation { get; set; }
 
-    public virtual Post? Post { get; set; }
+    [JsonIgnore]
+    public virtual ICollection<PostMedia> PostMedia { get; set; }
 
-    public virtual ICollection<User> UserCoverPhotoNavigations { get; set; } = new List<User>();
 
-    public virtual ICollection<User> UserProfilePictureNavigations { get; set; } = new List<User>();
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    [JsonIgnore]
+    public virtual ICollection<UserMedia> UserMedia { get; set; } = new List<UserMedia>();
 }

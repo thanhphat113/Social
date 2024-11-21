@@ -3,15 +3,22 @@ import clsx from "clsx";
 import { useSelector } from "react-redux";
 import styles from "./InforMess.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
+import Nickname from "./components/Nickname";
+import MainTopic from "./components/MainTopic";
+import Media from "./components/Media";
+import File from "./components/File";
 
 function InforMess() {
     const friends = useSelector((state) => state.friends.allFriends);
-    const currentFriend = useSelector((state) => state.message.currentUser);
-    const InforCurrentFriend = friends.find((u) => u.userId === currentFriend);
+    const currentFriendId = useSelector((state) => state.message.currentUserId);
+    const InforCurrentFriend = friends.find(
+        (u) => u.userId === currentFriendId
+    );
     const [typeDrop, setTypeDrop] = useState("mmm");
     const [click, setClick] = useState(false);
     const [dropSetting, setDropSetting] = useState(false);
     const [dropFile, setDropFile] = useState(false);
+    const [isFileTheme, setIsFileTheme] = useState(false);
 
     return (
         <div className={styles.wrapper}>
@@ -19,10 +26,13 @@ function InforMess() {
                 <img
                     className={clsx(styles.profile)}
                     src={
-                        InforCurrentFriend.profilePicture ||
-                        `/public/img/default/${
-                            InforCurrentFriend.genderId !== 2 ? "man" : "woman"
-                        }_default.png`
+                        InforCurrentFriend.profilePicture
+                            ? `/public/img/Picture/${InforCurrentFriend.profilePicture.src}`
+                            : `/public/img/default/${
+                                  InforCurrentFriend.genderId !== 2
+                                      ? "man"
+                                      : "woman"
+                              }_default.png`
                     }
                 ></img>
             </div>
@@ -56,10 +66,13 @@ function InforMess() {
                 </div>
                 {dropSetting && (
                     <>
-                        <button className={styles.item}>Thay đổi chủ đề</button>
-                        <button className={styles.item}>
-                            Thay đổi biệt danh
-                        </button>
+                        <div className={styles.item}>
+                            <button>Thay đổi chủ đề</button>
+                            <div className={styles.icon}></div>
+                        </div>
+                        <div className={clsx(styles.item)}>
+                            <button>Thay đổi biệt danh</button>
+                        </div>
                     </>
                 )}
                 <div
@@ -83,14 +96,19 @@ function InforMess() {
                         </button>
                     </>
                 )}
-                {/* {typeDrop && <div className={styles.show}>
-                    <div className={styles.contentshow}>
-                        <div className={styles.delete}>
-                            <i onClick={() => setTypeDrop(null)} className="fa-solid fa-x"></i>
+                {typeDrop && (
+                    <div className={styles.show}>
+                        <div className={styles.contentshow}>
+                            <div className={styles.delete}>
+                                <i
+                                    onClick={() => setTypeDrop(null)}
+                                    className="fa-solid fa-x"
+                                ></i>
+                            </div>
+                            <File />
                         </div>
-                        <h1>hâhhah</h1>
                     </div>
-                </div>} */}
+                )}
             </div>
         </div>
     );

@@ -6,8 +6,8 @@ const UserSlice = createSlice({
     name: "user",
     initialState: {
         information: null,
-		historysearch: [],
 		requests: [],
+		profilePicture: null,
 		postrequests: [],
     },
     reducers: {
@@ -20,14 +20,12 @@ const UserSlice = createSlice({
 			.addCase(SetUser.fulfilled,(state,action) => {
 				const infor = action.payload
 				state.information = infor?.information || null
-				state.historysearch = infor?.historysearch || []
 				state.requests = infor?.requests || []
+				state.profilePicture = infor?.media || null
 				state.postrequests = infor?.postrequests || []
 			})
 			.addCase(SetUser.rejected,(state) => {
 				state.information = null
-				state.friends = []
-				state.historysearch = []
 				state.requests = []
 				state.postrequests = []
 			})

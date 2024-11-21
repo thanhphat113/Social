@@ -19,44 +19,25 @@ namespace Backend.Controllers
 		private readonly ChatInMessageService _detailmess;
 		private readonly GroupChatService _group;
 
-		private readonly HistorySearchService _historySearchContext;
 		private readonly RequestNotiService _NotiContext;
 		private readonly PostNotiService _PostContext;
+		private readonly MediaService _media;
 
-		public UserController(GroupChatService group, ChatInMessageService detailmess, UserService UserContext, MessageService mess, HistorySearchService historySearchContext, RequestNotiService NotiContext, PostNotiService PostContext)
+
+		public UserController(MediaService media, GroupChatService group, ChatInMessageService detailmess, UserService UserContext, MessageService mess, RequestNotiService NotiContext, PostNotiService PostContext)
 		{
 			_group = group;
 			_detailmess = detailmess;
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
-			_historySearchContext = historySearchContext;
+			_media = media;
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Get()
 		{
 			return Ok(await _userContext.GetAll());
-		}
-
-		[HttpGet("friends-by-name")]
-		public async Task<IActionResult> GetFriendsByName([FromQuery] string name)
-		{
-			var UserId = GetCookie.GetUserIdFromCookie(Request);
-			try
-			{
-				var friends = await _userContext.GetFriendsByName(UserId, name);
-				foreach (var item in friends)
-				{
-					item.ChatInMessages = await _detailmess.GetMessage(UserId, item.UserId);
-				}
-				return Ok(friends);
-			}
-			catch (System.Exception ex)
-			{
-				return BadRequest("Lỗi: " + ex);
-				throw;
-			}
 		}
 
 
@@ -66,17 +47,13 @@ namespace Backend.Controllers
 			var userId = GetCookie.GetUserIdFromCookie(Request);
 			if (userId == -1) return null;
 
-			var information = await _userContext.GetById(userId);
+			var information = await _userContext.GetLoginById(userId);
 			var friends = await _userContext.GetFriends(userId);
-			foreach (var item in friends)
-			{
-				item.ChatInMessages = await _detailmess.GetMessage(userId, item.UserId);
-			}
 			var groupchat = await _group.FindByUserId(userId);
 			var requests = await _NotiContext.FindByUserId(userId);
+			var media = await _media.FindProfilePictureByUserId(userId);
 			var postrequests = await _PostContext.FindByUserId(userId);
-			var historysearch = await _historySearchContext.GetHistorySearchByUserId(userId);
-			return Ok(new { information = information, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests, historysearch = historysearch });
+			return Ok(new { information = information, media = media, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests });
 		}
 
 		[AllowAnonymous]
@@ -90,7 +67,13 @@ namespace Backend.Controllers
 		[HttpGet("users-by-name")]
 		public async Task<IActionResult> GetListByName([FromQuery] string name)
 		{
-			return Ok(await _userContext.GetListByName(name));
+			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			var list = await _userContext.GetListByName(name, UserId);
+			foreach (var item in list)
+			{
+				item.ProfilePicture = await _media.FindProfilePictureByUserId(item.UserId);
+			}
+			return Ok(list);
 		}
 
 

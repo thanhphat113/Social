@@ -1,0 +1,79 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 60rem;
+    h1 {
+        text-align: center;
+    }
+    .content {
+        display: flex;
+        gap: 10px;
+        .item {
+            width: 50%;
+        }
+        .left {
+            overflow-y: auto;
+            max-height: 50rem;
+            padding: 0 5px;
+            li {
+                height: 5.5rem;
+            }
+        }
+        .right {
+            padding: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            .user {
+                justify-items: end;
+                .chat {
+                    width: 80%;
+                    border-radius: 10px 10px 0 10px;
+                    padding: 8px 8px;
+                    background-color: aqua;
+                }
+            }
+
+            .other {
+                .chat {
+                    width: 80%;
+                    border-radius: 10px 10px 10px 0px;
+                    padding: 8px 8px;
+                    background-color: var(--background);
+                }
+            }
+        }
+    }
+
+	.action{
+		text-align: end;
+		padding-top: 20px;
+		button{
+			text-align: center;
+			background-color: rgba(20, 203, 216, 0.5);
+			width: 10rem;
+			height: 3rem;
+			border-radius: 10px;
+
+			border: 1px solid black;
+
+			&:hover {
+                animation: bounce 1s infinite;
+            }
+		}
+
+		
+	}
+	
+}
+
+@keyframes bounce {
+	0% {
+		transform: translateY(0); /* Vị trí ban đầu */
+	}
+	50% {
+		transform: translateY(-6px); /* Nảy lên 10px */
+	}
+	100% {
+		transform: translateY(0); /* Quay lại vị trí ban đầu */
+	}
+}
