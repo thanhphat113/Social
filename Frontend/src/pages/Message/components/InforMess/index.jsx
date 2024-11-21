@@ -5,6 +5,8 @@ import styles from "./InforMess.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
 import Nickname from "./components/Nickname";
 import MainTopic from "./components/MainTopic";
+import Media from "./components/Media";
+import File from "./components/File";
 
 function InforMess() {
     const friends = useSelector((state) => state.friends.allFriends);
@@ -16,6 +18,7 @@ function InforMess() {
     const [click, setClick] = useState(false);
     const [dropSetting, setDropSetting] = useState(false);
     const [dropFile, setDropFile] = useState(false);
+    const [isFileTheme, setIsFileTheme] = useState(false);
 
     return (
         <div className={styles.wrapper}>
@@ -93,14 +96,19 @@ function InforMess() {
                         </button>
                     </>
                 )}
-                {typeDrop && <div className={styles.show}>
-                    <div className={styles.contentshow}>
-                        <div className={styles.delete}>
-                            <i onClick={() => setTypeDrop(null)} className="fa-solid fa-x"></i>
+                {typeDrop && (
+                    <div className={styles.show}>
+                        <div className={styles.contentshow}>
+                            <div className={styles.delete}>
+                                <i
+                                    onClick={() => setTypeDrop(null)}
+                                    className="fa-solid fa-x"
+                                ></i>
+                            </div>
+                            <File />
                         </div>
-                        <MainTopic/>
                     </div>
-                </div>}
+                )}
             </div>
         </div>
     );

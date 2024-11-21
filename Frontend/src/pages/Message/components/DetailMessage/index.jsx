@@ -7,6 +7,7 @@ import styles from "./DetailMessage.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
 import {
     addMess,
+    recallMess,
     deleteMess,
 } from "../../../../components/Redux/Actions/MessageActions";
 import Validate from "../../../../components/Validate";
@@ -44,6 +45,10 @@ function DetailMessage({ onShow }) {
             listRef.current.scrollTop = scrollPosition.current;
         }
     }, [friends]);
+
+    const handleCall = () => {
+        window.open("/call", "_blank", "width=400,height=600");
+      };
 
     const toggleListVisibility = () => {
         scrollPosition.current = listRef.current.scrollTop;
@@ -92,7 +97,13 @@ function DetailMessage({ onShow }) {
     };
 
     const onAccept = () => {
-        dispatch(deleteMess({ id: targetMess, Otheruser: currentFriendId }));
+        typeShow === "recall"
+            ? dispatch(
+                  recallMess({ id: targetMess, Otheruser: currentFriendId })
+              )
+            : dispatch(
+                  deleteMess({ id: targetMess, Otheruser: currentFriendId })
+              );
         setTypeShow(null);
     };
 
@@ -139,7 +150,7 @@ function DetailMessage({ onShow }) {
                 </CustomTooltip>
                 <div className={styles.action}>
                     <CustomTooltip title="Gọi">
-                        <i className="fa-solid fa-phone"></i>
+                        <i onClick={() => handleCall()} className="fa-solid fa-phone"></i>
                     </CustomTooltip>
                     <CustomTooltip title="Gọi video">
                         <i className="fa-solid fa-video"></i>
@@ -152,9 +163,9 @@ function DetailMessage({ onShow }) {
                     </CustomTooltip>
                 </div>
             </div>
-            <div ref={listRef} className={styles.content}>
+            <div ref={listRef} className={clsx(styles.content)}>
                 {Object.keys(groupedMessages).map((date) => (
-                    <div key={date} className={styles.chatzone}>
+                    <div key={date} className={clsx(styles.chatzone)}>
                         <small>{date}</small>
                         {groupedMessages[date].map((mess) => {
                             const formattedTime = moment(
@@ -179,7 +190,7 @@ function DetailMessage({ onShow }) {
                                     {hoveredMessageId === mess.chatId &&
                                         userid === mess.fromUser && (
                                             <>
-                                                {!mess.isRecall && (
+                                                {!mess.isRecall ? (
                                                     <>
                                                         {" "}
                                                         <CustomTooltip title="Thu hồi">
@@ -199,20 +210,30 @@ function DetailMessage({ onShow }) {
                                                                 }}
                                                             ></i>
                                                         </CustomTooltip>
-                                                        <CustomTooltip title="Chỉnh sửa">
-                                                            <i
-                                                                className={clsx(
-                                                                    styles.update,
-                                                                    "fa-solid fa-pencil"
-                                                                )}
-                                                            ></i>
-                                                        </CustomTooltip>
                                                     </>
+                                                ) : (
+                                                    <CustomTooltip title="Xoá">
+                                                        <i
+                                                            className={clsx(
+                                                                styles.update,
+                                                                "fa-solid fa-trash"
+                                                            )}
+                                                            onClick={() => {
+                                                                toggleListVisibility();
+                                                                setTypeShow(
+                                                                    "delete"
+                                                                );
+                                                                setTargetMess(
+                                                                    mess.chatId
+                                                                );
+                                                            }}
+                                                        ></i>
+                                                    </CustomTooltip>
                                                 )}
                                             </>
                                         )}
                                     <CustomTooltip title={formattedTime}>
-                                        <div className={styles.mess}>
+                                        <div className={clsx(styles.mess)}>
                                             <p
                                                 className={clsx({
                                                     [styles.recall]:
@@ -247,11 +268,11 @@ function DetailMessage({ onShow }) {
                 ></i>
             </div>
 
-            {typeShow === "recall" && (
+            {typeShow && (
                 <Validate
                     onAccept={onAccept}
                     onCancel={onCancel}
-                    message={"Bạn có chắc chắn muốn thu hồi tin nhắn này?"}
+                    message={`Bạn có chắc chắn muốn ${typeShow === "recall" ? `thu hồi` : `xoá`} tin nhắn này?`}
                 />
             )}
         </div>

@@ -1,0 +1,39 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 40rem;
+    gap: 5px;
+
+    h1 {
+        text-align: center;
+    }
+
+    .list {
+        max-height: 40rem;
+        overflow-y: auto;
+    }
+
+    .item {
+		cursor: pointer;
+        position: relative;
+        height: 5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        padding: 0 5px;
+        &::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0px;
+            width: 110%;
+            height: 2px;
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: translateX(-50%);
+        }
+
+        &:hover {
+            background-color: var(--background);
+        }
+    }
+}

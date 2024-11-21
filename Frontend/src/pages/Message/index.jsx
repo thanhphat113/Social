@@ -9,7 +9,7 @@ import { setCurrentUser } from "../../components/Redux/Slices/MessageSlice";
 
 function Message() {
     const currentUser = useSelector((state) => state.message.currentUserId);
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const [show, setShow] = useState(true);
 
@@ -18,8 +18,8 @@ function Message() {
     };
 
     useEffect(() => {
-        return () => dispatch(setCurrentUser(null))
-    },[])
+        return () => dispatch(setCurrentUser(null));
+    }, []);
 
     return (
         <div className={clsx(styles.wrapper)}>
@@ -31,11 +31,19 @@ function Message() {
                     <div className={clsx(styles.center)}>
                         <DetailMessage onShow={handleShowInfor}></DetailMessage>
                     </div>
-                    {show && <div className={clsx(styles.right)}>
-                        <InforMess />
-                    </div>}
+                    {show && (
+                        <div className={clsx(styles.right)}>
+                            <div className={styles.infor}>
+                                <InforMess />
+                            </div>
+                        </div>
+                    )}
                 </>
-            ):(<h1 className={clsx(styles.validate,styles.center)}>Hãy chọn đoạn tin nhắn muốn hiển thị</h1>)}
+            ) : (
+                <h1 className={clsx(styles.validate, styles.center)}>
+                    Hãy chọn đoạn tin nhắn muốn hiển thị
+                </h1>
+            )}
         </div>
     );
 }
