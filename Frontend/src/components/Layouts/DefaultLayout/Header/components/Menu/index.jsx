@@ -4,16 +4,18 @@ import styles from "./Menu.module.scss";
 import { CustomTooltip } from "../../../../../GlobalStyles";
 
 function Menu({ type , onHandleClick}) {
+    
+
     return (
         <div className={clsx(styles.content)}>
             <CustomTooltip title="Trang chủ">
                 <Link
                     to="/"
                     className={clsx(styles.choice, {
-                        [styles.active]: type === "home",
+                        [styles.active]: type === "/",
                     })}
                     onClick={() => {
-                        onHandleClick("home");
+                        onHandleClick("/");
                     }}
                 >
                     <i className="fa-solid fa-house-chimney"></i>
@@ -23,10 +25,10 @@ function Menu({ type , onHandleClick}) {
                 <Link
                     to="/group"
                     className={clsx(styles.choice, {
-                        [styles.active]: type === "group",
+                        [styles.active]: type === "/group",
                     })}
                     onClick={() => {
-                        onHandleClick("group");
+                        onHandleClick("/group");
                     }}
                 >
                     <i className="fa-solid fa-user-group"></i>
@@ -36,9 +38,9 @@ function Menu({ type , onHandleClick}) {
                 <Link
                     to="/message"
                     className={clsx(styles.choice, {
-                        [styles.active]: type === 'message',
+                        [styles.active]: type === '/message',
                     })}
-                    onClick={() => onHandleClick('message')}
+                    onClick={() => onHandleClick('/message')}
                 >
                     <i className="fa-solid fa-message"></i>
                 </Link>

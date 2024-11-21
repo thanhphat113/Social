@@ -1,23 +1,85 @@
 import clsx from "clsx";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./MainTopic.module.scss";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
 
 function MainTopic() {
+    const mainTopic = useSelector((state) => state.message.currentMessage);
+
+    const [select, setSelect] = useState(
+        mainTopic.mainTopicNavigation?.topicId
+    );
+    const [topics, setTopics] = useState([]);
+
+    const dispatch = useDispatch();
+
+    const item = topics.find((t) => t.topicId === select);
+
+    useEffect(() => {
+        getMainTopic();
+    }, []);
+
+    const updateTopic = async (TopicId, MessageId) => {
+        if (TopicId === mainTopic.mainTopicNavigation.topicId) return;
+        try {
+            const response = await axios.put(
+                `http://localhost:5164/api/Message/topic`,
+                { TopicId, MessageId },
+                {
+                    withCredentials: true,
+                }
+            );
+            dispatch(setTopic(response.data));
+        } catch (error){
+            console.log(error)
+        }
+    };
+
+    const getMainTopic = async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5164/api/MainTopic`,
+                {
+                    withCredentials: true,
+                }
+            );
+            setTopics(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div className={styles.wrapper}>
             <h1 className="have-line">Xem trước và thay đổi chủ đề</h1>
             <div className={styles.content}>
                 <div className={clsx(styles.item, styles.left)}>
-                    <div>
-                        <li>1</li>
-                        <li>2</li>
-                        <li>3</li>
-                        <li>4</li>
-                        <li>5</li>
-                    </div>
+                    {topics.length > 0 &&
+                        topics.map((item) => (
+                            <div
+                                key={item.topicId}
+                                className={clsx(styles.choise, "have-line")}
+                                onClick={() => setSelect(item.topicId)}
+                            >
+                                <div
+                                    className={styles.circle}
+                                    style={{ borderColor: item.color }}
+                                ></div>
+                                <span>{item.topicName}</span>
+                                {item.topicId === select && (
+                                    <i className="fa-solid fa-check"></i>
+                                )}
+                            </div>
+                        ))}
                 </div>
                 <div className={clsx(styles.item, styles.right)}>
                     <div className={styles.user}>
-                        <p className={styles.chat}>
+                        <p
+                            className={styles.chat}
+                            style={{ backgroundColor: item?.color }}
+                        >
                             Tin nhắn của bạn sẽ như thế này
                         </p>
                     </div>
@@ -27,7 +89,13 @@ function MainTopic() {
                 </div>
             </div>
             <div className={styles.action}>
-                <button>Xác nhận</button>
+                <button
+                    onClick={() =>
+                        updateTopic(item.topicId, mainTopic.messagesId)
+                    }
+                >
+                    Xác nhận
+                </button>
             </div>
         </div>
     );
