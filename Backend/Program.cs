@@ -52,16 +52,16 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
-<<<<<<< HEAD
+//<<<<<<< HEAD
 builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<PostService>();
 /*builder.Services.AddScoped<IRepositories<Post>, PostRepository>();*/
-=======
+//=======
 // builder.Services.AddScoped<PostRepository>();
 // builder.Services.AddScoped<PostService>();
 // builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
 
->>>>>>> main
+//>>>>>>> main
 
 
 

@@ -25,10 +25,10 @@ public class PostService
         return await _postRepository.GetAllUser();
     }
 
-    public async Task<PostDTO> GetPostById(int id)
-    {
-        return await _postRepository.GetById(id);
-    }
+    //public async Task<PostDTO> GetPostById(int id)
+    //{
+    //    //return await _postRepository.GetById(id);
+    //}
 
     public async Task<bool> CreatePost(PostDTO post)
     {
@@ -70,8 +70,9 @@ public class PostService
                 });
             }
         }
+        return true;
 
-        return await _postRepository.AddPostWithMedia(postDTO, mediaList);
+        //return await _postRepository.AddPostWithMedia(postDTO, mediaList);
     }
 
     public async Task<bool> UpdatePost(int id, PostDTO postDTO)
