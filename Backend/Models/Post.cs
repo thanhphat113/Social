@@ -21,7 +21,7 @@ public partial class Post
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-    public virtual User CreatedByUser { get; set; } = null!;
+    public virtual User? CreatedByUser { get; set; } = null!;
 
     public virtual UserGroup? Group { get; set; }
 
