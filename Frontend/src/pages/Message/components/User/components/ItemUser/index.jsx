@@ -25,7 +25,6 @@ function ItemUser({ list }) {
     }, [currentTime]);
 
     const handleClick = async (value, lastMess, compareId) => {
-        console.log(lastMess);
         dispatch(setCurrentUser(value));
         lastMess &&
             !compareId &&

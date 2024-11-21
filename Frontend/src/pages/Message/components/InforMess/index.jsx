@@ -11,14 +11,15 @@ import File from "./components/File";
 function InforMess() {
     const friends = useSelector((state) => state.friends.allFriends);
     const currentFriendId = useSelector((state) => state.message.currentUserId);
+    const mainTopic = useSelector((state) => state.message.currentMessage);
+
     const InforCurrentFriend = friends.find(
         (u) => u.userId === currentFriendId
     );
-    const [typeDrop, setTypeDrop] = useState("mmm");
+    const [typeDrop, setTypeDrop] = useState(null);
     const [click, setClick] = useState(false);
     const [dropSetting, setDropSetting] = useState(false);
     const [dropFile, setDropFile] = useState(false);
-    const [isFileTheme, setIsFileTheme] = useState(false);
 
     return (
         <div className={styles.wrapper}>
@@ -66,11 +67,17 @@ function InforMess() {
                 </div>
                 {dropSetting && (
                     <>
-                        <div className={styles.item}>
+                        <div onClick={()=> setTypeDrop("maintopic")} className={styles.item}>
                             <button>Thay đổi chủ đề</button>
-                            <div className={styles.icon}></div>
+                            <div
+                                className={styles.icon}
+                                style={{
+                                    borderColor:
+                                        mainTopic.mainTopicNavigation?.color,
+                                }}
+                            ></div>
                         </div>
-                        <div className={clsx(styles.item)}>
+                        <div onClick={()=> setTypeDrop("nickname")} className={clsx(styles.item)}>
                             <button>Thay đổi biệt danh</button>
                         </div>
                     </>
@@ -90,8 +97,8 @@ function InforMess() {
                 </div>
                 {dropFile && (
                     <>
-                        <button className={styles.item}>File</button>
-                        <button className={styles.item}>
+                        <button onClick={()=> setTypeDrop("media")} className={styles.item}>File</button>
+                        <button onClick={()=> setTypeDrop("file")} className={styles.item}>
                             File phương tiện
                         </button>
                     </>
@@ -105,7 +112,15 @@ function InforMess() {
                                     className="fa-solid fa-x"
                                 ></i>
                             </div>
-                            <File />
+                            {typeDrop === "file" ? (
+                                <File />
+                            ): typeDrop === "nickname" ?(
+                                <Nickname user={InforCurrentFriend}/>
+                            ): typeDrop === "maintopic" ?(
+                                <MainTopic/>
+                            ): typeDrop === "media"  && (
+                            <Media/>
+                            )}
                         </div>
                     </div>
                 )}

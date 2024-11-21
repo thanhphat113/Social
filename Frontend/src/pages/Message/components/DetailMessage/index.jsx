@@ -6,6 +6,7 @@ import moment from "moment";
 import styles from "./DetailMessage.module.scss";
 import { CustomTooltip } from "../../../../components/GlobalStyles";
 import {
+    getMess,
     addMess,
     recallMess,
     deleteMess,
@@ -16,6 +17,12 @@ function DetailMessage({ onShow }) {
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
     const currentFriendId = useSelector((state) => state.message.currentUserId);
+    const mainTopic = useSelector(
+        (state) => state.message.currentMessage?.mainTopicNavigation
+    );
+    const { user1, user2, nickName1, nickName2 } = useSelector(
+        (state) => state.message.currentMessage
+    );
 
     const dispatch = useDispatch();
     const [isSending, setIsSending] = useState(false);
@@ -35,8 +42,17 @@ function DetailMessage({ onShow }) {
     );
 
     useEffect(() => {
+        getMessage();
         scrollPosition.current = 0;
     }, [currentFriendId]);
+
+    const getMessage = async () => {
+        try {
+            await dispatch(getMess(currentFriendId));
+        } catch (error) {
+            console.log("Lỗi: " + error);
+        }
+    };
 
     useEffect(() => {
         if (scrollPosition.current === 0) {
@@ -48,7 +64,7 @@ function DetailMessage({ onShow }) {
 
     const handleCall = () => {
         window.open("/call", "_blank", "width=400,height=600");
-      };
+    };
 
     const toggleListVisibility = () => {
         scrollPosition.current = listRef.current.scrollTop;
@@ -112,7 +128,6 @@ function DetailMessage({ onShow }) {
     };
 
     const scrollToBottom = () => {
-        console.log("trong croll:" + scrollPosition.current);
         scrollPosition.current === 0 &&
             messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
     };
@@ -143,14 +158,25 @@ function DetailMessage({ onShow }) {
                             }
                         ></img>
                         <strong>
-                            {InforCurrentFriend.lastName}{" "}
-                            {InforCurrentFriend.firstName}
+                            {user1 === currentFriendId
+                                ? nickName1 ||
+                                  `${InforCurrentFriend.lastName} ${InforCurrentFriend.firstName}`
+                                : nickName2 ||
+                                  `${InforCurrentFriend.lastName} ${InforCurrentFriend.firstName}`}
                         </strong>
                     </div>
                 </CustomTooltip>
-                <div className={styles.action}>
+                <div
+                    className={styles.action}
+                    style={{
+                        color: mainTopic?.color,
+                    }}
+                >
                     <CustomTooltip title="Gọi">
-                        <i onClick={() => handleCall()} className="fa-solid fa-phone"></i>
+                        <i
+                            onClick={() => handleCall()}
+                            className="fa-solid fa-phone"
+                        ></i>
                     </CustomTooltip>
                     <CustomTooltip title="Gọi video">
                         <i className="fa-solid fa-video"></i>
@@ -233,7 +259,15 @@ function DetailMessage({ onShow }) {
                                             </>
                                         )}
                                     <CustomTooltip title={formattedTime}>
-                                        <div className={clsx(styles.mess)}>
+                                        <div
+                                            className={clsx(styles.mess)}
+                                            style={{
+                                                backgroundColor:
+                                                    userid === mess.fromUser &&
+                                                    mainTopic &&
+                                                    mainTopic.color,
+                                            }}
+                                        >
                                             <p
                                                 className={clsx({
                                                     [styles.recall]:
@@ -263,6 +297,9 @@ function DetailMessage({ onShow }) {
                     placeholder="Aa"
                 ></input>
                 <i
+                    style={{
+                        color: mainTopic?.color,
+                    }}
                     onClick={() => handleSendMessage()}
                     className="fa-solid fa-paper-plane"
                 ></i>
@@ -272,7 +309,9 @@ function DetailMessage({ onShow }) {
                 <Validate
                     onAccept={onAccept}
                     onCancel={onCancel}
-                    message={`Bạn có chắc chắn muốn ${typeShow === "recall" ? `thu hồi` : `xoá`} tin nhắn này?`}
+                    message={`Bạn có chắc chắn muốn ${
+                        typeShow === "recall" ? `thu hồi` : `xoá`
+                    } tin nhắn này?`}
                 />
             )}
         </div>

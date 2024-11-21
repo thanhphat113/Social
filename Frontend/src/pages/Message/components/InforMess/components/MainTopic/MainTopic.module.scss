@@ -11,13 +11,49 @@
         .item {
             width: 50%;
         }
+
         .left {
             overflow-y: auto;
             max-height: 50rem;
             padding: 0 5px;
-            li {
-                height: 5.5rem;
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+            .choise {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                padding: 5px;
+                cursor: pointer;
+
+                i{
+                    font-size: 2rem;
+                    color: rgb(16, 130, 231);
+                }
+                
+                .circle {
+                    width: 4rem;
+                    border-radius: 50%;
+                    height: 4rem;
+                    border: 10px solid;
+                }
+                span {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    height: 5rem;
+                    span {
+                        width: 2rem;
+                        content: none;
+                        height: 2rem;
+                    }
+                }
+                &:hover {
+                    background-color: var(--background);
+                    border-radius: 10px;
+                }
             }
+            
         }
         .right {
             padding: 5px;
@@ -25,6 +61,7 @@
             border-radius: 10px;
             .user {
                 justify-items: end;
+                color :white;
                 .chat {
                     width: 80%;
                     border-radius: 10px 10px 0 10px;
@@ -44,36 +81,33 @@
         }
     }
 
-	.action{
-		text-align: end;
-		padding-top: 20px;
-		button{
-			text-align: center;
-			background-color: rgba(20, 203, 216, 0.5);
-			width: 10rem;
-			height: 3rem;
-			border-radius: 10px;
+    .action {
+        text-align: end;
+        padding-top: 20px;
+        button {
+            text-align: center;
+            background-color: rgba(20, 203, 216, 0.5);
+            width: 10rem;
+            height: 3rem;
+            border-radius: 10px;
 
-			border: 1px solid black;
+            border: 1px solid black;
 
-			&:hover {
+            &:hover {
                 animation: bounce 1s infinite;
             }
-		}
-
-		
-	}
-	
+        }
+    }
 }
 
 @keyframes bounce {
-	0% {
-		transform: translateY(0); /* Vị trí ban đầu */
-	}
-	50% {
-		transform: translateY(-6px); /* Nảy lên 10px */
-	}
-	100% {
-		transform: translateY(0); /* Quay lại vị trí ban đầu */
-	}
+    0% {
+        transform: translateY(0); /* Vị trí ban đầu */
+    }
+    50% {
+        transform: translateY(-6px); /* Nảy lên 10px */
+    }
+    100% {
+        transform: translateY(0); /* Quay lại vị trí ban đầu */
+    }
 }
