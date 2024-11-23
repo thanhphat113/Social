@@ -15,6 +15,8 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<HistorySearch> _HistorySearch;
 		private readonly IGenericRepository<Message> _Message;
 		private readonly IGenericRepository<Media> _Media;
+		private readonly IGenericRepository<MainTopic> _main;
+
 		private readonly IGenericRepository<UserMedia> _UserMedia;
 
 
@@ -32,9 +34,11 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<RequestNotification> RequestNotification,
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
+						  IGenericRepository<MainTopic> main,
 						  IGenericRepository<UserMedia> UserMedia)
 		{
 			_context = context;
+			_main = main;
 			_Users = Users;
 			_UserMedia = UserMedia;
 			_ChatInMessage = ChatInMessage;
@@ -54,6 +58,8 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<HistorySearch> HistorySearch => _HistorySearch;
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;
+		public IGenericRepository<MainTopic> MainTopic => _main;
+
 		public IGenericRepository<UserMedia> UserMedia => _UserMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;

@@ -57,7 +57,7 @@ function ItemUser({ list }) {
             {list.map((item) => {
                 const lastMess =
                     item.chatInMessages[item.chatInMessages.length - 1];
-                const compareId = compareIds(lastMess.fromUser, userId);
+                const compareId = compareIds(lastMess?.fromUser, userId);
 
                 return (
                     <button
@@ -70,7 +70,7 @@ function ItemUser({ list }) {
                         <img
                             src={
                                 item.profilePicture?.src
-                                    ? `/public/img/Picture/${item.profilePicture.src}`
+                                    ? `${item.profilePicture.src}`
                                     : `/public/img/default/${
                                           item.genderId !== 2 ? "man" : "woman"
                                       }_default.png`
@@ -85,7 +85,7 @@ function ItemUser({ list }) {
                                 className={clsx(
                                     {
                                         [styles.NotRead]:
-                                            !lastMess.isRead && !compareId,
+                                            !lastMess?.isRead && !compareId,
                                     },
                                     styles.lastmess
                                 )}
@@ -93,8 +93,8 @@ function ItemUser({ list }) {
                                 <p>
                                     {lastMess
                                         ? compareId
-                                            ? `Bạn: ${lastMess.content}`
-                                            : lastMess.content
+                                            ? `Bạn: ${lastMess.content || "Đã gửi một file"}`
+                                            : lastMess.content || "Đã gửi một file"
                                         : "Hãy Gửi một lời chào với bạn mới!!!"}
                                 </p>
                                 <small>

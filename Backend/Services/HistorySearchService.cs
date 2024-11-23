@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
+using Backend.DTO;
+
 using Backend.Repositories.Interface;
 using Backend.Services.Interface;
 
@@ -73,13 +75,13 @@ namespace Backend.Services
 
 				foreach (var item in items)
 				{
-					var UserMedia = await _unit.UserMedia.GetByConditionAsync(u => u.UserId == item.UserId && u.IsProfilePicture == true);
+					var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == item.UserId && u.IsProfilePicture == true);
 					if (UserMedia == null)
 					{
 						continue;
 					};
 
-					var profilePicture = await _unit.Media.GetByConditionAsync(m => m.MediaId == UserMedia.MediaId);
+					var profilePicture = await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
 
 					item.ProfilePicture = profilePicture;
 				}
@@ -107,7 +109,7 @@ namespace Backend.Services
 			try
 			{
 				Console.WriteLine("Đối tượng: " + FromUserId + " " + OtherUserId);
-				var item = await _unit.HistorySearch.GetByConditionAsync(h => h.FromUserId == FromUserId && h.OtherUserId == OtherUserId);
+				var item = await _unit.HistorySearch.GetByConditionAsync<HistorySearch>(h => h.FromUserId == FromUserId && h.OtherUserId == OtherUserId);
 				var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 				var vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
 

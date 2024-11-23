@@ -40,7 +40,7 @@ function Message() {
                     )}
                 </>
             ) : (
-                <h1 className={clsx(styles.validate, styles.center)}>
+                <h1 className={clsx(styles.validate, styles.right)}>
                     Hãy chọn đoạn tin nhắn muốn hiển thị
                 </h1>
             )}

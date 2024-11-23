@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CustomTooltip } from "../../../../../../../GlobalStyles";
 import styles from "./AccountIcon.module.scss";
 import { typeContext } from "../../../..";
-import {logout} from "../../../../../../../Redux/Actions/AuthAction"
+import { logout } from "../../../../../../../Redux/Actions/AuthAction";
 import { SetUser } from "../../../../../../../Redux/Actions/UserAction";
 
 function AccountIcon(props) {
@@ -32,7 +32,7 @@ function AccountIcon(props) {
                     className={styles.circle}
                     src={
                         profilePicture
-                            ? `/public/img/Picture/${profilePicture.src}`
+                            ? `${profilePicture.src}`
                             : `/public/img/default/${
                                   user.genderId !== 2 ? "man" : "woman"
                               }_default.png`
@@ -50,7 +50,7 @@ function AccountIcon(props) {
                             <img
                                 src={
                                     profilePicture
-                                        ? `/public/img/Picture/${profilePicture.src}`
+                                        ? `${profilePicture.src}`
                                         : `/public/img/default/${
                                               user.genderId !== 2
                                                   ? "man"

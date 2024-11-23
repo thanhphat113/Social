@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Backend.Models;
 
-namespace Backend.Models;
+namespace Backend.DTO;
 
 public partial class HistoryWithUser
 {

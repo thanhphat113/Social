@@ -28,7 +28,7 @@ function InforMess() {
                     className={clsx(styles.profile)}
                     src={
                         InforCurrentFriend.profilePicture
-                            ? `/public/img/Picture/${InforCurrentFriend.profilePicture.src}`
+                            ? `${InforCurrentFriend.profilePicture.src}`
                             : `/public/img/default/${
                                   InforCurrentFriend.genderId !== 2
                                       ? "man"
@@ -112,13 +112,13 @@ function InforMess() {
                                     className="fa-solid fa-x"
                                 ></i>
                             </div>
-                            {typeDrop === "file" ? (
+                            {typeDrop === "media" ? (
                                 <File />
                             ): typeDrop === "nickname" ?(
                                 <Nickname user={InforCurrentFriend}/>
                             ): typeDrop === "maintopic" ?(
                                 <MainTopic/>
-                            ): typeDrop === "media"  && (
+                            ): typeDrop === "file"  && (
                             <Media/>
                             )}
                         </div>
