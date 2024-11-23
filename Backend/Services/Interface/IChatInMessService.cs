@@ -8,7 +8,9 @@ namespace Backend.Services.Interface
 {
 	public interface IChatInMessService : IService<ChatInMessage>
 	{
-		public Task<ICollection<ChatInMessage>> GetMessage(int user1, int user2);
-		public Task<bool> ReadMess(int user1);
+		public Task<bool> ReadMess(int Id);
+
+		public Task<bool> Recall(int id);
+
 	}
 }

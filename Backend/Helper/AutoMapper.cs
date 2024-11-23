@@ -1,7 +1,8 @@
 using AutoMapper;
+using Backend.DTO;
 using Backend.Models;
 
-namespace Backend.AutoMapper;
+namespace Backend.Helper;
 public class MappingProfile : Profile
 {
 	public MappingProfile()

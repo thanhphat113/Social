@@ -7,16 +7,15 @@
     padding: 0.5rem;
     width: var(--left-and-right-item);
     border-right: 0.5px solid #333;
-    // flex-grow: 1;
 }
 
 .center {
-    flex: 1;
+    width: 70rem;
     border-right: 0.5px solid #333;
 }
 
 .right {
-    width: var(--left-and-right-item);
+    flex:1;
 }
 
 .validate {

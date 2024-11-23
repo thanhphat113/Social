@@ -20,6 +20,7 @@ const MessageSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getMess.fulfilled, (state, action) => {
+            console.log(action.payload)
             state.currentMessage = action.payload;
         });
     },

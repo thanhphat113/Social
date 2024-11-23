@@ -21,7 +21,7 @@ namespace Backend.Services
 		{
 			try
 			{
-				var item = await _unit.RequestNotification.GetByConditionAsync(r =>
+				var item = await _unit.RequestNotification.GetByConditionAsync<RequestNotification>(r =>
 							(r.FromUserId == user1 && r.ToUserId == user2) ||
 					 		(r.FromUserId == user2 && r.ToUserId == user1));
 				if (item == null) return false;
@@ -29,7 +29,7 @@ namespace Backend.Services
 				item.IsAccept = true;
 				item.IsRead = true;
 
-				var relation = await _unit.Relationship.GetByConditionAsync(r =>
+				var relation = await _unit.Relationship.GetByConditionAsync<Relationship>(r =>
 							(r.FromUserId == user1 && r.ToUserId == user2) ||
 					 		(r.FromUserId == user2 && r.ToUserId == user1));
 

@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
 import ProfileGroup from "./pages/ProfileGroup";
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 import Information from "./pages/Information";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
@@ -39,14 +39,14 @@ function App() {
                         </Authentication>
                     }
                 />
-                <Route
+                {/* <Route
                     path="/"
                     element={
                         <Authentication>
                             <Home />
                         </Authentication>
                     }
-                />
+                /> */}
                 {/* <Route
                     path="/group"
                     element={

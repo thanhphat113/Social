@@ -10,6 +10,7 @@ function Nickname({ user }) {
     const User = useSelector((state) => state.user.information);
     const currentNickname1 =  User.userId === message.user1 ? message.nickName1 : message.nickName2
     const currentNickname2 =  User.userId === message.user1 ? message.nickName2 : message.nickName1
+    console.log(currentNickname1, currentNickname2)
     const dispatch = useDispatch();
 
     const [nickName1, setNickName1] = useState(currentNickname1);
@@ -17,6 +18,7 @@ function Nickname({ user }) {
     const [focus, setFocus] = useState(0);
 
     const handleAccept = async (MessageId, Nickname1, Nickname2) => {
+        console.log(MessageId, Nickname1, Nickname2)
         if (Nickname1 === currentNickname1 && Nickname2 === currentNickname2) return
         try {
             const response = await axios.put(
