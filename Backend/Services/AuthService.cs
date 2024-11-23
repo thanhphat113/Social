@@ -70,7 +70,7 @@ public class AuthService
         Console.WriteLine("Đã `chạy tạo token");
 
 
-        return (jwtToken);
+        return jwtToken;
     }
 
     // Refresh token

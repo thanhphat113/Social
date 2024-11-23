@@ -57,10 +57,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//Post
 
-// builder.Services.AddScoped<PostRepository>();
-// builder.Services.AddScoped<PostService>();
-// builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
+builder.Services.AddScoped<PostService>();
 
 
 

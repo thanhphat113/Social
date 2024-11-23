@@ -8,7 +8,6 @@ public partial class Media
 {
     public int MediaId { get; set; }
 
-
     public string Src { get; set; } = null!;
     [JsonIgnore]
 

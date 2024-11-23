@@ -23,6 +23,8 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<PostNotification> _PostNotification;
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
+		private readonly IGenericRepository<Post> _post;
+		private readonly IGenericRepository<PostMedia> _postMedia;
 
 		public UnitOfWork(SocialMediaContext context,
 						  IGenericRepository<User> Users,
@@ -34,8 +36,10 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<RequestNotification> RequestNotification,
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
-						  IGenericRepository<MainTopic> main,
-						  IGenericRepository<UserMedia> UserMedia)
+						  IGenericRepository<UserMedia> UserMedia,
+              IGenericRepository<Post> post,
+              IGenericRepository<PostMedia> postMedia)
+						  
 		{
 			_context = context;
 			_main = main;
@@ -49,6 +53,8 @@ namespace Backend.Repositories.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
+			_post = post;
+			_postMedia = postMedia;
 		}
 
 		// Các property chỉ đọc cho các repository
@@ -65,8 +71,11 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
 
-		// Phương thức SaveChanges
-		public async Task<bool> CompleteAsync()
+		public IGenericRepository<PostMedia> PostMedia => _postMedia;
+        public IGenericRepository<Post> Post => _post;
+
+        // Phương thức SaveChanges
+        public async Task<bool> CompleteAsync()
 		{
 			var result = await _context.SaveChangesAsync();
 			return result > 0;
