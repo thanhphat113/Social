@@ -1,6 +1,5 @@
 using Backend.Models;
 using Backend.Helper;
-
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,8 +24,6 @@ namespace Backend.Controllers
 			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 			return Ok(await _service.GetHistorySearchByUserId(UserId));
 		}
-
-
 
 
 		[HttpPost]
