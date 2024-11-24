@@ -16,10 +16,7 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<Message> _Message;
 		private readonly IGenericRepository<Media> _Media;
 		private readonly IGenericRepository<MainTopic> _main;
-
 		private readonly IGenericRepository<UserMedia> _UserMedia;
-
-
 		private readonly IGenericRepository<PostNotification> _PostNotification;
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
@@ -37,13 +34,15 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
 						  IGenericRepository<UserMedia> UserMedia,
-              IGenericRepository<Post> post,
-              IGenericRepository<PostMedia> postMedia)
-						  
+						  IGenericRepository<MainTopic> main,
+						  IGenericRepository<Post> post,
+			  			IGenericRepository<PostMedia> postMedia)
+
 		{
 			_context = context;
 			_main = main;
 			_Users = Users;
+			_post = post;
 			_UserMedia = UserMedia;
 			_ChatInMessage = ChatInMessage;
 			_GroupChat = GroupChat;
@@ -53,7 +52,6 @@ namespace Backend.Repositories.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
-			_post = post;
 			_postMedia = postMedia;
 		}
 
@@ -65,23 +63,21 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<MainTopic> MainTopic => _main;
+		public IGenericRepository<Post> Post => _post;
+		public IGenericRepository<PostMedia> PostMedia => _postMedia;
 
 		public IGenericRepository<UserMedia> UserMedia => _UserMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
 
-		public IGenericRepository<PostMedia> PostMedia => _postMedia;
-        public IGenericRepository<Post> Post => _post;
-
-        // Phương thức SaveChanges
-        public async Task<bool> CompleteAsync()
+		// Phương thức SaveChanges
+		public async Task<bool> CompleteAsync()
 		{
 			var result = await _context.SaveChangesAsync();
 			return result > 0;
 		}
 
-		// Dispose
 		public void Dispose()
 		{
 			_context.Dispose();
