@@ -1,14 +1,19 @@
-import { loginUser } from '~/apis';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import {axiosInstance}  from '~/utils/axiosInstance';
 import axios from 'axios';
 
-export const login = (values) => async (dispatch) => {
+export const loginUser = createAsyncThunk(
+  "auth/login",
+ async (values) => {
   try {
-    await dispatch(loginUser(values));
+    // const response = await axios.post('https://localhost:7294/api/Auth/login',values);
+    const response = await axiosInstance.post('/api/Auth/login', values);
+    console.log(response.data)
+    return response.data;
   } catch (error) {
-    console.error("Login failed: ", error);
+    throw error.response.data;
   }
-};
+})
 
 export const logout = createAsyncThunk(
   "user/logout",

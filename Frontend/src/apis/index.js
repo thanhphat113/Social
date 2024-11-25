@@ -1,20 +1,7 @@
 import { axiosInstance } from '~/utils/axiosInstance';
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 
 ///////////////// Auth API ///////////////////
-export const loginUser = createAsyncThunk(
-  "auth/login",
- async (values) => {
-  try {
-    // const response = await axios.post('https://localhost:7294/api/Auth/login',values);
-    const response = await axiosInstance.post('/api/Auth/login', values);
-    console.log(response.data)
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-})
+
 
 export const registerUser = async (userData) => {
   try {

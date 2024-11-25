@@ -21,24 +21,24 @@ namespace Backend.Controllers
             _authService = authService;
         }
 
-        // [HttpPost("register")]
-        // public async Task<IActionResult> Register([FromBody] User model)
-        // {
-        //     try
-        //     {
-        //         var (jwtToken, refreshToken) = await _authService.Register(model.Email, model.Password, model.LastName, model.FirstName);
-        //         return Ok(new { JwtToken = jwtToken, RefreshToken = refreshToken });
-        //     }
-        //     catch (DbUpdateException dbEx)
-        //     {
-        //         var innerExceptionMessage = dbEx.InnerException != null ? dbEx.InnerException.Message : dbEx.Message;
-        //         return BadRequest(new { Message = "Error saving changes: " + innerExceptionMessage });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(new { Message = ex.Message });
-        //     }
-        // }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] User model)
+        {
+            try
+            {
+                var (jwtToken, refreshToken) = await _authService.Register(model.Email, model.Password, model.LastName, model.FirstName);
+                return Ok(new { JwtToken = jwtToken, RefreshToken = refreshToken });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var innerExceptionMessage = dbEx.InnerException != null ? dbEx.InnerException.Message : dbEx.Message;
+                return BadRequest(new { Message = "Error saving changes: " + innerExceptionMessage });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login loginRequest) // Đổi sang async Task<IActionResult>

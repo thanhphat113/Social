@@ -14,5 +14,6 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<Media> Media { get; }
 	IGenericRepository<UserMedia> UserMedia { get; }
 
-	Task<bool> CompleteAsync();
+    IGenericRepository<UserGroup> userGroup { get; }
+    Task<bool> CompleteAsync();
 }

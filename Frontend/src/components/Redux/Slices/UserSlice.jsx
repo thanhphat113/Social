@@ -23,6 +23,7 @@ const UserSlice = createSlice({
 				state.requests = infor?.requests || []
 				state.profilePicture = infor?.media || null
 				state.postrequests = infor?.postrequests || []
+				state.friends = infor?.friends || []
 			})
 			.addCase(SetUser.rejected,(state) => {
 				state.information = null

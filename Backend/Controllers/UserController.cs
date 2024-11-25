@@ -53,6 +53,7 @@ namespace Backend.Controllers
 			var requests = await _NotiContext.FindByUserId(userId);
 			var media = await _media.FindProfilePictureByUserId(userId);
 			var postrequests = await _PostContext.FindByUserId(userId);
+            Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
 			return Ok(new { information = information, media = media, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests });
 		}
 

@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Login from "./pages/Login";
@@ -80,7 +80,7 @@ function App() {
                     }
                 />
                 <Route path="/login" element={<Login />} />
-                <Route path="*" element={<Login />} />
+                {/* <Route path="*" element={<Login />} /> */}
             </Route>
         </Routes>
     );

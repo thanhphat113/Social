@@ -172,6 +172,7 @@ label {
 .friendsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  justify-content: start;
   gap: 20px;
   width: 100%; /* Đảm bảo grid chiếm toàn bộ chiều rộng của container */
 
