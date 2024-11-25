@@ -4,6 +4,7 @@ using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Backend.Models;
+using Backend.Helper;
 using Backend.Services;
 
 namespace Backend.Controllers
@@ -44,7 +45,7 @@ namespace Backend.Controllers
 		[HttpGet("user-login")]
 		public async Task<IActionResult> FindById()
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
+			var userId = MiddleWare.GetUserIdFromCookie(Request);
 			if (userId == -1) return null;
 
 			var information = await _userContext.GetLoginById(userId);
@@ -68,7 +69,7 @@ namespace Backend.Controllers
 		[HttpGet("users-by-name")]
 		public async Task<IActionResult> GetListByName([FromQuery] string name)
 		{
-			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 			var list = await _userContext.GetListByName(name, UserId);
 			foreach (var item in list)
 			{

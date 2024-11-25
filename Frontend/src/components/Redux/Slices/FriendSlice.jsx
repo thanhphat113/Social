@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { SetUser } from "../Actions/UserAction";
-import { deleteMess } from "../Actions/MessageActions";
+import { recallMess,deleteMess, addMessWithMedia } from "../Actions/MessageActions";
 import { addMess, readMess } from "../Actions/MessageActions";
 
 const FriendSlice = createSlice({
     name: "friends",
     initialState: {
-        allFriends: [],
+        allFriends:[],
         isLoad: false,
         isError: false,
     },
@@ -42,8 +42,8 @@ const FriendSlice = createSlice({
                 state.isLoad = false;
                 state.isError = true;
             })
-            .addCase(deleteMess.fulfilled, (state, action) => {
-                const { friendId, chatId, isDelete } = action.payload;
+            .addCase(recallMess.fulfilled, (state, action) => {
+                const { friendId, chatId, isRecall } = action.payload;
 
                 const indexFriend = state.allFriends.findIndex(
                     (i) => i.userId === friendId
@@ -53,13 +53,31 @@ const FriendSlice = createSlice({
                     indexFriend
                 ].chatInMessages.findIndex((i) => i.chatId === chatId);
 
-                if (isDelete) {
+                if (isRecall) {
                     state.allFriends[indexFriend].chatInMessages[
                         indexChat
                     ].content = "Tin nhắn đã thu hồi";
                     state.allFriends[indexFriend].chatInMessages[
                         indexChat
                     ].isRecall = true;
+                }
+
+                state.isLoad = false;
+                state.isError = false;
+            })
+            .addCase(deleteMess.fulfilled, (state, action) => {
+                const { friendId, chatId, isDelete } = action.payload;
+
+                const indexFriend = state.allFriends.findIndex(
+                    (i) => i.userId === friendId
+                );
+
+                if (isDelete) {
+                    const newChat = state.allFriends[
+                        indexFriend
+                    ].chatInMessages.filter(c => c.chatId !== chatId)
+
+                    state.allFriends[indexFriend].chatInMessages = newChat
                 }
 
                 state.isLoad = false;
@@ -75,7 +93,6 @@ const FriendSlice = createSlice({
             })
             .addCase(addMess.fulfilled, (state, action) => {
                 const { friendId, message } = action.payload;
-                console.log(message);
 
                 const index = state.allFriends.findIndex(
                     (i) => i.userId === friendId
@@ -102,6 +119,32 @@ const FriendSlice = createSlice({
             })
             .addCase(addMess.rejected, (state, action) => {
                 console.log(action.payload);
+            })
+            .addCase(addMessWithMedia.fulfilled, (state, action) => {
+                const { friendId, message } = action.payload;
+
+                const index = state.allFriends.findIndex(
+                    (i) => i.userId === friendId
+                );
+
+                if (index !== -1) {
+                    state.allFriends[index].chatInMessages.push(message);
+                }
+
+                state.allFriends.sort((a, b) => {
+                    const latestA = a.chatInMessages.reduce((latest, message) => {    
+                        return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
+                      }, null);
+                    
+                      const latestB = b.chatInMessages.reduce((latest, message) => {
+                        return latest && new Date(latest.dateCreated) > new Date(message.dateCreated) ? latest : message;
+                      }, null);
+    
+                      return new Date(latestB.dateCreated) - new Date(latestA.dateCreated)
+                });
+
+                state.isLoad = false;
+                state.isError = false;
             })
             .addCase(readMess.fulfilled, (state, action) => {
                 state.allFriends = action.payload;

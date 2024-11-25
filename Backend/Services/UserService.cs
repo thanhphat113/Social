@@ -1,8 +1,10 @@
 using Backend.Models;
+using Backend.DTO;
 using Backend.Services.Interface;
 using Backend.Repositories.Interface;
 using Backend.Services;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Identity;
 
@@ -11,13 +13,17 @@ namespace Backend.Services
     public class UserService : IUserService
     {
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly IUnitOfWork _unit;
 
 
-        public UserService(IUnitOfWork unit, IMapper mapper)
+        public UserService(IUnitOfWork unit, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _unit = unit;
+            _httpContextAccessor = httpContextAccessor;
+
         }
         public async Task<User> Add(User value)
         {
@@ -48,21 +54,30 @@ namespace Backend.Services
                 var predicate = (Expression<Func<Message, bool>>)(m =>
                 (m.User1 == item.UserId && m.User2 == UserId) ||
                 (m.User1 == UserId && m.User2 == item.UserId));
-                var selector = (Expression<Func<Message, IEnumerable<ChatInMessage>>>)
-                            (m => m.ChatInMessages);
+                var selector = (Func<IQueryable<Message>, IQueryable<ChatInMessage>>)(query =>
+                    query.Include(m => m.ChatInMessages)
+                            .ThenInclude(c => c.Media)
+                            .SelectMany(m => m.ChatInMessages));
                 var mess = (ICollection<ChatInMessage>)await _unit.Message.FindAsyncMany(predicate, selector);
-
+                foreach (var x in mess)
+                {
+                    if (x.Media == null) continue;
+                    string type = (x.Media.MediaType == 1 || x.Media.MediaType == 2) ? "media" : "file";
+                    if (!x.Media.Src.StartsWith($"{_httpContextAccessor.HttpContext.Request.Scheme}://"))
+                    {
+                        x.Media.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{type}/{x.Media.Src}";
+                    }
+                }
 
                 item.ChatInMessages = mess;
             }
-
 
             return friends;
         }
 
         public async Task<User> FindToLogin(string email, string password)
         {
-            var user = await _unit.Users.GetByConditionAsync(u => u.Email == email);
+            var user = await _unit.Users.GetByConditionAsync<User>(u => u.Email == email);
 
             if (user == null) return null;
 
@@ -102,7 +117,7 @@ namespace Backend.Services
             if (string.IsNullOrEmpty(email))
                 return new ValidateEmail("Vui lòng nhập email", false);
 
-            var item = await _unit.Users.GetByConditionAsync(u => u.Email == email);
+            var item = await _unit.Users.GetByConditionAsync<User>(u => u.Email == email);
 
             if (item != null)
                 return new ValidateEmail("Email này đã được đăng ký vui lòng nhập lại", false);
@@ -126,14 +141,15 @@ namespace Backend.Services
 
             foreach (var item in users)
             {
-                var UserMedia = await _unit.UserMedia.GetByConditionAsync(u => u.UserId == item.UserId && u.IsProfilePicture == true);
+                var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == item.UserId && u.IsProfilePicture == true);
                 if (UserMedia == null)
                 {
                     continue;
                 };
 
-                Console.WriteLine(item.LastName + " " + item.UserId + " có ảnh");
-                var profilePicture = await _unit.Media.GetByConditionAsync(m => m.MediaId == UserMedia.MediaId);
+                var profilePicture = await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
+                profilePicture.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{profilePicture.Src}";
+
 
                 item.ProfilePicture = profilePicture;
             }

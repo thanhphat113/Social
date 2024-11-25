@@ -11,11 +11,20 @@ public partial class ChatInGroup
 
     public int GroupChatId { get; set; }
 
-    public string Content { get; set; } = null!;
+    public string? Content { get; set; } = null!;
 
-    public DateTime DateCreated { get; set; }
+    public int? MediaId { get; set; } = null;
+
+    public bool? IsRead { get; set; } = false;
+    public bool? IsRecall { get; set; } = false;
+
+    public DateTime? DateCreated { get; set; } = DateTime.Now;
+    public int Otheruser { get; set; }
+
 
     public virtual User FromUserNavigation { get; set; } = null!;
 
     public virtual GroupChat GroupChat { get; set; } = null!;
+    public virtual Media Media { get; set; } = null;
+
 }

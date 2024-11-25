@@ -21,7 +21,7 @@ namespace Backend.Repositories.Repository
 
 		public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
 		{
-			var item = await GetByConditionAsync(predicate);
+			var item = await GetByConditionAsync<T>(predicate);
 			_context.Remove(item);
 		}
 
@@ -30,17 +30,19 @@ namespace Backend.Repositories.Repository
 			return await _context.Set<T>().FindAsync(id);
 		}
 
-		public async Task<T> GetByConditionAsync(Expression<Func<T, bool>> predicate)
+		public async Task<TResult> GetByConditionAsync<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>>? selector = null)
 		{
-			try
+
+			var query = _context.Set<T>().Where(predicate);
+
+			if (selector != null)
 			{
-				return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+				var resultQuery = query.Select(selector);
+
+				return await resultQuery.FirstOrDefaultAsync();
 			}
-			catch (ArgumentException ex)
-			{
-				Console.WriteLine("Lỗi khi thực hiện truy vấn: " + ex.Message);
-				throw;
-			}
+
+			return await query.Cast<TResult>().FirstOrDefaultAsync();
 		}
 
 
@@ -63,9 +65,14 @@ namespace Backend.Repositories.Repository
 		}
 
 
-		public async Task<IEnumerable<TResult>> FindAsyncMany<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, IEnumerable<TResult>>> selector)
+		public async Task<IEnumerable<TResult>> FindAsyncMany<TResult>(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IQueryable<TResult>> selector)
 		{
-			return await _context.Set<T>().Where(predicate).SelectMany(selector).ToListAsync();
+
+			var query = _context.Set<T>().Where(predicate);
+
+			var result = await selector(query).ToListAsync();
+
+			return result;
 		}
 
 		public async Task<IEnumerable<T>> GetAll()

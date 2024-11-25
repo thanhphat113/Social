@@ -10,7 +10,8 @@ using Backend.Repositories.Repository;
 using Backend.Repositories.Interface;
 using Backend.Models;
 using Backend.Services;
-using Backend.AutoMapper;
+using Backend.Helper;
+using Backend.Services.Interface;
 
 //var builder = WebApplication.CreateBuilder(args);
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -28,6 +29,7 @@ builder.Services.AddDbContext<SocialMediaContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
@@ -37,8 +39,12 @@ builder.Services.AddScoped<ChatInMessageService>();
 builder.Services.AddScoped<RequestNotiService>();
 builder.Services.AddScoped<PostNotiService>();
 builder.Services.AddScoped<RelationshipService>();
+builder.Services.AddScoped<IService<MainTopic>, MainTopicService>();
+
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();
+builder.Services.AddScoped<MainTopicService>();
+
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
@@ -52,16 +58,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
-//<<<<<<< HEAD
-builder.Services.AddScoped<PostRepository>();
-builder.Services.AddScoped<PostService>();
-/*builder.Services.AddScoped<IRepositories<Post>, PostRepository>();*/
-//=======
-// builder.Services.AddScoped<PostRepository>();
-// builder.Services.AddScoped<PostService>();
-// builder.Services.AddScoped<IRepositories<Post>, PostRepository>();
 
-//>>>>>>> main
+builder.Services.AddScoped<PostService>();
 
 
 
@@ -112,6 +110,30 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<SocialMediaContext>();
+        // Kiểm tra kết nối
+        context.Database.EnsureCreated(); // Hoặc context.Database.Migrate(); nếu bạn muốn áp dụng các migration
+        if (context.Database.CanConnect())
+        {
+            Console.WriteLine("Kết nối đến cơ sở dữ liệu thành công!");
+        }
+        else
+        {
+            Console.WriteLine("Không thể kết nối đến cơ sở dữ liệu.");
+        }
+    }
+    catch (Exception ex)
+    {
+        // Xử lý lỗi (nếu cần)
+        Console.WriteLine($"Lỗi khi kết nối đến cơ sở dữ liệu: {ex.Message}");
+    }
 }
 
 

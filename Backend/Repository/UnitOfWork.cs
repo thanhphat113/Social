@@ -15,12 +15,13 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<HistorySearch> _HistorySearch;
 		private readonly IGenericRepository<Message> _Message;
 		private readonly IGenericRepository<Media> _Media;
+		private readonly IGenericRepository<MainTopic> _main;
 		private readonly IGenericRepository<UserMedia> _UserMedia;
-
-
 		private readonly IGenericRepository<PostNotification> _PostNotification;
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
+		private readonly IGenericRepository<Post> _post;
+		private readonly IGenericRepository<PostMedia> _postMedia;
 
 		private readonly IGenericRepository<UserGroup> _userGroup;
 
@@ -35,11 +36,16 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
 						  IGenericRepository<UserMedia> UserMedia,
-                          IGenericRepository<UserGroup> userGroup)
-						  
+              IGenericRepository<UserGroup> userGroup,
+						  IGenericRepository<MainTopic> main,
+						  IGenericRepository<Post> post,
+			  			IGenericRepository<PostMedia> postMedia)
+
 		{
 			_context = context;
+			_main = main;
 			_Users = Users;
+			_post = post;
 			_UserMedia = UserMedia;
 			_ChatInMessage = ChatInMessage;
 			_GroupChat = GroupChat;
@@ -49,8 +55,9 @@ namespace Backend.Repositories.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
-            _userGroup = userGroup;
-        }
+      _userGroup = userGroup;
+			_postMedia = postMedia;
+		}
 
 		// Các property chỉ đọc cho các repository
 		public IGenericRepository<User> Users => _Users;
@@ -59,6 +66,10 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<HistorySearch> HistorySearch => _HistorySearch;
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;
+		public IGenericRepository<MainTopic> MainTopic => _main;
+		public IGenericRepository<Post> Post => _post;
+		public IGenericRepository<PostMedia> PostMedia => _postMedia;
+
 		public IGenericRepository<UserMedia> UserMedia => _UserMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
@@ -73,7 +84,6 @@ namespace Backend.Repositories.Repository
 			return result > 0;
 		}
 
-		// Dispose
 		public void Dispose()
 		{
 			_context.Dispose();

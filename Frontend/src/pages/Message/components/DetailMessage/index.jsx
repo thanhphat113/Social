@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import moment from "moment";
@@ -10,6 +10,7 @@ import {
     addMess,
     recallMess,
     deleteMess,
+    addMessWithMedia,
 } from "../../../../components/Redux/Actions/MessageActions";
 import Validate from "../../../../components/Validate";
 
@@ -17,10 +18,11 @@ function DetailMessage({ onShow }) {
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
     const currentFriendId = useSelector((state) => state.message.currentUserId);
+    console.log(currentFriendId)
     const mainTopic = useSelector(
         (state) => state.message.currentMessage?.mainTopicNavigation
     );
-    const { user1, user2, nickName1, nickName2 } = useSelector(
+    const { user1, nickName1, nickName2 } = useSelector(
         (state) => state.message.currentMessage
     );
 
@@ -32,6 +34,8 @@ function DetailMessage({ onShow }) {
 
     const [typeShow, setTypeShow] = useState();
     const [targetMess, setTargetMess] = useState([]);
+
+    const [medias, setMedias] = useState([]);
 
     const messagesEndRef = useRef(null);
     const listRef = useRef(null);
@@ -70,7 +74,7 @@ function DetailMessage({ onShow }) {
         scrollPosition.current = listRef.current.scrollTop;
     };
 
-    const messageId = InforCurrentFriend?.chatInMessages[0].messagesId || -1;
+    const messageId = InforCurrentFriend?.chatInMessages[0]?.messagesId || -1;
 
     const message = InforCurrentFriend?.chatInMessages;
 
@@ -88,7 +92,6 @@ function DetailMessage({ onShow }) {
             const FromUser = userid;
             const Content = mess;
             const Otheruser = currentFriendId;
-            console.log("Đây là: " + Otheruser);
 
             if (isSending) return;
 
@@ -106,9 +109,44 @@ function DetailMessage({ onShow }) {
         }
     };
 
+    const handleSendMedia = async (medias) => {
+        if (medias.length > 0) {
+            const MessageId = messageId;
+            const friendId = currentFriendId;
+
+            if (isSending) return;
+            setIsSending(true);
+
+            for (const item of medias) {
+                const file = item.file;
+                const fileType = item.type;
+                try {
+                    const response = await dispatch(
+                        addMessWithMedia({
+                            MessageId,
+                            file,
+                            fileType,
+                            friendId,
+                        })
+                    );
+                    if (addMessWithMedia.fulfilled.match(response)) {
+                        setMedias([]);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+
+            setIsSending(false);
+        }
+    };
+
+    console.log(medias);
+
     const handleKeyDown = async (e) => {
         if (e.key === "Enter" && isFocused) {
             handleSendMessage();
+            handleSendMedia(medias);
         }
     };
 
@@ -141,6 +179,35 @@ function DetailMessage({ onShow }) {
         return acc;
     }, {});
 
+    const handleDeleteMedia = (indexSelect) => {
+        setMedias(medias.filter((_, index) => index !== indexSelect));
+    };
+
+    const handleFileChange = (event) => {
+        const selectedFiles = event.target.files;
+
+        const newImages = Array.from(selectedFiles).map((file) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // Lưu ảnh dưới dạng base64 trong state
+                setMedias((prevImages) => [
+                    ...prevImages,
+                    {
+                        src: reader.result,
+                        type: file.type.startsWith("image")
+                            ? 1
+                            : file.type.startsWith("video")
+                            ? 2
+                            : 3,
+                        file: file,
+                    },
+                ]);
+            };
+            reader.readAsDataURL(file);
+        });
+        event.target.value = null;
+    };
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.top}>
@@ -149,7 +216,7 @@ function DetailMessage({ onShow }) {
                         <img
                             src={
                                 InforCurrentFriend.profilePicture
-                                    ? `/public/img/Picture/${InforCurrentFriend.profilePicture.src}`
+                                    ? `${InforCurrentFriend.profilePicture.src}`
                                     : `/public/img/default/${
                                           InforCurrentFriend.genderId !== 2
                                               ? "man"
@@ -268,16 +335,41 @@ function DetailMessage({ onShow }) {
                                                     mainTopic.color,
                                             }}
                                         >
-                                            <p
-                                                className={clsx({
-                                                    [styles.recall]:
-                                                        mess.isRecall,
-                                                })}
-                                            >
-                                                {!mess.isRecall
-                                                    ? mess.content
-                                                    : "Bạn đã thu hồi tin nhắn"}
-                                            </p>
+
+                                            {mess.media && !mess.isRecall ? (
+                                                mess.media.mediaType === 1 ? (
+                                                    <img
+                                                        src={mess.media.src}
+                                                        alt={mess.media.mediaId}
+                                                        className={styles.file}
+                                                    />
+                                                ) : mess.media.mediaType ===
+                                                  2 ? (
+                                                    <video
+                                                        src={mess.media.src}
+                                                        className={styles.file}
+                                                        controls
+                                                        alt={mess.media.mediaId}
+                                                    />
+                                                ) : (
+                                                    <iframe
+                                                        src={mess.media.src}
+                                                        className={styles.file}
+                                                        alt={mess.media.mediaId}
+                                                    />
+                                                )
+                                            ) : (
+                                                <p
+                                                    className={clsx({
+                                                        [styles.recall]:
+                                                            mess.isRecall,
+                                                    })}
+                                                >
+                                                    {!mess.isRecall
+                                                        ? mess.content
+                                                        : "Bạn đã thu hồi tin nhắn"}
+                                                </p>
+                                            )}
                                         </div>
                                     </CustomTooltip>
                                 </div>
@@ -288,21 +380,79 @@ function DetailMessage({ onShow }) {
                 ))}
             </div>
             <div className={styles.chat}>
-                <input
-                    value={mess}
-                    onBlur={() => setIsFocused(false)}
-                    onFocus={() => setIsFocused(true)}
-                    onKeyDown={handleKeyDown}
-                    onChange={(e) => setMess(e.target.value)}
-                    placeholder="Aa"
-                ></input>
-                <i
-                    style={{
-                        color: mainTopic?.color,
-                    }}
-                    onClick={() => handleSendMessage()}
-                    className="fa-solid fa-paper-plane"
-                ></i>
+                <div className={styles.medias}>
+                    {medias.length > 0 &&
+                        medias.map((media, index) => (
+                            <div
+                                className={styles.mediaFrame}
+                                key={index}
+                                style={{
+                                    display: "inline-block",
+                                    margin: "8px",
+                                }}
+                            >
+                                <div
+                                    className={styles.delete}
+                                    onClick={() => handleDeleteMedia(index)}
+                                >
+                                    x
+                                </div>
+                                {media.type === 2 ? (
+                                    <video
+                                        src={media.src}
+                                        alt={media.file.name}
+                                        className={styles.show}
+                                    />
+                                ) : media.type === 1 ? (
+                                    <img
+                                        src={media.src}
+                                        alt={media.file.name}
+                                        className={styles.show}
+                                    />
+                                ) : (
+                                    <iframe
+                                        src={media.src}
+                                        alt={media.file.name}
+                                        className={styles.show}
+                                    />
+                                )}
+                                <p>{media.name}</p>
+                            </div>
+                        ))}
+                </div>
+                <div className={styles.chatAction}>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        multiple
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                    />
+                    <i
+                        style={{
+                            color: mainTopic?.color,
+                        }}
+                        className={clsx("fa-solid fa-plus")}
+                        onClick={() =>
+                            document.getElementById("fileInput").click()
+                        }
+                    ></i>
+                    <input
+                        value={mess}
+                        onBlur={() => setIsFocused(false)}
+                        onFocus={() => setIsFocused(true)}
+                        onKeyDown={handleKeyDown}
+                        onChange={(e) => setMess(e.target.value)}
+                        placeholder="Aa"
+                    ></input>
+                    <i
+                        style={{
+                            color: mainTopic?.color,
+                        }}
+                        onClick={() => handleSendMessage()}
+                        className={clsx("fa-solid fa-paper-plane")}
+                    ></i>
+                </div>
             </div>
 
             {typeShow && (

@@ -34,11 +34,10 @@ namespace Backend.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ChatId"));
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("content");
 
-                    b.Property<DateTime>("DateCreated")
+                    b.Property<DateTime?>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
                         .HasColumnName("date_created")
@@ -52,8 +51,25 @@ namespace Backend.Migrations
                         .HasColumnType("int(11)")
                         .HasColumnName("group_chat_id");
 
+                    b.Property<bool?>("IsRead")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_read");
+
+                    b.Property<bool?>("IsRecall")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_recall");
+
+                    b.Property<int?>("MediaId")
+                        .HasColumnType("int(11)")
+                        .HasColumnName("media_id");
+
+                    b.Property<int>("Otheruser")
+                        .HasColumnType("int");
+
                     b.HasKey("ChatId")
                         .HasName("PRIMARY");
+
+                    b.HasIndex("MediaId");
 
                     b.HasIndex(new[] { "GroupChatId" }, "fk_chat_in_group_group_chat_id");
 
@@ -72,7 +88,6 @@ namespace Backend.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int?>("ChatId"));
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("content");
@@ -93,12 +108,18 @@ namespace Backend.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("is_recall");
 
+                    b.Property<int?>("MediaId")
+                        .HasColumnType("int(1)")
+                        .HasColumnName("media_id");
+
                     b.Property<int>("MessagesId")
                         .HasColumnType("int(11)")
                         .HasColumnName("messages_id");
 
                     b.HasKey("ChatId")
                         .HasName("PRIMARY");
+
+                    b.HasIndex("MediaId");
 
                     b.HasIndex(new[] { "FromUser" }, "from_user");
 
@@ -276,6 +297,12 @@ namespace Backend.Migrations
                         .HasColumnName("media_id");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("MediaId"));
+
+                    b.Property<string>("HashCode")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("hash_code");
 
                     b.Property<int?>("MediaType")
                         .HasColumnType("int(11)")
@@ -931,6 +958,21 @@ namespace Backend.Migrations
                     b.ToTable("user_in_group_chat", (string)null);
                 });
 
+            modelBuilder.Entity("media_message", b =>
+                {
+                    b.Property<int>("media_id")
+                        .HasColumnType("int(11)");
+
+                    b.Property<int>("message_id")
+                        .HasColumnType("int(11)");
+
+                    b.HasKey("media_id", "message_id");
+
+                    b.HasIndex("message_id");
+
+                    b.ToTable("media_message");
+                });
+
             modelBuilder.Entity("Backend.Models.ChatInGroup", b =>
                 {
                     b.HasOne("Backend.Models.User", "FromUserNavigation")
@@ -946,9 +988,16 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_chat_in_group_group_chat_id");
 
+                    b.HasOne("Backend.Models.Media", "Media")
+                        .WithMany("ChatInGroup")
+                        .HasForeignKey("MediaId")
+                        .HasConstraintName("fk_chatInGroup_media");
+
                     b.Navigation("FromUserNavigation");
 
                     b.Navigation("GroupChat");
+
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("Backend.Models.ChatInMessage", b =>
@@ -960,6 +1009,11 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasConstraintName("chat_in_message_ibfk_1");
 
+                    b.HasOne("Backend.Models.Media", "Media")
+                        .WithMany("ChatInMessage")
+                        .HasForeignKey("MediaId")
+                        .HasConstraintName("fk_media_chat");
+
                     b.HasOne("Backend.Models.Message", "Messages")
                         .WithMany("ChatInMessages")
                         .HasForeignKey("MessagesId")
@@ -968,6 +1022,8 @@ namespace Backend.Migrations
                         .HasConstraintName("chat_in_message_ibfk_2");
 
                     b.Navigation("FromUserNavigation");
+
+                    b.Navigation("Media");
 
                     b.Navigation("Messages");
                 });
@@ -1357,6 +1413,23 @@ namespace Backend.Migrations
                         .HasConstraintName("fk_user_in_group_chat_user_id");
                 });
 
+            modelBuilder.Entity("media_message", b =>
+                {
+                    b.HasOne("Backend.Models.Media", null)
+                        .WithMany()
+                        .HasForeignKey("media_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_media_message");
+
+                    b.HasOne("Backend.Models.Message", null)
+                        .WithMany()
+                        .HasForeignKey("message_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_message_media");
+                });
+
             modelBuilder.Entity("Backend.Models.Comment", b =>
                 {
                     b.Navigation("InverseChildOfNavigation");
@@ -1383,6 +1456,10 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Media", b =>
                 {
+                    b.Navigation("ChatInGroup");
+
+                    b.Navigation("ChatInMessage");
+
                     b.Navigation("PostMedia");
 
                     b.Navigation("UserMedia");

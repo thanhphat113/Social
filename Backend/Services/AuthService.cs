@@ -1,6 +1,7 @@
 ﻿using Backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Backend.Models;
+using Backend.DTO;
 using Microsoft.IdentityModel.Tokens;
 using Backend.Repositories.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -73,7 +74,7 @@ public class AuthService
         Console.WriteLine("Đã `chạy tạo token");
 
 
-        return (jwtToken);
+        return jwtToken;
     }
 
     // Refresh token

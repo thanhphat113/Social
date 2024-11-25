@@ -1,13 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using System.Security.Cryptography;
 
 
-namespace Backend.Controllers
+
+namespace Backend.Helper
 {
-	public static class GetCookie
+	public static class MiddleWare
 	{
 		public static int GetUserIdFromCookie(HttpRequest request)
 		{
@@ -20,9 +19,17 @@ namespace Backend.Controllers
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var jwtToken = tokenHandler.ReadJwtToken(token);
 			var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-			Console.WriteLine("Đây là userId: " + userId);
 
 			return int.Parse(userId);
+		}
+
+		public static async Task<string> GetFileHashAsync(IFormFile file)
+		{
+			using var sha256 = SHA256.Create();
+			using var stream = file.OpenReadStream();
+			var hashBytes = await sha256.ComputeHashAsync(stream);
+
+			return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 		}
 	}
 }

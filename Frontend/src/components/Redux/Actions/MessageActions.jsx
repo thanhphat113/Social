@@ -36,6 +36,33 @@ const addMess = createAsyncThunk(
     }
 );
 
+const addMessWithMedia = createAsyncThunk(
+    "message/chatwithmedia",
+    async ({ MessageId, file, fileType, friendId}, thunkAPI) => {
+        try {
+            console.log(MessageId, file, fileType, friendId)
+            const formData = new FormData();
+
+            formData.append("messageId", MessageId);
+            formData.append("file", file);
+            formData.append("fileType", fileType);
+
+            const response = await axios.post(
+                `http://localhost:5164/api/ChatInMessage/chat-with-file`,
+                formData,
+                {
+                     withCredentials: true 
+                }
+            );
+            return {friendId:friendId, message:response.data}
+        } catch (error) {
+            return thunkAPI.rejectWithValue(
+                error.response ? error.response.data : error.message
+            );
+        }
+    }
+);
+
 const recallMess = createAsyncThunk(
     "message/recall",
     async ({ id, Otheruser }, thunkAPI) => {
@@ -93,4 +120,4 @@ const readMess = createAsyncThunk("message/read", async (id, thunkAPI) => {
     }
 });
 
-export { getMess, addMess, readMess, recallMess, deleteMess };
+export { addMessWithMedia, getMess, addMess, readMess, recallMess, deleteMess };
