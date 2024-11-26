@@ -56,7 +56,7 @@ public partial class User
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 
     [JsonIgnore]
-    public virtual ReactsComment? ReactsComment { get; set; }
+    public virtual ICollection<ReactsComment> ReactsComment { get; set; } = new List<ReactsComment>();
     [JsonIgnore]
     public virtual ICollection<Relationship> RelationshipFromUsers { get; set; } = new List<Relationship>();
     [JsonIgnore]
