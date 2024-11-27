@@ -46,13 +46,11 @@ public class GroupService
     }
 
     //get member of group
-    public async Task<List<UserGroup>> GetMembers(int groupId)
-    {
-        var members = await _unit.userGroup.FindAsyncMany(
-            x => x.GroupId == groupId,
-            x => new List<UserGroup> { x }
-        );
-        return members.ToList();
-    }
+    //public async Task<List<UserGroup>> GetMembers(int groupId)
+    //{
+    //    var members = await _unit.userGroup.GetByConditionAsync(groupId);
+
+    //    return members as List<UserGroup>;
+    //}
 
 }
