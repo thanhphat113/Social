@@ -12,6 +12,7 @@ using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
 using Backend.Services.Interface;
+using ReactPostService = Backend.Services.ReactPostService;
 
 //var builder = WebApplication.CreateBuilder(args);
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -50,6 +51,7 @@ builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
 builder.Services.AddScoped<GroupChatService>();
+builder.Services.AddScoped<ReactPostService>();
 
 
 builder.Services.AddControllers();

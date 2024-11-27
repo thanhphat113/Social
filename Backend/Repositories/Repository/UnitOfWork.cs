@@ -25,6 +25,7 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<Relationship> _Relationship;
 		private readonly IGenericRepository<Post> _post;
 		private readonly IGenericRepository<PostMedia> _postMedia;
+		private readonly IGenericRepository<ReactsPost> _reactPost;
 
 		public UnitOfWork(SocialMediaContext context,
 						  IGenericRepository<User> Users,
@@ -37,8 +38,11 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
 						  IGenericRepository<UserMedia> UserMedia,
-              IGenericRepository<Post> post,
-              IGenericRepository<PostMedia> postMedia)
+						  IGenericRepository<MainTopic> main,
+			              IGenericRepository<Post> post,
+			              IGenericRepository<PostMedia> postMedia,
+			              IGenericRepository<ReactsPost> reactPost
+						  )
 						  
 		{
 			_context = context;
@@ -55,6 +59,7 @@ namespace Backend.Repositories.Repository
 			_Media = Media;
 			_post = post;
 			_postMedia = postMedia;
+			_reactPost = reactPost;
 		}
 
 		// Các property chỉ đọc cho các repository
@@ -72,7 +77,8 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<Relationship> Relationship => _Relationship;
 
 		public IGenericRepository<PostMedia> PostMedia => _postMedia;
-        public IGenericRepository<Post> Post => _post;
+		public IGenericRepository<ReactsPost> ReactsPost => _reactPost;
+		public IGenericRepository<Post> Post => _post;
 
         // Phương thức SaveChanges
         public async Task<bool> CompleteAsync()

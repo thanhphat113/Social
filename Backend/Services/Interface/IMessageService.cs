@@ -10,6 +10,5 @@ namespace Backend.Services.Interface
 	{
 		Task<Message> FindBy2User(int user1, int user2);
 		Task<bool> UpdateTopic(int Id, int TopicId);
-
 	}
 }

@@ -24,16 +24,6 @@ namespace Backend.Services
             _dbContext = dbContext;
         }
 
-        //public Task<Post> Add(Post value)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public Task<bool> Delete(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         public async Task<IEnumerable<Post>> GetAll()
         {
             try
@@ -225,23 +215,5 @@ namespace Backend.Services
                 throw new Exception($"Có lỗi khi thực hiện cập nhật: {ex.Message} {innerExceptionMessage}");
             }
         }
-
-
-
-        //public async Task<PostDTO> GetPostById(int id)
-        //{
-        //    return await _postRepository.GetById(id);
-        //}
-
-        //public async Task<bool> UpdatePost(int id, PostDTO postDTO)
-        //{
-        //    return await _postRepository.Update(id, postDTO);
-        //}
-
-        /*public async Task<bool> DeletePost(int id)
-        {
-            return await _postRepository.Delete(id);
-        }*/
     }
-
 }

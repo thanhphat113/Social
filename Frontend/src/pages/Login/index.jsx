@@ -32,18 +32,30 @@ function Login () {
     // onLogin()
     // console.log('Login form submitted', values);
 
-    const actionResult = await dispatch(login({ email, password }));
-        if (login.fulfilled.match(actionResult)) {
-            if (actionResult.payload === true) {
-                await dispatch(SetUser());
-                navigate("/");
-            } else {
-                console.log("11");
-            }
+    const actionResult = await dispatch(loginUser({ email, password }));
+      console.log(actionResult + "actionResult !!!!!!!");
+        if (actionResult.type === 'auth/login/fulfilled') {
+
+        console.log('Đăng nhập thành công đã xác định fullfilled:', actionResult.payload);
+        await dispatch(SetUser());
+            navigate('/information');
         } else {
-            console.log("Có lỗi xảy ra trong quá trình đăng nhập");
+            console.error('Đăng nhập thất bại:', actionResult.error?.message || 'Không rõ nguyên nhân');
         }
-  };
+    };
+
+  //   const actionResult = await dispatch(login({ email, password }));
+  //       if (login.fulfilled.match(actionResult)) {
+  //           if (actionResult.payload === true) {
+  //               await dispatch(SetUser());
+  //               navigate("/information");
+  //           } else {
+  //               console.log("11");
+  //           }
+  //       } else {
+  //           console.log("Có lỗi xảy ra trong quá trình đăng nhập");
+  //       }
+  // };
 
   const handleRegisterSubmit = async (values) => {
     const data = await registerUser(values);
