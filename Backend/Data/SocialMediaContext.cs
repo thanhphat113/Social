@@ -579,14 +579,14 @@ public partial class SocialMediaContext : DbContext
 
         modelBuilder.Entity<ReactsComment>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PRIMARY");
+            entity.HasKey(e => new { e.UserId, e.CommentId }).HasName("PK_reacts_comment");
 
             entity.ToTable("reacts_comment");
 
             entity.HasIndex(e => e.CommentId, "fk_reacts_comment_comment_id");
+            entity.HasIndex(e => e.UserId, "fk_reacts_comment_user_id");
 
             entity.Property(e => e.UserId)
-                .ValueGeneratedNever()
                 .HasColumnType("int(11)")
                 .HasColumnName("user_id");
             entity.Property(e => e.CommentId)
@@ -597,17 +597,16 @@ public partial class SocialMediaContext : DbContext
                 .HasForeignKey(d => d.CommentId)
                 .HasConstraintName("fk_reacts_comment_comment_id");
 
-            entity.HasOne(d => d.User).WithOne(p => p.ReactsComment)
-                .HasForeignKey<ReactsComment>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+            entity.HasOne(d => d.User).WithMany(p => p.ReactsComment)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("fk_user_cloud");
         });
 
         modelBuilder.Entity<ReactsPost>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("reacts_post");
+            entity.HasKey(e => new { e.PostId, e.UserId }).HasName("PK_reacts_post");
+
+            entity.ToTable("reacts_post");
 
             entity.HasIndex(e => e.PostId, "fk_reacts_post_post_id");
 

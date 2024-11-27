@@ -3,38 +3,34 @@ import clsx from 'clsx';
 import styles from './Information.module.scss';
 import Button from '../../components/Button';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { useParams } from 'react-router-dom';
+import { useSelector } from "react-redux";
 import { useEffect } from 'react';
 import * as Yup from 'yup';
-import { fetchUserInfo } from '../../apis';
 import { updateUser } from '../../apis';
+
 // import { Password } from '@mui/icons-material';
 
 function Information() {
   const [selectedContent, setSelectedContent] = useState('User information');
-  const { userId } = useParams();
-  const [userInfo, setUserInfo] = useState(null);
+  const currentUserInfo = useSelector((state) => state.user.information);
+  const currentUserFriends = useSelector((state) => state.user.friends);
+  const currentPostNoti = useSelector((state) => state.user.postrequests);
+  const currentReqNoti = useSelector((state) => state.user.requests);
   const [editedUserInfo, setEditedUserInfo] = useState(null);
   const [isChanged, setIsChanged] = useState(false);
   const [showChangePasswordPopup, setChangePasswordPopup] = useState(false);
 
   useEffect(() => {
-    fetchUserInfo(userId)
-      .then((data) => {
-        const userData = {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          bio: data.bio,
-          password: data.password,
-        };
-        setUserInfo(userData);
-        setEditedUserInfo(userData);
-      })
-      .catch((error) => {
-        console.error("Error fetching user information:", error);
+    if (currentUserInfo) {
+      setEditedUserInfo({
+        firstName: currentUserInfo.firstName || '',
+        lastName: currentUserInfo.lastName || '',
+        email: currentUserInfo.email || '',
+        bio: currentUserInfo.bio || '',
+        password: '', 
       });
-  }, [userId]);
+    }
+  }, [currentUserInfo]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,23 +42,29 @@ function Information() {
   };
 
   const handleSaveChanges = () => {
-    console.log("Saving changes:", editedUserInfo);
-    const newUserInfo = { ... editedUserInfo, password: userInfo.password }
-    updateUser(userId, newUserInfo)
-      .then((response) => {
-        if (response.status === 200) {
-          alert("User information updated successfully!");
-          setUserInfo(newUserInfo);
-          setIsChanged(false);
-        } else {
-          alert("Failed to update user information. Please try again.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error updating user information:", error);
-        alert("An error occurred while updating. Please check the console for details.");
-      });
+    if (editedUserInfo) {
+      updateUser(editedUserInfo) // Giả sử `currentUser` có `id`
+        .then((response) => {
+          if (response.status === 200) {
+            alert('User information updated successfully!');
+            setIsChanged(false);
+          } else {
+            alert('Failed to update user information.');
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating user information:', error);
+          alert('An error occurred while updating user information.');
+        });
+    }
   };
+
+  useEffect(() => {
+    console.log("Current User Post Noti: ", currentUserInfo);
+    console.log("Current User Req Noti: ", currentReqNoti);
+  }, [currentUserInfo], [currentReqNoti]);
+
+
   const handleChangePasswordClick = () => {
     setChangePasswordPopup(true);
   };
@@ -81,34 +83,21 @@ function Information() {
     setSelectedContent(content);
   };
 
+  if (!currentUserInfo) {
+    return <p>Loading user information...</p>;
+  }
 
 
 
-  // Mock data cho phần thông báo và bạn bè
-  const [notifications, setNotifications] = useState([
-    { id: 1, name: '  Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias veritatis, possimus odio iure corrupti, praesentium impedit quod, obcaecati enim dicta cupiditate. Qui perspiciatis cupiditate praesentium neque quaerat expedita, dolore dicta!', isRead: false },
-    { id: 2, name: 'Your post was liked', isRead: true },
-    { id: 3, name: 'You have a friend request', isRead: false },
-  ]);
-
-  const friends = [
-    { id: 1, firstName: 'John', lastName: 'Doe', profilePicture: 'https://i.pinimg.com/736x/8c/fe/13/8cfe1317b9b77cc9c1123bbd217f003a.jpg' },
-    { id: 2, firstName: 'Jane', lastName: 'Smith', profilePicture: 'https://i.pinimg.com/564x/dd/aa/8f/ddaa8fe15abec8d2fd7127c57b635ab1.jpg' },
-    { id: 3, firstName: 'Mike', lastName: 'Johnson', profilePicture: 'https://i.pinimg.com/564x/ef/8e/a0/ef8ea030b83f0bed7badd969ce99fc91.jpg' },
-    { id: 4, firstName: 'John', lastName: 'Doe', profilePicture: 'https://i.pinimg.com/736x/8c/fe/13/8cfe1317b9b77cc9c1123bbd217f003a.jpg' },
-    { id: 5, firstName: 'Jane', lastName: 'Smith', profilePicture: 'https://i.pinimg.com/564x/dd/aa/8f/ddaa8fe15abec8d2fd7127c57b635ab1.jpg' },
-    { id: 6, firstName: 'Mike', lastName: 'Johnson', profilePicture: 'https://i.pinimg.com/564x/ef/8e/a0/ef8ea030b83f0bed7badd969ce99fc91.jpg' },
-  ];
-
-  const handleNotificationClick = (id) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.map((notification) =>
-        notification.id === id
-          ? { ...notification, isRead: true } // Nếu thông báo có ID trùng thì set isRead = true
-          : notification
-      )
-    );
-  };
+  // const handleNotificationClick = (id) => {
+  //   setNotifications((prevNotifications) =>
+  //     prevNotifications.map((notification) =>
+  //       notification.id === id
+  //         ? { ...notification, isRead: true } // Nếu thông báo có ID trùng thì set isRead = true
+  //         : notification
+  //     )
+  //   );
+  // };
 
 
   return (
@@ -209,6 +198,7 @@ function Information() {
                   <Formik
                     initialValues={{ newPassword: '', confirmPassword: '' }}
                     validationSchema={Yup.object({
+                      oldPassword: Yup.string().required('Enter old password'),
                       newPassword: Yup.string().min(6, 'Password at least 6 characters').required('Enter new password'),
                       confirmPassword: Yup.string()
                         .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
@@ -220,6 +210,10 @@ function Information() {
                     }}
                   >
                     <Form>
+                      <div className={clsx(styles.formGroup)}>
+                        <Field type="password" id="oldPassword" name="oldPassword" placeholder="Old password" />
+                        <ErrorMessage name="oldPassword" component="div" className={clsx(styles.errorMessage)} />
+                      </div>
                       <div className={clsx(styles.formGroup)}>
                         <Field type="password" id="newPassword" name="newPassword" placeholder="New password" />
                         <ErrorMessage name="newPassword" component="div" className={clsx(styles.errorMessage)} />
@@ -243,13 +237,15 @@ function Information() {
           <div className={clsx(styles.notificationContent)}>
             <h1>Notification</h1>
             <ul className={clsx(styles.notificationList)}>
-              {notifications.map((notification) => (
+              {[...currentPostNoti, ...currentReqNoti].map((notification, index) => (
                 <li
-                  key={notification.id}
-                  className={clsx(styles.notificationItem)}
-                  onClick={() => handleNotificationClick(notification.id)}
+                  key={notification.id || index}
+                  className={clsx(styles.notificationItem, {
+                    [styles.unread]: !notification.isRead, 
+                  })}
+                  // onClick={() => handleNotificationClick(notification.id || index)}
                 >
-                  {notification.name}
+                  {notification.type ?  notification.type.content : "Bạn nhận được lời mời kết bạn từ " + notification.lastName}
                   {!notification.isRead && <span className={clsx(styles.unreadDot)}></span>}
                 </li>
               ))}
@@ -261,16 +257,22 @@ function Information() {
           <div className={clsx(styles.friendContent)}>
             <h1>Friends</h1>
             <div className={clsx(styles.friendsGrid)}>
-              {friends.map((friend) => (
-                <div key={friend.id} className={clsx(styles.friendCard)}>
-                  <img
-                    src={friend.profilePicture}
-                    alt={`${friend.firstName} ${friend.lastName}`}
-                    className={clsx(styles.avatar)}
-                  />
-                  <p>{`${friend.firstName} ${friend.lastName}`}</p>
+              {currentUserFriends && currentUserFriends.length > 0 ? (
+                currentUserFriends.map((friend) => (
+                  <div key={friend.UserId} className={clsx(styles.friendCard)}>
+                    <img
+                      src={friend.profilePicture || 'https://via.placeholder.com/150'} // Đường dẫn mặc định nếu không có hình ảnh
+                      alt={`${friend.firstName} ${friend.lastName}`}
+                      className={clsx(styles.avatar)}
+                    />
+                    <p>{`${friend.firstName} ${friend.lastName}`}</p>
+                  </div>
+                ))
+              ) : (
+                <div>
+                <p>No friends found.</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}

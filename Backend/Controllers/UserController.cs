@@ -1,10 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Backend.Models;
+using Backend.Helper;
 using Backend.Services;
+using Backend.DTO;
+using Microsoft.IdentityModel.Tokens;
+
 
 namespace Backend.Controllers
 {
@@ -44,7 +48,7 @@ namespace Backend.Controllers
 		[HttpGet("user-login")]
 		public async Task<IActionResult> FindById()
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
+			var userId = MiddleWare.GetUserIdFromCookie(Request);
 			if (userId == -1) return null;
 
 			var information = await _userContext.GetLoginById(userId);
@@ -53,21 +57,22 @@ namespace Backend.Controllers
 			var requests = await _NotiContext.FindByUserId(userId);
 			var media = await _media.FindProfilePictureByUserId(userId);
 			var postrequests = await _PostContext.FindByUserId(userId);
+            Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
 			return Ok(new { information = information, media = media, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests });
 		}
 
-		[AllowAnonymous]
-		[HttpPost]
-		public async Task<IActionResult> Put([FromBody] User user)
-		{
-			user.GenderId ??= 0;
-			return Ok(new { result = await _userContext.Add(user) });
-		}
+		//[AllowAnonymous]
+		//[HttpPost]
+		//public async Task<IActionResult> Put([FromBody] User user)
+		//{
+		//	user.GenderId ??= 0;
+		//	return Ok(new { result = await _userContext.Add(user) });
+		//}
 
 		[HttpGet("users-by-name")]
 		public async Task<IActionResult> GetListByName([FromQuery] string name)
 		{
-			var UserId = GetCookie.GetUserIdFromCookie(Request);
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 			var list = await _userContext.GetListByName(name, UserId);
 			foreach (var item in list)
 			{
@@ -81,5 +86,70 @@ namespace Backend.Controllers
 		public void Delete(int id)
 		{
 		}
-	}
+
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] User user)
+        {
+
+            if (user == null)
+            {
+				Console.WriteLine(user.UserId + user.FirstName + user.LastName);
+                return BadRequest(new { message = "Dữ liệu không hợp lệ" });
+            }
+
+            try
+            {
+                var UserId = MiddleWare.GetUserIdFromCookie(Request);
+				user.UserId = UserId;
+				Console.WriteLine("user tu token" + UserId);
+                var result = await _userContext.Update(user);
+
+                if (result)
+                {
+                    return Ok(new { message = "Cập nhật thông tin người dùng thành công" });
+                }
+                else
+                {
+                    return NotFound(new { message = "Không tìm thấy người dùng" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi trong quá trình cập nhật", error = ex.Message });
+            }
+        }
+
+
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
+        {
+
+            try
+            {
+                var userId = MiddleWare.GetUserIdFromCookie(Request);
+                var token = Request.Cookies["YourCookieName"];
+                Console.WriteLine("Token từ cookie: " + token);
+                Console.WriteLine("UserId từ token: " + userId);
+                if (userId == null)
+                {
+                    return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+                }
+
+                var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
+                return result
+                    ? Ok(new { message = "Đổi mật khẩu thành công" })
+                    : BadRequest(new { message = "Mật khẩu cũ không đúng" });
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+    }
 }

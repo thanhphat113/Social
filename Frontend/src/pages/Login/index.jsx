@@ -5,10 +5,10 @@ import * as Yup from 'yup';
 import clsx from 'clsx';
 import styles from './Login.module.scss'; 
 import Button from '../../components/Button';
-import { login } from '~/components/Redux/Actions/AuthAction';
-import { SetUser } from '../../components/Redux/Actions/UserAction';
+import { loginUser } from '~/components/Redux/Actions/AuthAction';
 import { useDispatch } from 'react-redux';
 import { registerUser } from '~/apis/index.js';
+import { SetUser } from '~/components/Redux/Actions/UserAction';
 
 function Login () {
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
@@ -27,35 +27,19 @@ function Login () {
   });
 
   const handleSubmit = async (values) => {
-    // nevigate("/")
     const { email, password } = values; 
-    // onLogin()
-    // console.log('Login form submitted', values);
 
     const actionResult = await dispatch(loginUser({ email, password }));
-      console.log(actionResult + "actionResult !!!!!!!");
-        if (actionResult.type === 'auth/login/fulfilled') {
-
-        console.log('Đăng nhập thành công đã xác định fullfilled:', actionResult.payload);
-        await dispatch(SetUser());
-            navigate('/information');
-        } else {
-            console.error('Đăng nhập thất bại:', actionResult.error?.message || 'Không rõ nguyên nhân');
-        }
-    };
-
-  //   const actionResult = await dispatch(login({ email, password }));
-  //       if (login.fulfilled.match(actionResult)) {
-  //           if (actionResult.payload === true) {
-  //               await dispatch(SetUser());
-  //               navigate("/information");
-  //           } else {
-  //               console.log("11");
-  //           }
-  //       } else {
-  //           console.log("Có lỗi xảy ra trong quá trình đăng nhập");
-  //       }
-  // };
+    console.log(actionResult + "actionResult !!!!!!!");
+      if (actionResult.type === 'auth/login/fulfilled') {
+        
+      console.log('Đăng nhập thành công đã xác định fullfilled:', actionResult.payload);
+      await dispatch(SetUser());
+          navigate('/information');
+      } else {
+          console.error('Đăng nhập thất bại:', actionResult.error?.message || 'Không rõ nguyên nhân');
+      }
+  };
 
   const handleRegisterSubmit = async (values) => {
     const data = await registerUser(values);

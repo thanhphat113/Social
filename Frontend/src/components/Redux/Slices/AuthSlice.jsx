@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser } from '~/apis';
+import { loginUser } from '../Actions/AuthAction';
 
 const initialState = {
   isAuthenticated: false,
@@ -22,7 +22,7 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
+      .addCase(loginUser.fulfilled, (state) => {
         state.loading = false;
         state.isAuthenticated = true;
         state.error = null;

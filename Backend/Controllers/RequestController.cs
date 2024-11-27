@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Backend.Services;
+using Backend.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +27,7 @@ namespace Backend.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Accept([FromQuery] int otheruser)
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
+			var userId = MiddleWare.GetUserIdFromCookie(Request);
 			if (await _NotiContext.Accept(userId, otheruser))
 			{
 				return await Get(userId);
@@ -38,7 +39,7 @@ namespace Backend.Controllers
 		[HttpGet]
 		public async Task<ActionResult> Get([FromQuery] int id)
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
+			var userId = MiddleWare.GetUserIdFromCookie(Request);
 			if (userId == -1) return Unauthorized("Bạn không có quyền truy cập");
 
 			var requests = await _NotiContext.FindByUserId(userId);
@@ -48,7 +49,7 @@ namespace Backend.Controllers
 		[HttpDelete("{id}")]
 		public async Task<ActionResult> delete(int id)
 		{
-			var userId = GetCookie.GetUserIdFromCookie(Request);
+			var userId = MiddleWare.GetUserIdFromCookie(Request);
 			if (userId == -1) return Unauthorized("Bạn không có quyền truy cập");
 			try
 			{
