@@ -7,6 +7,7 @@ using Backend.Repositories;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Backend.Services;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -26,16 +27,22 @@ namespace Backend.Controllers
         {
             try
             {
-                var (jwtToken, refreshToken) = await _authService.Register(model.Email, model.Password, model.LastName, model.FirstName);
-                return Ok(new { JwtToken = jwtToken, RefreshToken = refreshToken });
-            }
-            catch (DbUpdateException dbEx)
-            {
-                var innerExceptionMessage = dbEx.InnerException != null ? dbEx.InnerException.Message : dbEx.Message;
-                return BadRequest(new { Message = "Error saving changes: " + innerExceptionMessage });
+                // Gọi service đăng ký
+                var result = await _authService.Register(model.Email, model.Password, model.LastName, model.FirstName);
+
+                // Trả về token
+               if (result)
+                {
+                    return Ok(new { Message = "Đăng ký thành công" });
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Đăng ký không thành công" });
+                }
             }
             catch (Exception ex)
             {
+                // Trả về lỗi
                 return BadRequest(new { Message = ex.Message });
             }
         }
@@ -87,6 +94,8 @@ namespace Backend.Controllers
 
             return Ok(new { Message = "Đăng xuất thành công" });
         }
+
+       
     }
 }
 

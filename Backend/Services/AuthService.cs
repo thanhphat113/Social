@@ -28,31 +28,37 @@ public class AuthService
 
     }
 
-    //Đăng ký
-    public async Task<(string jwtToken, string refreshToken)> Register(string email, string password, string lastname, string firstname)
-    {
-        // var existingUser = await _userRepository.GetUserByEmail(email);
-        // if (existingUser != null) throw new Exception("Email đã tồn tại");
 
+
+    public async Task<bool> Register(string email, string password, string lastName, string firstName)
+    {
+        // Kiểm tra email đã tồn tại chưa
+        var existingUser = await _user.IsHasEmail(email);
+        if (!existingUser.isTrue)
+        {
+            throw new Exception("Email đã tồn tại");
+        }
+
+        // Tạo người dùng mới
         var newUser = new User
         {
             Email = email,
-            LastName = lastname,
-            FirstName = firstname
+            LastName = lastName,
+            FirstName = firstName
         };
 
         // Băm mật khẩu và lưu vào User
         newUser.Password = _passwordHasher.HashPassword(newUser, password);
 
-        var userAdded = await _unit.Users.AddAsync(newUser); // Thêm await
+        // Lưu người dùng vào cơ sở dữ liệu
+        var userAdded = await _unit.Users.AddAsync(newUser);
+        await _unit.CompleteAsync();
+        if (userAdded == null)
+        {
+            throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
+        }
 
-        if (userAdded == null) throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
-
-        // var newJwtToken = _jwtService.GenerateAccessToken(user);
-        // var newRefreshToken = _jwtService.GenerateRefreshToken(user);
-
-        // return (newJwtToken, newRefreshToken);
-        return ("", "");
+        return true;
     }
 
     // Đăng nhập
@@ -94,13 +100,5 @@ public class AuthService
         return ("", "");
     }
 
-    //change password
-    public async Task<bool> ChangePassword(string email, string oldPassword, string newPassword)
-    {
-        User user = await _user.FindToLogin(email, oldPassword);
-        if (user == null) throw new Exception("Email hoặc mật khẩu không đúng");
 
-        user.Password = _passwordHasher.HashPassword(user, newPassword);
-        return await _unit.CompleteAsync();
-    }
 }

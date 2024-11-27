@@ -43,7 +43,7 @@ function Information() {
 
   const handleSaveChanges = () => {
     if (editedUserInfo) {
-      updateUser(currentUserInfo.id, editedUserInfo) // Giả sử `currentUser` có `id`
+      updateUser(editedUserInfo) // Giả sử `currentUser` có `id`
         .then((response) => {
           if (response.status === 200) {
             alert('User information updated successfully!');
@@ -60,9 +60,9 @@ function Information() {
   };
 
   useEffect(() => {
-    console.log("Current User Post Noti: ", currentPostNoti);
+    console.log("Current User Post Noti: ", currentUserInfo);
     console.log("Current User Req Noti: ", currentReqNoti);
-  }, [currentPostNoti], [currentReqNoti]);
+  }, [currentUserInfo], [currentReqNoti]);
 
 
   const handleChangePasswordClick = () => {
@@ -89,15 +89,15 @@ function Information() {
 
 
 
-  const handleNotificationClick = (id) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.map((notification) =>
-        notification.id === id
-          ? { ...notification, isRead: true } // Nếu thông báo có ID trùng thì set isRead = true
-          : notification
-      )
-    );
-  };
+  // const handleNotificationClick = (id) => {
+  //   setNotifications((prevNotifications) =>
+  //     prevNotifications.map((notification) =>
+  //       notification.id === id
+  //         ? { ...notification, isRead: true } // Nếu thông báo có ID trùng thì set isRead = true
+  //         : notification
+  //     )
+  //   );
+  // };
 
 
   return (
@@ -198,6 +198,7 @@ function Information() {
                   <Formik
                     initialValues={{ newPassword: '', confirmPassword: '' }}
                     validationSchema={Yup.object({
+                      oldPassword: Yup.string().required('Enter old password'),
                       newPassword: Yup.string().min(6, 'Password at least 6 characters').required('Enter new password'),
                       confirmPassword: Yup.string()
                         .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
@@ -209,6 +210,10 @@ function Information() {
                     }}
                   >
                     <Form>
+                      <div className={clsx(styles.formGroup)}>
+                        <Field type="password" id="oldPassword" name="oldPassword" placeholder="Old password" />
+                        <ErrorMessage name="oldPassword" component="div" className={clsx(styles.errorMessage)} />
+                      </div>
                       <div className={clsx(styles.formGroup)}>
                         <Field type="password" id="newPassword" name="newPassword" placeholder="New password" />
                         <ErrorMessage name="newPassword" component="div" className={clsx(styles.errorMessage)} />
@@ -238,7 +243,7 @@ function Information() {
                   className={clsx(styles.notificationItem, {
                     [styles.unread]: !notification.isRead, 
                   })}
-                  onClick={() => handleNotificationClick(notification.id || index)}
+                  // onClick={() => handleNotificationClick(notification.id || index)}
                 >
                   {notification.type ?  notification.type.content : "Bạn nhận được lời mời kết bạn từ " + notification.lastName}
                   {!notification.isRead && <span className={clsx(styles.unreadDot)}></span>}

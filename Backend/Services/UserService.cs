@@ -125,10 +125,6 @@ namespace Backend.Services
             return new ValidateEmail("Email hợp lệ", true);
         }
 
-        public Task<bool> Update(User value)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<IEnumerable<UserPrivate>> GetFriends(int id)
         {
@@ -175,6 +171,65 @@ namespace Backend.Services
             var result = _mapper.Map<IEnumerable<UserPrivate>>(users);
             return result;
         }
-    }
 
+
+        public async Task<bool> Update(User value)
+        {
+            try
+            {
+                Console.WriteLine("day la userid" + value.UserId);
+                var existingUser = await _unit.Users.GetByIdAsync(value.UserId);
+
+                if (existingUser == null)
+                {
+                    Console.WriteLine("Khong tim thay");
+                    return false; // Không tìm thấy người dùng
+                }
+
+                // Cập nhật các thuộc tính cần thiết
+                existingUser.FirstName = value.FirstName ?? existingUser.FirstName;
+                existingUser.LastName = value.LastName ?? existingUser.LastName;
+                existingUser.Email = value.Email ?? existingUser.Email;
+                existingUser.Bio = value.Bio ?? existingUser.Bio;
+                //existingUser.GenderId = value.GenderId ?? existingUser.GenderId;
+
+                // Nếu có thêm các thuộc tính khác, xử lý tại đây
+                _unit.Users.UpdateAsync(existingUser);
+
+                return await _unit.CompleteAsync(); // Lưu thay đổi
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Cập nhật thông tin người dùng không thành công.", ex);
+            }
+        }
+
+        //change password
+        public async Task<bool> ChangePassword(int id, string oldPassword, string newPassword)
+        {
+            var user = await _unit.Users.GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new Exception("Người dùng không tồn tại");
+            }
+
+            var passHasher = new PasswordHasher<User>();
+            var passwordVerificationResult = passHasher.VerifyHashedPassword(user, user.Password, oldPassword);
+
+            if (passwordVerificationResult == PasswordVerificationResult.Success)
+            {
+                user.Password = passHasher.HashPassword(user, newPassword);
+                _unit.Users.UpdateAsync(user);
+                return await _unit.CompleteAsync();
+            }
+            else
+            {
+                throw new Exception("Mật khẩu cũ không đúng");
+
+
+            }
+        }
+
+
+    }
 }
