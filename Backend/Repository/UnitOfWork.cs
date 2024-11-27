@@ -70,9 +70,7 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<MainTopic> MainTopic => _main;
-		public IGenericRepository<Post> Post => _post;
-		public IGenericRepository<PostMedia> PostMedia => _postMedia;
-
+		public IGenericRepository<UserGroup> userGroup { get; }
 		public IGenericRepository<UserMedia> UserMedia => _UserMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;

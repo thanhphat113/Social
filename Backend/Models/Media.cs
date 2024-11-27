@@ -11,7 +11,7 @@ public partial class Media
     public string Src { get; set; } = null!;
     [JsonIgnore]
 
-    public string? HashCode { get; set; } = null!;
+    public string HashCode { get; set; } = null!;
 
     // [JsonIgnore]
     public int? MediaType { get; set; }

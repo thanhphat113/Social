@@ -1,13 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
-using Backend.Data;
 using Backend.Services;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using Backend.DTO;
-using Microsoft.Extensions.Logging;
+using Backend.Helper;
 
 namespace Backend.Controllers
 {
@@ -71,6 +65,16 @@ namespace Backend.Controllers
         [HttpPost("WithMedia")]
         public async Task<IActionResult> CreatePostWithMedia([FromForm] Post post, [FromForm] List<IFormFile> files)
         {
+            
+            var userId = MiddleWare.GetUserIdFromCookie(Request);
+
+            var token = Request.Cookies["YourCookieName"];
+            
+            Console.WriteLine($"User id: {userId}");
+            Console.WriteLine("Token từ cookie: " + token);            
+            post.CreatedByUserId = userId;
+            
+            
             if (files == null || !files.Any())
             {
                 Console.WriteLine("Không nhận được files");

@@ -21,10 +21,10 @@ public partial class Post
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-    public virtual User? CreatedByUser { get; set; } = null!;
+    public virtual User CreatedByUser { get; set; } = null!;
 
     public virtual UserGroup? Group { get; set; }
-
+    
     public virtual ICollection<PostMedia>? PostMedia { get; set; }
 
     public virtual ICollection<PostNotification> PostNotifications { get; set; } = new List<PostNotification>();
@@ -32,4 +32,6 @@ public partial class Post
     public virtual PrivacySetting? Privacy { get; set; }
 
     public virtual ICollection<SharePost> SharePosts { get; set; } = new List<SharePost>();
+
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

@@ -9,6 +9,7 @@ using Backend.Models;
 using Backend.Repositories.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
@@ -30,6 +31,9 @@ namespace Backend.Services
             {
                 // Lấy toàn bộ dữ liệu từ repository của Post
                 var posts = await _unit.Post.GetAll();
+                
+                
+                
                 return posts;
             }
             catch (Exception ex)
@@ -108,79 +112,89 @@ namespace Backend.Services
 
         public async Task<bool> CreatePostWithMedia(Post post, List<IFormFile> mediaFiles)
         {
-            if (string.IsNullOrEmpty(_hostEnvironment.WebRootPath))
+            // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                throw new InvalidOperationException("WebRootPath is not set.");
-            }
-
-            var mediaPath = Path.Combine(_hostEnvironment.WebRootPath, "media");
-
-            // Tạo thư mục media nếu chưa tồn tại
-            if (!Directory.Exists(mediaPath))
-            {
-                Directory.CreateDirectory(mediaPath);
-            }
-
-            var mediaList = new List<Media>();
-
-            if (mediaFiles != null && mediaFiles.Any())
-            {
-                foreach (var file in mediaFiles)
+                try 
                 {
-                    var fileName = Path.GetFileName(file.FileName);
-                    var filePath = Path.Combine(_hostEnvironment.WebRootPath, "media", fileName);
+                    // 1. Tìm và xác nhận user
+                    var user = await _dbContext.Users
+                        .FirstOrDefaultAsync(u => u.UserId == post.CreatedByUserId);
 
-                    Console.WriteLine(filePath);
-
-                    try
+                    if (user == null)
                     {
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        throw new Exception($"User with ID {post.CreatedByUserId} not found");
+                    }
+
+                    post.CreatedByUser = user;
+                    Console.WriteLine(post.CreatedByUser.UserId + post.CreatedByUser.FirstName + post.CreatedByUser.LastName);
+
+                    
+                    // 3. Đặt các giá trị mặc định
+                    post.DateCreated = DateTime.Now;
+                    post.DateUpdated = DateTime.Now;
+
+                    // 4. Thêm post vào context
+                    var addedPost = await _dbContext.Posts.AddAsync(post);
+                    await _dbContext.SaveChangesAsync();
+
+                    // 5. Xử lý media
+                    var mediaList = new List<Media>();
+                    var postMediaList = new List<PostMedia>();
+
+                    if (mediaFiles != null && mediaFiles.Any())
+                    {
+                        foreach (var file in mediaFiles)
                         {
-                            await file.CopyToAsync(fileStream);
+                            // Lưu file
+                            var fileName = Path.GetFileName(file.FileName);
+                            var filePath = Path.Combine(_hostEnvironment.WebRootPath, "media", fileName);
+
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(fileStream);
+                            }
+
+                            // Tạo media
+                            var media = new Media
+                            {
+                                Src = filePath
+                            };
+                            mediaList.Add(media);
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error saving file: {ex.Message}");
-                        throw;
+
+                        // Thêm media vào context
+                        await _dbContext.Media.AddRangeAsync(mediaList);
+                        await _dbContext.SaveChangesAsync();
+
+                        // Tạo PostMedia
+                        postMediaList = mediaList.Select(media => new PostMedia
+                        {
+                            PostId = post.PostId,
+                            MediaId = media.MediaId
+                        }).ToList();
+
+                        await _dbContext.PostMedia.AddRangeAsync(postMediaList);
+                        await _dbContext.SaveChangesAsync();
                     }
 
-                    var media = new Media
-                    {
-                        Src = filePath
-                    };
+                    // 6. Commit transaction
+                    await transaction.CommitAsync();
 
-                    mediaList.Add(media);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    // Rollback nếu có lỗi
+                    await transaction.RollbackAsync();
+
+                    // Log lỗi
+                    Console.WriteLine($"Error in CreatePostWithMedia: {ex.Message}");
+                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                    return false;
                 }
             }
-
-            foreach (var i in mediaList)
-            {
-                Console.WriteLine("================" + i);
-            }
-
-            if (mediaList.Any())
-            {
-                await _dbContext.Media.AddRangeAsync(mediaList);
-                await _unit.CompleteAsync();
-            }
-
-            await _unit.Post.AddAsync(post);
-            await _unit.CompleteAsync();
-
-            var postMediaList = mediaList.Select(media => new PostMedia
-            {
-                PostId = post.PostId,
-                MediaId = media.MediaId
-            }).ToList();
-
-            if (postMediaList.Any())
-            {
-                await _dbContext.PostMedia.AddRangeAsync(postMediaList);
-                await _unit.CompleteAsync();
-            }
-
-            return true;
         }
 
         public async Task<bool> UpdatePost(Post post)
