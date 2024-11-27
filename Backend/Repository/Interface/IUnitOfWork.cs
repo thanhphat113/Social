@@ -15,7 +15,8 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<Relationship> Relationship { get; }
 	IGenericRepository<Media> Media { get; }
 	IGenericRepository<UserMedia> UserMedia { get; }
+  IGenericRepository<UserGroup> userGroup { get; }
 	IGenericRepository<Post> Post { get; }
-    IGenericRepository<PostMedia> PostMedia { get; }
-    Task<bool> CompleteAsync();
+  IGenericRepository<PostMedia> PostMedia { get; }
+  Task<bool> CompleteAsync();
 }

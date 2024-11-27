@@ -23,7 +23,9 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<Post> _post;
 		private readonly IGenericRepository<PostMedia> _postMedia;
 
-		public UnitOfWork(SocialMediaContext context,
+		private readonly IGenericRepository<UserGroup> _userGroup;
+
+        public UnitOfWork(SocialMediaContext context,
 						  IGenericRepository<User> Users,
 						  IGenericRepository<ChatInMessage> ChatInMessage,
 						  IGenericRepository<GroupChat> GroupChat,
@@ -34,6 +36,7 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
 						  IGenericRepository<UserMedia> UserMedia,
+              IGenericRepository<UserGroup> userGroup,
 						  IGenericRepository<MainTopic> main,
 						  IGenericRepository<Post> post,
 			  			IGenericRepository<PostMedia> postMedia)
@@ -52,6 +55,7 @@ namespace Backend.Repositories.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
+      _userGroup = userGroup;
 			_postMedia = postMedia;
 		}
 
@@ -71,8 +75,10 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
 
-		// Phương thức SaveChanges
-		public async Task<bool> CompleteAsync()
+        public IGenericRepository<UserGroup> userGroup => _userGroup;
+
+        // Phương thức SaveChanges
+        public async Task<bool> CompleteAsync()
 		{
 			var result = await _context.SaveChangesAsync();
 			return result > 0;

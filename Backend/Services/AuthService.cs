@@ -14,42 +14,52 @@ public class AuthService
     private readonly UserService _user;
     private readonly JwtService _jwtService;
     private readonly PasswordHasher<User> _passwordHasher;
+    private readonly IUnitOfWork _unit;
 
 
 
-    public AuthService(UserService user, JwtService jwtService)
+
+    public AuthService(UserService user, JwtService jwtService, IUnitOfWork unit)
     {
         _user = user;
         _jwtService = jwtService;
         _passwordHasher = new PasswordHasher<User>(); // Khởi tạo PasswordHasher
+        _unit = unit;
+
     }
 
-    // Đăng ký
-    // public async Task<(string jwtToken, string refreshToken)> Register(string email, string password, string lastname, string firstname)
-    // {
-    //     // var existingUser = await _userRepository.GetUserByEmail(email);
-    //     // if (existingUser != null) throw new Exception("Email đã tồn tại");
 
-    //     var newUser = new User
-    //     {
-    //         Email = email,
-    //         LastName = lastname,
-    //         FirstName = firstname
-    //     };
 
-    //     // Băm mật khẩu và lưu vào User
-    //     newUser.Password = _passwordHasher.HashPassword(newUser, password);
+    public async Task<bool> Register(string email, string password, string lastName, string firstName)
+    {
+        // Kiểm tra email đã tồn tại chưa
+        var existingUser = await _user.IsHasEmail(email);
+        if (!existingUser.isTrue)
+        {
+            throw new Exception("Email đã tồn tại");
+        }
 
-    //     var userAdded = await _userRepository.Add(newUser); // Thêm await
+        // Tạo người dùng mới
+        var newUser = new User
+        {
+            Email = email,
+            LastName = lastName,
+            FirstName = firstName
+        };
 
-    //     if (userAdded == null) throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
+        // Băm mật khẩu và lưu vào User
+        newUser.Password = _passwordHasher.HashPassword(newUser, password);
 
-    //     // var newJwtToken = _jwtService.GenerateAccessToken(user);
-    //     // var newRefreshToken = _jwtService.GenerateRefreshToken(user);
+        // Lưu người dùng vào cơ sở dữ liệu
+        var userAdded = await _unit.Users.AddAsync(newUser);
+        await _unit.CompleteAsync();
+        if (userAdded == null)
+        {
+            throw new Exception("Lỗi khi thêm người dùng vào cơ sở dữ liệu");
+        }
 
-    //     // return (newJwtToken, newRefreshToken);
-    //     return ("", "");
-    // }
+        return true;
+    }
 
     // Đăng nhập
     public async Task<string> Login(string email, string password)
@@ -89,4 +99,6 @@ public class AuthService
         // return (newJwtToken, newRefreshToken);
         return ("", "");
     }
+
+
 }
