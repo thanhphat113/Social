@@ -11,6 +11,8 @@ function MainTopic() {
     const [select, setSelect] = useState(
         mainTopic.mainTopicNavigation?.topicId
     );
+
+    const [isLoading, setIsLoading] = useState(false)
     const [topics, setTopics] = useState([]);
 
     const dispatch = useDispatch();
@@ -21,7 +23,16 @@ function MainTopic() {
         getMainTopic();
     }, []);
 
+    useEffect( () => {
+        // connection.on("ReceiveMessage", async (message) => {
+        //     await dispatch(receiveMess(message));
+        // });
+    })
+
     const updateTopic = async (TopicId, MessageId) => {
+        if (isLoading) return
+
+        setIsLoading(true)
         if (TopicId === mainTopic.mainTopicNavigation.topicId) return;
         try {
             const response = await axios.put(
@@ -31,10 +42,12 @@ function MainTopic() {
                     withCredentials: true,
                 }
             );
-            dispatch(setTopic(response.data));
+            console.log(response.data)
+            dispatch(setTopic(response.data.mainTopic));
         } catch (error){
             console.log(error)
         }
+        setIsLoading(false)
     };
 
     const getMainTopic = async () => {

@@ -1,9 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
 import Login from "./pages/Login";
 import Message from "./pages/Message";
-// import GroupList from "./pages/Group/components/GroupList";
 import ProfileGroup from "./pages/ProfileGroup";
 import Home from "./pages/Home";
 import Information from "./pages/Information";
@@ -11,22 +11,27 @@ import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
 import Authentication from "./components/Authentication";
 import { SetUser } from "./components/Redux/Actions/UserAction";
+// import Call from "./components/Call";
 import LoadingPage from "./pages/Loading/index.jsx";
-
+// import { connectSignalR } from "./components/Redux/Actions/ConnectSignalR.jsx";
 
 function App() {
     const dispatch = useDispatch();
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const getuser = async () => {
-            await dispatch(SetUser());
-            setLoading(false);
-        };
         getuser();
+        
     }, []);
 
-    if(loading){ return(<LoadingPage/>)}
+    const getuser = async () => {
+        const response = await dispatch(SetUser());
+        if (SetUser.fulfilled.match(response)) setLoading(false);
+    };
+
+    if (loading) {
+        return <LoadingPage />;
+    }
 
     return (
         <Routes>
@@ -56,7 +61,7 @@ function App() {
                     }
                 /> */}
                 <Route
-                    path="/profile"
+                    path="/:id"
                     element={
                         <Authentication>
                             <Profile />
@@ -64,7 +69,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/profilegroup"
+                    path="/group/:id"
                     element={
                         <Authentication>
                             <ProfileGroup />

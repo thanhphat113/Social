@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Backend.Data;
-using Backend.Repositories;
-
 
 using Backend.Repositories.Repository;
 using Backend.Repositories.Interface;
@@ -13,12 +11,15 @@ using Backend.Services;
 using Backend.Helper;
 using Backend.Services.Interface;
 using ReactPostService = Backend.Services.ReactPostService;
+using Backend.RealTime;
 
 //var builder = WebApplication.CreateBuilder(args);
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     WebRootPath = "wwwroot" // Đặt WebRootPath tại đây
 });
+
+builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
@@ -41,8 +42,8 @@ builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<MessageService>();
-builder.Services.AddScoped<ChatInMessageService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IChatInMessService, ChatInMessageService>();
 builder.Services.AddScoped<RequestNotiService>();
 builder.Services.AddScoped<PostNotiService>();
 builder.Services.AddScoped<RelationshipService>();
@@ -70,8 +71,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<PostService>();
 
 
-
-// Cấu hình CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -144,11 +143,20 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseRouting();
+app.UseHttpsRedirection();
+
+
 
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<OnlineHub>("/onlinehub");
+});
 
 app.MapControllers();
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Repositories.Interface;
 using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
@@ -16,6 +17,7 @@ namespace Backend.Services
 		{
 			_unit = unit;
 		}
+
 
 		public async Task<Message> Add(Message value)
 		{
@@ -76,13 +78,25 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<bool> UpdateTopic(int Id, int TopicId)
+		public async Task<ChatInMessage> UpdateTopic(int Id, int TopicId, int UserId)
 		{
 			try
 			{
 				var item = await _unit.Message.GetByIdAsync(Id);
 				item.MainTopic = TopicId;
-				return await _unit.CompleteAsync();
+
+				var newChat = new ChatInMessage
+				{
+					Content = "Chủ đề của cuộc trò chuyện đã được thay đổi",
+					IsNoti = true,
+					FromUser = UserId,
+					MessagesId = Id
+				};
+
+				var chat = await _unit.ChatInMessage.AddAsync(newChat);
+
+				var result = await _unit.CompleteAsync();
+				return result ? chat : null;
 			}
 			catch (System.Exception ex)
 			{
@@ -90,6 +104,13 @@ namespace Backend.Services
 				throw;
 			}
 		}
+
+		// public async Task<int> FindOtherIdByMessageId(int MessageId, int UserId){
+		//     var predicate = (Expression<Func<Message, bool>>) (m => m.MessagesId == MessageId);
+		// 	var selector = (Expression<Func<Message, int>>) (query => 
+		// 				query.Select( u => u.User1 == UserId ? u.User2 : u.User1));
+		// 	var item = await _unit.Message.GetByConditionAsync(predicate,selector);
+		// }
 
 		public async Task<bool> UpdateNickName(int Id, int user1, string nn1, string nn2)
 		{

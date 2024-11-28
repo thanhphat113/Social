@@ -156,6 +156,10 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.IsRead)
                 .HasColumnType("tinyint(1)")
                 .HasColumnName("is_read");
+            entity.Property(e => e.IsNoti)
+                .HasColumnType("tinyint(1)")
+                .HasColumnName("is_notification")
+                .HasDefaultValue(false);
             entity.Property(e => e.MediaId)
                 .HasColumnType("int(1)")
                 .HasColumnName("media_id");

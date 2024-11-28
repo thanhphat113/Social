@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -21,6 +21,9 @@ public partial class ChatInMessage
 
 
     public string? Content { get; set; } = null!;
+
+    public bool? IsNoti { get; set; } = false;
+
 
     public DateTime DateCreated { get; set; } = DateTime.Now;
 
