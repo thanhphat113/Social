@@ -227,11 +227,6 @@ function DetailMessage({ onShow }) {
 
     return (
         <div className={styles.wrapper}>
-            <audio
-                ref={audioRef}
-                src="/public/sound/notification.mp3"
-                style={{ display: "none" }}
-            />
             <div className={styles.top}>
                 <CustomTooltip title="Trang cá nhân">
                     <div className={styles.information}>

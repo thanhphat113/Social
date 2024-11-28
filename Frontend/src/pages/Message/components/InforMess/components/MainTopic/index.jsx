@@ -4,9 +4,11 @@ import styles from "./MainTopic.module.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
+import {  staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
 
 function MainTopic() {
     const mainTopic = useSelector((state) => state.message.currentMessage);
+    const currentFriendId = useSelector( (state) => state.message.currentUserId ) 
 
     const [select, setSelect] = useState(
         mainTopic.mainTopicNavigation?.topicId
@@ -29,7 +31,7 @@ function MainTopic() {
         // });
     })
 
-    const updateTopic = async (TopicId, MessageId) => {
+    const updateTopic = async (TopicId, MessageId, currentFriendId) => {
         if (isLoading) return
 
         setIsLoading(true)
@@ -42,7 +44,7 @@ function MainTopic() {
                     withCredentials: true,
                 }
             );
-            console.log(response.data)
+            dispatch(staticMess({chat:response.data.result, id:currentFriendId}))
             dispatch(setTopic(response.data.mainTopic));
         } catch (error){
             console.log(error)
@@ -104,7 +106,7 @@ function MainTopic() {
             <div className={styles.action}>
                 <button
                     onClick={() =>
-                        updateTopic(item.topicId, mainTopic.messagesId)
+                        updateTopic(item.topicId, mainTopic.messagesId,currentFriendId)
                     }
                 >
                     Xác nhận

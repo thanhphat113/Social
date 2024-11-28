@@ -14,7 +14,6 @@ function Authentication({ children }) {
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`http://localhost:5164/onlinehub`)
-            // .configureLogging(signalR.LogLevel.None)
             .withAutomaticReconnect()
             .build();
 

@@ -2,12 +2,14 @@ import { useState } from "react";
 import styles from "./Nickname.module.scss";
 import clsx from "clsx";
 import { useSelector, useDispatch } from "react-redux";
-import { setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
+import { setNN, setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
 import axios from "axios";
+import { staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
 
 function Nickname({ user }) {
     const message = useSelector((state) => state.message.currentMessage);
     const User = useSelector((state) => state.user.information);
+    const friendId = useSelector((state) => state.message.currentUserId);
     const currentNickname1 =  User.userId === message.user1 ? message.nickName1 : message.nickName2
     const currentNickname2 =  User.userId === message.user1 ? message.nickName2 : message.nickName1
     console.log(currentNickname1, currentNickname2)
@@ -17,7 +19,7 @@ function Nickname({ user }) {
     const [nickName2, setNickName2] = useState(currentNickname2);
     const [focus, setFocus] = useState(0);
 
-    const handleAccept = async (MessageId, Nickname1, Nickname2) => {
+    const handleAccept = async (MessageId, Nickname1, Nickname2, friendId) => {
         console.log(MessageId, Nickname1, Nickname2)
         if (Nickname1 === currentNickname1 && Nickname2 === currentNickname2) return
         try {
@@ -26,7 +28,10 @@ function Nickname({ user }) {
                 { MessageId, Nickname1, Nickname2 },
                 { withCredentials: true }
             );
-            dispatch(setTopic(response.data));
+
+            dispatch(staticMess({chat:response.data.result, id: friendId}));
+            // console.log(response.data.message)
+            dispatch(setNN(response.data.message));
         } catch (error) {
             console.log(error);
         }
@@ -67,7 +72,7 @@ function Nickname({ user }) {
                 />
             </div>
             <div className={styles.action}>
-                <button onClick={() => handleAccept(message.messagesId, nickName1, nickName2)} className={styles.accept}>Xác nhận</button>
+                <button onClick={() => handleAccept(message.messagesId, nickName1, nickName2, friendId)} className={styles.accept}>Xác nhận</button>
             </div>
         </div>
     );
