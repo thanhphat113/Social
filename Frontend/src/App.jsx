@@ -1,4 +1,6 @@
+
 import { Routes, Route, Navigate } from "react-router-dom";
+
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -18,7 +20,6 @@ import LoadingPage from "./pages/Loading/index.jsx";
 function App() {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
-
     const user = useSelector((state) => state.user.information);
 
     useEffect(() => {
