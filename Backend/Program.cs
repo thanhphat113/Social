@@ -22,14 +22,20 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    options.UseLazyLoadingProxies()
+        .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.WriteIndented = true; // Nếu muốn JSON dễ đọc hơn
+    });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/

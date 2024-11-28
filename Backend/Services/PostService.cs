@@ -3,6 +3,7 @@ using Backend.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Models;
@@ -112,6 +113,98 @@ namespace Backend.Services
 
         public async Task<bool> CreatePostWithMedia(Post post, List<IFormFile> mediaFiles)
         {
+            if (string.IsNullOrEmpty(_hostEnvironment.WebRootPath))
+            {
+                throw new InvalidOperationException("WebRootPath is not set.");
+            }
+
+            var mediaPath = Path.Combine(_hostEnvironment.WebRootPath, "media");
+
+            // Tạo thư mục media nếu chưa tồn tại
+            if (!Directory.Exists(mediaPath))
+            {
+                Directory.CreateDirectory(mediaPath);
+            }
+
+            var mediaList = new List<Media>();
+
+            if (mediaFiles != null && mediaFiles.Any())
+            {
+                foreach (var file in mediaFiles)
+                {
+                    // Tạo tên file duy nhất để tránh trùng lặp
+                    var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                    var filePath = Path.Combine(mediaPath, uniqueFileName);
+
+                    Console.WriteLine($"Saving file to: {filePath}");
+
+                    try
+                    {
+                        // Lưu file
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
+
+                        // Tạo hash code
+                        string hashCode;
+                        using (var stream = new FileStream(filePath, FileMode.Open))
+                        {
+                            using (var sha256 = SHA256.Create())
+                            {
+                                var hashBytes = await sha256.ComputeHashAsync(stream);
+                                hashCode = BitConverter.ToString(hashBytes)
+                                    .Replace("-", "")
+                                    .ToLowerInvariant();
+                            }
+                        }
+
+                        // Tạo đối tượng Media
+                        var media = new Media
+                        {
+                            Src = $"/media/{uniqueFileName}", // Lưu đường dẫn tương đối
+                            HashCode = hashCode,
+                        };
+
+                        mediaList.Add(media);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error saving file '{file.FileName}': {ex.Message}");
+                        throw;
+                    }
+                }
+            }
+
+            // Lưu Post trước
+            await _unit.Post.AddAsync(post);
+            await _unit.CompleteAsync(); // Lưu để có PostId
+
+            // Lưu Media
+            if (mediaList.Any())
+            {
+                await _dbContext.Media.AddRangeAsync(mediaList);
+                await _unit.CompleteAsync(); // Lưu các Media đã thêm
+            }
+
+            // Tạo liên kết PostMedia
+            var postMediaList = mediaList.Select(media => new PostMedia
+            {
+                PostId = post.PostId, // Sử dụng PostId đã lưu
+                MediaId = media.MediaId
+            }).ToList();
+
+            if (postMediaList.Any())
+            {
+                await _dbContext.PostMedia.AddRangeAsync(postMediaList);
+                await _unit.CompleteAsync(); // Lưu các liên kết PostMedia
+            }
+
+            return true;
+        }
+        
+        /*public async Task<bool> CreatePostWithMedia(Post post, List<IFormFile> mediaFiles)
+        {
             // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
             using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
@@ -126,10 +219,6 @@ namespace Backend.Services
                         throw new Exception($"User with ID {post.CreatedByUserId} not found");
                     }
 
-                    post.CreatedByUser = user;
-                    Console.WriteLine(post.CreatedByUser.UserId + post.CreatedByUser.FirstName + post.CreatedByUser.LastName);
-
-                    
                     // 3. Đặt các giá trị mặc định
                     post.DateCreated = DateTime.Now;
                     post.DateUpdated = DateTime.Now;
@@ -195,7 +284,7 @@ namespace Backend.Services
                     return false;
                 }
             }
-        }
+        }*/
 
         public async Task<bool> UpdatePost(Post post)
         {

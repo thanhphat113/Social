@@ -75,6 +75,4 @@ public partial class User
     public virtual ICollection<GroupChat> GroupChats { get; set; } = new List<GroupChat>();
     [JsonIgnore]
     public virtual ICollection<UserMedia> UserMedia { get; set; } = new List<UserMedia>();
-    
-    public virtual ICollection<Post> PostsNavigation { get; set; } = new List<Post>();
 }

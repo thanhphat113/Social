@@ -397,7 +397,7 @@ public partial class SocialMediaContext : DbContext
                         .HasConstraintName("messages_ibfk_2");
         });
 
-        /*modelBuilder.Entity<Post>(entity =>
+        modelBuilder.Entity<Post>(entity =>
         {
             entity.HasKey(e => e.PostId).HasName("PRIMARY");
 
@@ -447,83 +447,6 @@ public partial class SocialMediaContext : DbContext
                             .HasForeignKey(d => d.PrivacyId)
                             .OnDelete(DeleteBehavior.SetNull)
                             .HasConstraintName("fk_posts_privacy_id");
-        });*/
-        
-        modelBuilder.Entity<Post>(entity =>
-        {
-            entity.HasKey(e => e.PostId).HasName("PRIMARY");
-
-            entity.ToTable("posts");
-
-            entity.HasIndex(e => e.GroupId, "fk_posts_group_id");
-
-            entity.HasIndex(e => e.PrivacyId, "fk_posts_privacy_id");
-
-            entity.HasIndex(e => e.CreatedByUserId, "idx_created_by_user_id_posts");
-
-            entity.Property(e => e.PostId)
-                .HasColumnType("int(11)")
-                .HasColumnName("post_id");
-            entity.Property(e => e.Content)
-                .HasColumnType("text")
-                .HasColumnName("content");
-            entity.Property(e => e.CreatedByUserId)
-                .HasColumnType("int(11)")
-                .HasColumnName("created_by_user_id");
-            entity.Property(e => e.DateCreated)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("timestamp")
-                .HasColumnName("date_created");
-            entity.Property(e => e.DateUpdated)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("timestamp")
-                .HasColumnName("date_updated");
-            entity.Property(e => e.GroupId)
-                .HasColumnType("int(11)")
-                .HasColumnName("group_id");
-            entity.Property(e => e.PrivacyId)
-                .HasColumnType("int(11)")
-                .HasColumnName("privacy_id");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.Posts)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("fk_posts_created_by_user_id");
-
-            entity.HasOne(d => d.Group).WithMany(p => p.Posts)
-                .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("fk_posts_group_id");
-
-            entity.HasOne(d => d.Privacy).WithMany(p => p.Posts)
-                .HasForeignKey(d => d.PrivacyId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("fk_posts_privacy_id");
-
-            entity.HasMany(d => d.Users).WithMany(p => p.PostsNavigation)
-                .UsingEntity<Dictionary<string, object>>(
-                    "ReactsPost",
-                    r => r.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_reacts_post_user_id"),
-                    l => l.HasOne<Post>().WithMany()
-                        .HasForeignKey("PostId")
-                        .HasConstraintName("fk_reacts_post_post_id"),
-                    j =>
-                    {
-                        j.HasKey("PostId", "UserId")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("reacts_post");
-                        j.HasIndex(new[] { "PostId" }, "fk_reacts_post_post_id");
-                        j.HasIndex(new[] { "UserId" }, "fk_reacts_post_user_id");
-                        j.IndexerProperty<int>("PostId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("post_id");
-                        j.IndexerProperty<int>("UserId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("user_id");
-                    });
         });
 
         modelBuilder.Entity<UserMedia>(entity =>
