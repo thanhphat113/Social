@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -18,6 +18,8 @@ import LoadingPage from "./pages/Loading/index.jsx";
 function App() {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
+
+    const user = useSelector((state) => state.user.information);
 
     useEffect(() => {
         getuser();
@@ -92,8 +94,20 @@ function App() {
                         </Authentication>
                     }
                 />
-                <Route path="/login" element={<Login />} />
-                {/* <Route path="*" element={<Login />} /> */}
+                {/* <Route
+                    path="/new-group"
+                    element={
+                        <Authentication>
+                            <NewGroupPage />
+                        </Authentication>
+                    }
+                /> */}
+                {user === null ? (
+                    <Route path="/login" element={<Login />} />
+                ) : (
+                    <Route path="/login" element={<Navigate to="/" />} />
+                )}
+                <Route path="*" element={<Login />} />
             </Route>
         </Routes>
     );
