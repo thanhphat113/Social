@@ -9,5 +9,7 @@ namespace Backend.Services.Interface
 	public interface IPostNotiService : IService<PostNotification>
 	{
 		Task<IEnumerable<Object>> FindByUserId(int userid);
-	}
+        // update isread
+        Task<bool> UpdateIsRead(int id);
+    }
 }

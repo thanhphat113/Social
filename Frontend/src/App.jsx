@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Message from "./pages/Message";
 // import GroupList from "./pages/Group/components/GroupList";
 import ProfileGroup from "./pages/ProfileGroup";
-// import Home from "./pages/Home";
+import Home from "./pages/Home";
 import Information from "./pages/Information";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
@@ -39,14 +39,14 @@ function App() {
                         </Authentication>
                     }
                 />
-                {/* <Route
+                <Route
                     path="/"
                     element={
                         <Authentication>
                             <Home />
                         </Authentication>
                     }
-                /> */}
+                />
                 {/* <Route
                     path="/group"
                     element={
@@ -56,15 +56,15 @@ function App() {
                     }
                 /> */}
                 <Route
-                    path="/profile"
+                    path="/profile/:userId"
                     element={
                         <Authentication>
-                            <Profile />
+                            <Profile/>
                         </Authentication>
                     }
                 />
                 <Route
-                    path="/profilegroup"
+                    path="/profilegroup/:groupId"
                     element={
                         <Authentication>
                             <ProfileGroup />
@@ -80,7 +80,7 @@ function App() {
                     }
                 />
                 <Route path="/login" element={<Login />} />
-                {/* <Route path="*" element={<Login />} /> */}
+                <Route path="*" element={<Login />} />
             </Route>
         </Routes>
     );

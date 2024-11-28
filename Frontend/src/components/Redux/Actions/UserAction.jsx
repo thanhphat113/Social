@@ -80,4 +80,24 @@ const getPostRequests = createAsyncThunk(
     }
 );
 
-export { SetUser, getRequests, acceptRequests, deleteRequests };
+
+const updateIsRead = createAsyncThunk(
+    "User/updateIsRead",
+    async (NotiId) => {
+        try {
+            const response = await axios.post(
+                `http://localhost:5164/api/PostNoti/update-isread?PostNotificationId=${NotiId}`,
+                {
+                    withCredentials: true,
+                }
+            );
+            return response.data;
+        } catch {
+            return null;
+        }
+    }
+);
+
+
+
+export { SetUser, getRequests, acceptRequests, deleteRequests, getPostRequests, updateIsRead };

@@ -1,10 +1,10 @@
 import clsx from "clsx";
 import PropTypes from 'prop-types';
-import Image from "../Image";
+import Image from "~/components/Image";
 import styles from './SubHeader.module.scss'
-import Avatar from "../Avatar";
+import Avatar from "~/components/Avatar";
 import { FaCameraRotate, FaLocationDot } from "react-icons/fa6";
-import Button from "../Button";
+import Button from "~/components/Button";
 // import { TickBlueIcon } from "../Icon";
 import {  FaCalendarAlt,FaLock,FaUserFriends } from "react-icons/fa";
 import { BiWorld } from "react-icons/bi";
@@ -12,13 +12,18 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 
 function SubHeader({children}) {
-    const {profile, isUser, isGroup, loading, error} = useSelector((state)=>state.profile)
-    const [isActive, setIsActive] = useState(0)
-    const handleClick = (index) => {
-        setIsActive(index)
-      }
-      console.log(profile)
-    const avatarSize = window.innerWidth <= 768 ? '100px' : '120px'
+
+
+        const {profile, isUser, isGroup, loading, error} = useSelector((state)=>state.profile)
+        const [isActive, setIsActive] = useState(0)
+        const handleClick = (index) => {
+            setIsActive(index)
+          }
+          console.log(profile)
+        const avatarSize = window.innerWidth <= 768 ? '100px' : '120px'
+
+
+
     return ( 
         <div className={clsx(styles.subHeader)}>
                 <div className={clsx(styles.wrapper)}>
@@ -36,7 +41,7 @@ function SubHeader({children}) {
                             <div className={clsx(styles.avatar)}>
                                 <Avatar 
                                 shape='circle'
-                                src={profile.profilePicture}
+                                src={profile.information.profilePicture}
                                 size={avatarSize}
                                 className={clsx(styles.avatarShadow)}
                                 />
@@ -47,21 +52,21 @@ function SubHeader({children}) {
                             )}
                         <div className={clsx(styles.detail)}>
                             <div className={clsx(styles.userName)}>
-                                <h1>{isUser?(profile.firstName+" "+profile.lastName):profile.groupName}</h1>
+                                <h1>{isUser?(profile.information.firstName+" "+profile.information.lastName):profile.groupName}</h1>
                                 {/* {(isUser&& data.tickBlue) && <TickBlueIcon size='1.7rem'/>} */}
                             </div>
                             {isUser &&(
-                                <p>{profile.friends.length} friends</p>
+                                <p>{profile.friend.length} friends</p>
                             )}
                             <div className={clsx(styles.description)}>
                                 {isUser?(
                                 <>
                                     <div>
-                                        <p style={{ fontSize: '18px' }}>{profile.bio}</p>
+                                        <p style={{ fontSize: '18px' }}>{profile.information.bio}</p>
                                     </div>
                                     <div>
                                         <FaLocationDot />
-                                        <p>{profile.location}</p>
+                                        <p>{profile.information.location}</p>
                                     </div>
                                 </>
                                 ):(
@@ -78,7 +83,7 @@ function SubHeader({children}) {
                                 )}
                                 <div>
                                     <FaCalendarAlt />
-                                    <p>Created at {profile.dateCreated}</p>
+                                    {/* <p style={{margin: 0}}>Created at {profile.information.dateCreated}</p> */}
                                 </div>
                             </div>
                         </div>

@@ -95,18 +95,19 @@ function ProfileGroup() {
                 {/* Chỗ nhét các button và logic Page nè*/}
             </SubHeader>
             <div className={clsx(styles.main)}>
+                <div className={clsx(styles.sideBar)}>
+                    <div style={{ width: "100%" , marginBottom: "10px"}}>
+                        <Connections />
+                    </div>
+                    <PostedPhotos data={{totalPhotos: group.totalPhotos,photos: group.photos}}/>
+                </div>
                 <div className={clsx(styles.content)}>
                     <div className={clsx(styles.wrapper)}>
                         {/* Chỗ nhét bài viết */}
                         content
                     </div>
                 </div>
-                <div className={clsx(styles.sideBar)}>
-                <div style={{ width: "100%" }}>
-                        <Connections />
-                    </div>
-                    <PostedPhotos data={{totalPhotos: group.totalPhotos,photos: group.photos}}/>
-                </div>
+                
                 
              </div>
     </div>   
