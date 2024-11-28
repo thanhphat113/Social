@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Backend.Models;
 using Backend.Repositories.Interface;
 using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
@@ -16,6 +17,7 @@ namespace Backend.Services
 		{
 			_unit = unit;
 		}
+
 
 		public async Task<Message> Add(Message value)
 		{
@@ -76,13 +78,25 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<bool> UpdateTopic(int Id, int TopicId)
+		public async Task<ChatInMessage> UpdateTopic(int Id, int TopicId, int UserId)
 		{
 			try
 			{
 				var item = await _unit.Message.GetByIdAsync(Id);
 				item.MainTopic = TopicId;
-				return await _unit.CompleteAsync();
+
+				var newChat = new ChatInMessage
+				{
+					Content = "Chủ đề của cuộc trò chuyện đã được thay đổi",
+					IsNoti = true,
+					FromUser = UserId,
+					MessagesId = Id
+				};
+
+				var chat = await _unit.ChatInMessage.AddAsync(newChat);
+
+				var result = await _unit.CompleteAsync();
+				return result ? chat : null;
 			}
 			catch (System.Exception ex)
 			{
@@ -91,7 +105,16 @@ namespace Backend.Services
 			}
 		}
 
-		public async Task<bool> UpdateNickName(int Id, int user1, string nn1, string nn2)
+		public async Task<int> GetOtherUserIdInMessage(int MessageId, int UserId)
+		{
+			var message = await _unit.Message.GetByIdAsync(MessageId);
+			var OtherUserId = UserId == message.User1 ? message.User2 : message.User1;
+
+			return OtherUserId;
+		}
+
+
+		public async Task<ChatInMessage> UpdateNickName(int Id, int user1, string nn1, string nn2)
 		{
 			try
 			{
@@ -106,7 +129,18 @@ namespace Backend.Services
 					item.NickName1 = nn2;
 					item.NickName2 = nn1;
 				}
-				return await _unit.CompleteAsync();
+
+				var chat = new ChatInMessage
+				{
+					MessagesId = Id,
+					Content = "Biệt danh trong cuộc trò chuyện đã được cập nhật",
+					IsNoti = true,
+					FromUser = user1,
+				};
+				var newChat = await _unit.ChatInMessage.AddAsync(chat);
+
+				var result = await _unit.CompleteAsync();
+				return result ? newChat : null;
 			}
 			catch (System.Exception ex)
 			{

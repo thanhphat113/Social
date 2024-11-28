@@ -57,7 +57,7 @@ function ItemUser({ list }) {
             {list.map((item) => {
                 const lastMess =
                     item.chatInMessages[item.chatInMessages.length - 1];
-                const compareId = compareIds(lastMess?.fromUser, userId);
+                const compareId = compareIds(lastMess.fromUser, userId);
 
                 return (
                     <button
@@ -85,7 +85,7 @@ function ItemUser({ list }) {
                                 className={clsx(
                                     {
                                         [styles.NotRead]:
-                                            !lastMess?.isRead && !compareId,
+                                            !lastMess.isRead && !compareId,
                                     },
                                     styles.lastmess
                                 )}

@@ -1,25 +1,31 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import styles from "./Message.module.scss";
 import User from "./components/User";
 import DetailMessage from "./components/DetailMessage";
 import InforMess from "./components/InforMess";
+
+
 import { setCurrentUser } from "../../components/Redux/Slices/MessageSlice";
 
 function Message() {
     const currentUser = useSelector((state) => state.message.currentUserId);
     const dispatch = useDispatch();
 
+
+
     const [show, setShow] = useState(true);
+
 
     const handleShowInfor = () => {
         setShow(!show);
     };
 
-    useEffect(() => {
+
+    useEffect ( () => {
         return () => dispatch(setCurrentUser(null));
-    }, []);
+    },[])
 
     return (
         <div className={clsx(styles.wrapper)}>
@@ -40,7 +46,7 @@ function Message() {
                     )}
                 </>
             ) : (
-                <h1 className={clsx(styles.validate, styles.right)}>
+                <h1 className={clsx(styles.validate, styles.center)}>
                     Hãy chọn đoạn tin nhắn muốn hiển thị
                 </h1>
             )}
