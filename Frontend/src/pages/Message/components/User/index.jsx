@@ -6,7 +6,6 @@ import ItemUser from "./components/ItemUser";
 
 function User() {
     const friends = useSelector((state) => state.friends.allFriends);
-    const userid = useSelector((state) => state.user.userid);
 
     const [search, setSearch] = useState('');
     const [isShow, setIsShow] = useState(false);

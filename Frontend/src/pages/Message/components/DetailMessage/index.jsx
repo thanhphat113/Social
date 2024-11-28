@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import clsx from "clsx";
 import moment from "moment";
@@ -18,7 +18,8 @@ function DetailMessage({ onShow }) {
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
     const currentFriendId = useSelector((state) => state.message.currentUserId);
-    console.log(currentFriendId)
+
+
     const mainTopic = useSelector(
         (state) => state.message.currentMessage?.mainTopicNavigation
     );
@@ -40,10 +41,28 @@ function DetailMessage({ onShow }) {
     const messagesEndRef = useRef(null);
     const listRef = useRef(null);
     const scrollPosition = useRef(0);
+    const audioRef = useRef(null);
 
     const InforCurrentFriend = friends.find(
         (u) => u.userId === currentFriendId
     );
+
+    useEffect(() => {
+        // connection.on("ReceiveMessage", async (message) => {
+        //     await dispatch(receiveMess(message));
+        // });
+        // connection.on("ReceiveTopic", async (message) => {
+        //     // await dispatch(receiveMess(message));
+        //     console.log(message)
+        // });
+        
+    });
+
+    const notifications = () => {
+        if (audioRef.current) {
+            audioRef.current.play();
+        }
+    };
 
     useEffect(() => {
         getMessage();
@@ -74,7 +93,7 @@ function DetailMessage({ onShow }) {
         scrollPosition.current = listRef.current.scrollTop;
     };
 
-    const messageId = InforCurrentFriend?.chatInMessages[0]?.messagesId || -1;
+    const messageId = InforCurrentFriend?.chatInMessages[0].messagesId || -1;
 
     const message = InforCurrentFriend?.chatInMessages;
 
@@ -140,8 +159,6 @@ function DetailMessage({ onShow }) {
             setIsSending(false);
         }
     };
-
-    console.log(medias);
 
     const handleKeyDown = async (e) => {
         if (e.key === "Enter" && isFocused) {
@@ -210,6 +227,11 @@ function DetailMessage({ onShow }) {
 
     return (
         <div className={styles.wrapper}>
+            <audio
+                ref={audioRef}
+                src="/public/sound/notification.mp3"
+                style={{ display: "none" }}
+            />
             <div className={styles.top}>
                 <CustomTooltip title="Trang cá nhân">
                     <div className={styles.information}>
@@ -264,6 +286,15 @@ function DetailMessage({ onShow }) {
                             const formattedTime = moment(
                                 mess.dateCreated
                             ).format("HH:mm");
+                            if (mess.isNoti)
+                                return (
+                                    <div
+                                        key={mess.chatId}
+                                        className={styles.noti}
+                                    >
+                                        {mess.content}
+                                    </div>
+                                );
                             return (
                                 <div
                                     onMouseEnter={() =>
@@ -335,7 +366,6 @@ function DetailMessage({ onShow }) {
                                                     mainTopic.color,
                                             }}
                                         >
-
                                             {mess.media && !mess.isRecall ? (
                                                 mess.media.mediaType === 1 ? (
                                                     <img

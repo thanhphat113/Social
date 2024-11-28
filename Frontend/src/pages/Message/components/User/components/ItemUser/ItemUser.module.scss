@@ -28,9 +28,11 @@
             .lastmess {
                 display: flex;
                 width: 100%;
+                gap:5px;
                 p {
                     text-align: start;
-                    width: 80%;
+                    width: 15.3rem;
+                    // flex: 1;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -39,6 +41,10 @@
                 }
                 small {
                     opacity: 0.5;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex:1;
                 }
             }
 

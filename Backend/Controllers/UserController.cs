@@ -20,7 +20,6 @@ namespace Backend.Controllers
 
 		private readonly UserService _userContext;
 
-		private readonly ChatInMessageService _detailmess;
 		private readonly GroupChatService _group;
 
 		private readonly RequestNotiService _NotiContext;
@@ -28,10 +27,9 @@ namespace Backend.Controllers
 		private readonly MediaService _media;
 
 
-		public UserController(MediaService media, GroupChatService group, ChatInMessageService detailmess, UserService UserContext, MessageService mess, RequestNotiService NotiContext, PostNotiService PostContext)
+		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext)
 		{
 			_group = group;
-			_detailmess = detailmess;
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
