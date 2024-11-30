@@ -42,7 +42,6 @@ namespace Backend.Controllers
 			var result = await _mess.UpdateTopic(value.MessageId, value.TopicId, UserId);
 			var message = await _mess.GetById(value.MessageId);
 			var ReceiveId = UserId == message.User1 ? message.User2 : message.User1;
-			Console.WriteLine("Đây là id nhận: " + ReceiveId);
 
 			var MainTopic = await _main.GetById(value.TopicId);
 
@@ -59,16 +58,22 @@ namespace Backend.Controllers
 		[HttpPut("nickname")]
 		public async Task<IActionResult> PutNickName([FromBody] UpdateNickname value)
 		{
-			Console.WriteLine("Ay dô: " + value.Nickname1 + value.Nickname2);
 			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 			var result = await _mess.UpdateNickName(value.MessageId, UserId, value.Nickname1, value.Nickname2);
-			if (result)
+
+			var ReceiveId = await _mess.GetOtherUserIdInMessage(value.MessageId, UserId);
+
+			var message = await _mess.GetById(value.MessageId);
+			message.MainTopicNavigation = await _main.GetById((int)message.MainTopic);
+
+			if (OnlineHub.IsOnline(ReceiveId))
 			{
-				var item = await _mess.GetById(value.MessageId);
-				item.MainTopicNavigation = await _main.GetById((int)item.MainTopic);
-				return Ok(item);
+				var connectionId = OnlineHub.UserIdConnections[ReceiveId];
+				await _hub.Clients.Client(connectionId).SendAsync("ReceiveMessage", result);
+				await _hub.Clients.Client(connectionId).SendAsync("ReceiveNickName", UserId, message);
 			}
-			return Ok(null);
+
+			return Ok(new { result, message });
 		}
 
 		[HttpDelete("{id}")]

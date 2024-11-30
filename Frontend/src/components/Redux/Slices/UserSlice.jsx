@@ -1,14 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { SetUser, deleteRequests, acceptRequests } from "../Actions/UserAction";
+import { SetUser, deleteRequests, acceptRequests, updateIsRead } from "../Actions/UserAction";
 import { addHistory, deleteHistory, updateHistory } from "../Actions/HistorySearchAction";
 
 const UserSlice = createSlice({
     name: "user",
     initialState: {
-        information: null,
+    information: null,
 		requests: [],
 		profilePicture: null,
 		postrequests: [],
+		post: [],
     },
     reducers: {
 		findFriend:( (state, action) => {
@@ -24,6 +25,7 @@ const UserSlice = createSlice({
 				state.profilePicture = infor?.media || null
 				state.postrequests = infor?.postrequests || []
 				state.friends = infor?.friends || []
+				state.post = infor?.post || []
 			})
 			.addCase(SetUser.rejected,(state) => {
 				state.information = null
@@ -44,6 +46,10 @@ const UserSlice = createSlice({
 			})
 			.addCase(updateHistory.fulfilled,(state,action) => {
 				state.historysearch = action.payload
+			})
+			.addCase(updateIsRead.fulfilled,(state,action) => {
+				state.postrequests.map((post) =>
+          post.id === action.payload.id ? { ...post, isRead: true } : post)
 			})
 	}
 });

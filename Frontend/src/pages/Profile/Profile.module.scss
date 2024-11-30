@@ -7,7 +7,7 @@
     flex-wrap: wrap;
 }
 .content{
-    width:70%;
+    width:68%;
 }
 .wrapper{
     display: flex;
@@ -26,6 +26,7 @@
 
 .sideBar{
     width: 30%;
+    margin: 1rem;
 }
 
 @media (max-width: 768px){

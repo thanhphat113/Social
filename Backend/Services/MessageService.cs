@@ -105,14 +105,16 @@ namespace Backend.Services
 			}
 		}
 
-		// public async Task<int> FindOtherIdByMessageId(int MessageId, int UserId){
-		//     var predicate = (Expression<Func<Message, bool>>) (m => m.MessagesId == MessageId);
-		// 	var selector = (Expression<Func<Message, int>>) (query => 
-		// 				query.Select( u => u.User1 == UserId ? u.User2 : u.User1));
-		// 	var item = await _unit.Message.GetByConditionAsync(predicate,selector);
-		// }
+		public async Task<int> GetOtherUserIdInMessage(int MessageId, int UserId)
+		{
+			var message = await _unit.Message.GetByIdAsync(MessageId);
+			var OtherUserId = UserId == message.User1 ? message.User2 : message.User1;
 
-		public async Task<bool> UpdateNickName(int Id, int user1, string nn1, string nn2)
+			return OtherUserId;
+		}
+
+
+		public async Task<ChatInMessage> UpdateNickName(int Id, int user1, string nn1, string nn2)
 		{
 			try
 			{
@@ -127,7 +129,18 @@ namespace Backend.Services
 					item.NickName1 = nn2;
 					item.NickName2 = nn1;
 				}
-				return await _unit.CompleteAsync();
+
+				var chat = new ChatInMessage
+				{
+					MessagesId = Id,
+					Content = "Biệt danh trong cuộc trò chuyện đã được cập nhật",
+					IsNoti = true,
+					FromUser = user1,
+				};
+				var newChat = await _unit.ChatInMessage.AddAsync(chat);
+
+				var result = await _unit.CompleteAsync();
+				return result ? newChat : null;
 			}
 			catch (System.Exception ex)
 			{

@@ -28,10 +28,10 @@
             .lastmess {
                 display: flex;
                 width: 100%;
-                gap:5px;
+                gap:8px;
                 p {
                     text-align: start;
-                    width: 15.3rem;
+                    width: 17rem;
                     // flex: 1;
                     white-space: nowrap;
                     overflow: hidden;
@@ -42,7 +42,7 @@
                 small {
                     opacity: 0.5;
                     display: flex;
-                    justify-content: center;
+                    justify-content: start;
                     align-items: center;
                     flex:1;
                 }

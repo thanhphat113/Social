@@ -23,6 +23,16 @@ const MessageSlice = createSlice({
                     action.payload.MainTopic;
             }
         },
+        setNN: (state, action) => {
+            state.currentMessage = action.payload;
+        },
+
+        setNNPassive: (state, action) => {
+            console.log(action.payload)
+            if (state.currentUserId === action.payload.userId) {
+                state.currentMessage = action.payload.message;
+            }
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(getMess.fulfilled, (state, action) => {
@@ -31,6 +41,6 @@ const MessageSlice = createSlice({
     },
 });
 
-export const { setCurrentUser, setTopic, setTopicPassive } =
+export const { setCurrentUser, setTopic, setTopicPassive, setNN, setNNPassive } =
     MessageSlice.actions;
 export default MessageSlice.reducer;
