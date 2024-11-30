@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Login from "./pages/Login";
 import Message from "./pages/Message";
 import ProfileGroup from "./pages/ProfileGroup";
-// import Home from "./pages/Home";
+import Home from "./pages/Home";
 import Information from "./pages/Information";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
@@ -47,6 +47,7 @@ function App() {
                         </Authentication>
                     }
                 />
+                <Route
                 {/* <Route
                     path="/call"
                     element={
@@ -62,7 +63,7 @@ function App() {
                             <Home />
                         </Authentication>
                     }
-                /> */}
+                />
                 {/* <Route
                     path="/group"
                     element={
@@ -72,15 +73,15 @@ function App() {
                     }
                 /> */}
                 <Route
-                    path="/:id"
+                    path="/profile/:userId"
                     element={
                         <Authentication>
-                            <Profile />
+                            <Profile/>
                         </Authentication>
                     }
                 />
                 <Route
-                    path="/group/:id"
+                    path="/profilegroup/:groupId"
                     element={
                         <Authentication>
                             <ProfileGroup />
@@ -95,6 +96,7 @@ function App() {
                         </Authentication>
                     }
                 />
+                <Route path="/login" element={<Login />} />
                 {/* <Route
                     path="/new-group"
                     element={

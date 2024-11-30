@@ -18,7 +18,7 @@ export const registerUser = async (userData) => {
 export const fetchUserInfo = async (userId) => {
   try {
     const response = await axiosInstance.get(`/api/User/${userId}`);
-    return response.data;
+    return response;
   } catch (error) {
     throw error.response.data;
   }
@@ -36,6 +36,25 @@ export const fetchGroupInfo = async (groupId) => {
 export const updateUser = async (userId, userData) => {
   try {
     const response = await axiosInstance.put(`/api/User/`, userData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+export const changePassword = async (passwordData) => {
+  try {
+    const response = await axiosInstance.put(`/api/User/change-password`, passwordData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+
+export const fetchUserPosts = async () => {
+  try {
+    const response = await axiosInstance.get(`/api/Post/`);
     return response.data;
   } catch (error) {
     throw error.response.data;

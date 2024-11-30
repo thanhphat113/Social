@@ -1,3 +1,4 @@
+using Backend.DTO;
 using Backend.Models;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +22,35 @@ namespace Namespace
 			return Ok(results);
 		}
 
-		[HttpGet("{id}")]
-		public ActionResult<string> Get(int id)
+        //get by id 
+        [HttpGet("getById")]
+        public async Task<ActionResult> GetById([FromQuery] int id)
+        {
+            var result = await _service.GetById(id);
+            if (result == null)
+            {
+                return BadRequest("Khong tim thay duoc noti");
+            }
+
+			Console.WriteLine("result: " + result);
+            return Ok(result);
+        }
+
+
+        // update isread
+        [HttpPost("update-isread")]
+		public async Task<ActionResult> UpdateIsRead([FromQuery]  int PostNotificationId)
 		{
-			return "value";
+
+            var result = await _service.UpdateIsRead(PostNotificationId);
+            if (!result)
+            {
+                return BadRequest("Khong tim thay duoc noti");
+            }
+            return await GetById(PostNotificationId);
+
 		}
+
 
 		[HttpPost]
 		public void Post([FromBody] string value)

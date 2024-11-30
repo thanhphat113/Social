@@ -26,13 +26,17 @@ namespace Backend.Controllers
 		private readonly PostNotiService _PostContext;
 		private readonly MediaService _media;
 
+		private readonly PostService _Post;
 
-		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext)
+
+		public UserController(MediaService media, GroupChatService group, ChatInMessageService detailmess, UserService UserContext, MessageService mess, RequestNotiService NotiContext, PostNotiService PostContext, PostService postService)
+
 		{
 			_group = group;
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
+			_Post = postService;
 			_media = media;
 		}
 
@@ -54,9 +58,11 @@ namespace Backend.Controllers
 			var groupchat = await _group.FindByUserId(userId);
 			var requests = await _NotiContext.FindByUserId(userId);
 			var media = await _media.FindProfilePictureByUserId(userId);
+			var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
+			//Console.WriteLine("User post: " + string.Join(", ", friends.ToList()));
 			var postrequests = await _PostContext.FindByUserId(userId);
-            Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
-			return Ok(new { information = information, media = media, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests });
+			Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
+			return Ok(new { information = information, media = media, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests, post = post });
 		}
 
 		//[AllowAnonymous]
@@ -86,37 +92,55 @@ namespace Backend.Controllers
 		}
 
 
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] User user)
-        {
+		[HttpPut]
+		public async Task<IActionResult> Update([FromBody] User user)
+		{
+
+			if (user == null)
+			{
+				Console.WriteLine(user.UserId + user.FirstName + user.LastName);
+				return BadRequest(new { message = "Dữ liệu không hợp lệ" });
+			}
+
+			try
+			{
+				var UserId = MiddleWare.GetUserIdFromCookie(Request);
+				user.UserId = UserId;
+				Console.WriteLine("user tu token" + UserId);
+				var result = await _userContext.Update(user);
+
+				if (result)
+				{
+					return Ok(new { message = "Cập nhật thông tin người dùng thành công" });
+				}
+				else
+				{
+					return NotFound(new { message = "Không tìm thấy người dùng" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { message = "Đã xảy ra lỗi trong quá trình cập nhật", error = ex.Message });
+			}
+		}
+
+		[HttpGet("{userId}")]
+        public async Task<IActionResult> GetById(int userId)
+		{
+            if (userId == -1) return null;
+
+            var friends = await _userContext.GetFriends(userId);
+            var user = await _userContext.GetLoginById(userId);
+            var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
 
             if (user == null)
             {
-				Console.WriteLine(user.UserId + user.FirstName + user.LastName);
-                return BadRequest(new { message = "Dữ liệu không hợp lệ" });
+                return NotFound(new { message = "Không tìm thấy người dùng" });
             }
+            return Ok(new { information = user, friend= friends , posts = post });
 
-            try
-            {
-                var UserId = MiddleWare.GetUserIdFromCookie(Request);
-				user.UserId = UserId;
-				Console.WriteLine("user tu token" + UserId);
-                var result = await _userContext.Update(user);
-
-                if (result)
-                {
-                    return Ok(new { message = "Cập nhật thông tin người dùng thành công" });
-                }
-                else
-                {
-                    return NotFound(new { message = "Không tìm thấy người dùng" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Đã xảy ra lỗi trong quá trình cập nhật", error = ex.Message });
-            }
         }
+
 
 
         [HttpPut("change-password")]
@@ -136,7 +160,7 @@ namespace Backend.Controllers
 
                 var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
                 return result
-                    ? Ok(new { message = "Đổi mật khẩu thành công" })
+                    ? Ok(new {status= 200, message = "Đổi mật khẩu thành công" })
                     : BadRequest(new { message = "Mật khẩu cũ không đúng" });
             }
             catch (SecurityTokenExpiredException)
