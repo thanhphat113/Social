@@ -22,6 +22,9 @@ public partial class ChatInMessage
 
     public string? Content { get; set; } = null!;
 
+    public bool? IsNoti { get; set; } = false;
+
+
     public DateTime DateCreated { get; set; } = DateTime.Now;
 
     [NotMapped]

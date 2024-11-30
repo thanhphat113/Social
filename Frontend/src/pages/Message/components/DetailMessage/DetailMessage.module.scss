@@ -106,6 +106,13 @@
             }
         }
 
+        .noti{
+            text-align: center;
+            font-size: smaller;
+            opacity: 0.5;
+            font-style: oblique;
+        }
+
         .usermessage {
             align-self: flex-end;
             .mess {
@@ -205,5 +212,5 @@
 }
 
 .file{
-    max-width: 35rem;
+    max-width: 30rem;
 }

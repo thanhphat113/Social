@@ -25,6 +25,7 @@ namespace Backend.Services
 			{
 				var item = await _unit.Media.GetByConditionAsync<Media>(m => m.HashCode == value.HashCode);
 
+
 				var ChatInMessage = new ChatInMessage
 				{
 					MessagesId = MessageId,
@@ -45,8 +46,8 @@ namespace Backend.Services
 					ChatInMessage.MediaId = item.MediaId;
 				}
 
-				var NewChatInMessage = await _unit.ChatInMessage.AddAsync(ChatInMessage);
 
+				var NewChatInMessage = await _unit.ChatInMessage.AddAsync(ChatInMessage);
 
 				var result = await _unit.CompleteAsync();
 

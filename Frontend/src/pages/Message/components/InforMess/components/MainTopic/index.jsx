@@ -4,13 +4,17 @@ import styles from "./MainTopic.module.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
+import {  staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
 
 function MainTopic() {
     const mainTopic = useSelector((state) => state.message.currentMessage);
+    const currentFriendId = useSelector( (state) => state.message.currentUserId ) 
 
     const [select, setSelect] = useState(
         mainTopic.mainTopicNavigation?.topicId
     );
+
+    const [isLoading, setIsLoading] = useState(false)
     const [topics, setTopics] = useState([]);
 
     const dispatch = useDispatch();
@@ -21,7 +25,16 @@ function MainTopic() {
         getMainTopic();
     }, []);
 
-    const updateTopic = async (TopicId, MessageId) => {
+    useEffect( () => {
+        // connection.on("ReceiveMessage", async (message) => {
+        //     await dispatch(receiveMess(message));
+        // });
+    })
+
+    const updateTopic = async (TopicId, MessageId, currentFriendId) => {
+        if (isLoading) return
+
+        setIsLoading(true)
         if (TopicId === mainTopic.mainTopicNavigation.topicId) return;
         try {
             const response = await axios.put(
@@ -31,10 +44,12 @@ function MainTopic() {
                     withCredentials: true,
                 }
             );
-            dispatch(setTopic(response.data));
+            dispatch(staticMess({chat:response.data.result, id:currentFriendId}))
+            dispatch(setTopic(response.data.mainTopic));
         } catch (error){
             console.log(error)
         }
+        setIsLoading(false)
     };
 
     const getMainTopic = async () => {
@@ -91,7 +106,7 @@ function MainTopic() {
             <div className={styles.action}>
                 <button
                     onClick={() =>
-                        updateTopic(item.topicId, mainTopic.messagesId)
+                        updateTopic(item.topicId, mainTopic.messagesId,currentFriendId)
                     }
                 >
                     Xác nhận

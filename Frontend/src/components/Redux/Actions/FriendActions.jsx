@@ -17,4 +17,33 @@ const getFriendList = createAsyncThunk(
     }
 ) 
 
-export { getFriendList }
+const sortFriendsByLatestMessage = (friends) => {
+    return friends.sort((a, b) => {
+        const latestA = a.chatInMessages?.reduce(
+            (latest, message) => {
+                return latest &&
+                    new Date(latest.dateCreated) > new Date(message.dateCreated)
+                    ? latest
+                    : message;
+            },
+            null
+        );
+
+        const latestB = b.chatInMessages?.reduce(
+            (latest, message) => {
+                return latest &&
+                    new Date(latest.dateCreated) > new Date(message.dateCreated)
+                    ? latest
+                    : message;
+            },
+            null
+        );
+
+        return (
+            new Date(latestB.dateCreated) - new Date(latestA.dateCreated)
+        );
+    });
+};
+
+
+export { getFriendList, sortFriendsByLatestMessage }
