@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 using Backend.Data;
 
 using Backend.Repositories.Repository;
@@ -24,6 +25,8 @@ builder.Services.AddSignalR();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
     options.UseLazyLoadingProxies()
+        .EnableSensitiveDataLogging() // Bật logging nhạy cảm
+        .LogTo(Console.WriteLine, LogLevel.Information)
         .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
@@ -34,7 +37,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.WriteIndented = true; // Nếu muốn JSON dễ đọc hơn
     });
 builder.Services.AddHttpContextAccessor();
@@ -60,15 +64,18 @@ builder.Services.AddScoped<HistorySearchService>();
 builder.Services.AddScoped<GroupChatService>();
 builder.Services.AddScoped<ReactPostService>();
 
+//Post
+
+builder.Services.AddScoped<PostService>();
+
+//Comment
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-//Post
-
-builder.Services.AddScoped<PostService>();
 
 
 builder.Services.AddCors(options =>

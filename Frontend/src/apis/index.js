@@ -41,3 +41,38 @@ export const updateUser = async (userId, userData) => {
     throw error.response.data;
   }
 }
+
+
+export const getLikeUser = async (postId) => {
+  try {
+    const response = await axiosInstance.get(`/api/Post/likeuser?postId=${postId}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+export const getLikeCount = async (postId) => {
+  try {
+    const response = await axiosInstance.get(`/api/Post/likes?postId=${postId}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+export const LikePost = async (postId) => {
+  try {
+    const response = await axiosInstance.post(`/api/Post/like?postId=${postId}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+export const UnlikePost = async (postId) => {
+  try {
+    const response = await axiosInstance.post(`/api/Post/delete?postId=${postId}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}

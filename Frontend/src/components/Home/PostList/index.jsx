@@ -4,14 +4,14 @@ import PostCard from './../PostCard/PostCard.jsx';
 
 export default function PostList() {
     const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);  // Thêm trạng thái loading để hiển thị khi đang tải dữ liệu
-    const [error, setError] = useState(null);  // Thêm trạng thái lỗi
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get('http://localhost:5164/api/Post');
-                console.log(response.data);
+                console.log("DDaay là json postlist" , response.data);
                 if (response.data && Array.isArray(response.data)) {
                     setPosts(response.data);
                 } else {
@@ -28,19 +28,29 @@ export default function PostList() {
         fetchPosts();
     }, []);
 
+    if (loading) {
+        return <p>Đang tải bài viết...</p>;  // Hiển thị thông báo khi đang tải
+    }
+
+    if (error) {
+        return <p>{error}</p>;  // Hiển thị thông báo lỗi nếu có
+    }
 
     return (
         <div>
-            {Array.isArray(posts) && posts.length > 0 ? (
+            {posts.length > 0 ? (
                 posts.map((post) => (
                     <PostCard
                         key={post.postId}
-                        author={post.createdByUser ? post.createdByUser.name : 'Ẩn danh'}  // Lấy tên tác giả từ createdByUser
+                        author={post.createdByUser  ? `${post.createdByUser .firstName} ${post.createdByUser .lastName}` : 'Ẩn danh'}  // Lấy tên tác giả từ createdByUser  
                         time={new Date(post.dateCreated).toLocaleString()}
-                        status={post.content || 'Không có nội dung'}
+                        status={post.content || ''}
                         imageUrls={post.postMedia && Array.isArray(post.postMedia) 
                             ? post.postMedia.map(m => `http://localhost:5164/${m.media.src.split('\\').slice(-2).join('/')}`) // Đảm bảo đường dẫn hợp lệ
                             : []}
+                            avatar={post.createdByUser?.profilePicture || (post.createdByUser?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')}
+                        postId={post.postId}
+                        userId={post.createdByUser.userId}
                     />
                 ))
             ) : (

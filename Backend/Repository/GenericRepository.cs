@@ -22,7 +22,7 @@ namespace Backend.Repositories.Repository
 		public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
 		{
 			var item = await GetByConditionAsync<T>(predicate);
-			_context.Remove(item);
+			_context.Remove(item); 
 		}
 
 		public async Task<T> GetByIdAsync(int id)

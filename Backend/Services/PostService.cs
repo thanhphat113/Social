@@ -32,9 +32,6 @@ namespace Backend.Services
             {
                 // Lấy toàn bộ dữ liệu từ repository của Post
                 var posts = await _unit.Post.GetAll();
-                
-                
-                
                 return posts;
             }
             catch (Exception ex)
@@ -88,26 +85,25 @@ namespace Backend.Services
         {
             throw new NotImplementedException();
         }
-
-
+        
         public async Task<IEnumerable<Post>> GetAllPostsWithMedia()
         {
             var posts = await _unit.Post.GetAll();
 
             foreach (var post in posts)
             {
-                // Tìm các PostMedia liên quan đến bài viết và bao gồm thông tin Media
                 var postMedias = await _unit.PostMedia.FindAsync(pm => pm.PostId == post.PostId, pm => new { pm.PostId, pm.Media });
 
                 // Gán media vào bài viết
                 post.PostMedia = postMedias.Select(pm => new PostMedia
                 {
-                    PostId = post.PostId, // Gán PostId
-                    MediaId = pm.Media.MediaId, // Gán MediaId từ Media
-                    Media = pm.Media // Gán đối tượng Media vào PostMedia
-                }).ToList(); // Chuyển đổi thành danh sách PostMedia
+                    PostId = post.PostId, 
+                    MediaId = pm.Media.MediaId, 
+                    Media = pm.Media 
+                }).ToList(); 
             }
 
+            posts = posts.OrderByDescending(p => p.DateCreated);
             return posts;
         }
 
@@ -203,88 +199,47 @@ namespace Backend.Services
             return true;
         }
         
-        /*public async Task<bool> CreatePostWithMedia(Post post, List<IFormFile> mediaFiles)
+        public async Task<bool> GetLikesUser(int postId, int userId)
         {
-            // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
-            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            var data = await _unit.ReactsPost.GetByConditionAsync<ReactsPost>(r => r.PostId == postId && r.UserId == userId);
+            if (data == null)
             {
-                try 
-                {
-                    // 1. Tìm và xác nhận user
-                    var user = await _dbContext.Users
-                        .FirstOrDefaultAsync(u => u.UserId == post.CreatedByUserId);
-
-                    if (user == null)
-                    {
-                        throw new Exception($"User with ID {post.CreatedByUserId} not found");
-                    }
-
-                    // 3. Đặt các giá trị mặc định
-                    post.DateCreated = DateTime.Now;
-                    post.DateUpdated = DateTime.Now;
-
-                    // 4. Thêm post vào context
-                    var addedPost = await _dbContext.Posts.AddAsync(post);
-                    await _dbContext.SaveChangesAsync();
-
-                    // 5. Xử lý media
-                    var mediaList = new List<Media>();
-                    var postMediaList = new List<PostMedia>();
-
-                    if (mediaFiles != null && mediaFiles.Any())
-                    {
-                        foreach (var file in mediaFiles)
-                        {
-                            // Lưu file
-                            var fileName = Path.GetFileName(file.FileName);
-                            var filePath = Path.Combine(_hostEnvironment.WebRootPath, "media", fileName);
-
-                            using (var fileStream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(fileStream);
-                            }
-
-                            // Tạo media
-                            var media = new Media
-                            {
-                                Src = filePath
-                            };
-                            mediaList.Add(media);
-                        }
-
-                        // Thêm media vào context
-                        await _dbContext.Media.AddRangeAsync(mediaList);
-                        await _dbContext.SaveChangesAsync();
-
-                        // Tạo PostMedia
-                        postMediaList = mediaList.Select(media => new PostMedia
-                        {
-                            PostId = post.PostId,
-                            MediaId = media.MediaId
-                        }).ToList();
-
-                        await _dbContext.PostMedia.AddRangeAsync(postMediaList);
-                        await _dbContext.SaveChangesAsync();
-                    }
-
-                    // 6. Commit transaction
-                    await transaction.CommitAsync();
-
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Rollback nếu có lỗi
-                    await transaction.RollbackAsync();
-
-                    // Log lỗi
-                    Console.WriteLine($"Error in CreatePostWithMedia: {ex.Message}");
-                    Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-                    return false;
-                }
+                return false;
             }
-        }*/
+            return true;
+        }
+        
+        public async Task<int> GetLikesCount(int postId)
+        {
+            var data = await _unit.ReactsPost.GetAll();
+            var count = data.Count(r => r.PostId == postId);
+            return count;
+        }
+        
+        public async Task<int> GetCommentCount(int postId)
+        {
+            var data = await _unit.Comment.GetAll();
+            var count = data.Count(r => r.PostId == postId);
+            return count;
+        }
+        
+        public async Task<bool> AddLike(int postId, int userId)
+        {
+            var react = new ReactsPost
+            {
+                PostId = postId,
+                UserId = userId
+            };
+
+            await _unit.ReactsPost.AddAsync(react);
+            return await _unit.CompleteAsync();
+        }
+
+        public async Task<bool> RemoveLike(int postId, int userId)
+        {
+            await _unit.ReactsPost.DeleteAsync(r => r.PostId == postId && r.UserId == userId);
+            return await _unit.CompleteAsync();
+        }
 
         public async Task<bool> UpdatePost(Post post)
         {
@@ -318,5 +273,6 @@ namespace Backend.Services
                 throw new Exception($"Có lỗi khi thực hiện cập nhật: {ex.Message} {innerExceptionMessage}");
             }
         }
+        
     }
 }

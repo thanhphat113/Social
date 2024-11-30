@@ -25,22 +25,26 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<ReactsPost> _reactPost;
 
 		private readonly IGenericRepository<UserGroup> _userGroup;
+		private readonly IGenericRepository<Comment> _comment;
+		private IGenericRepository<ReactsComment> _reactComment;
 
-        public UnitOfWork(SocialMediaContext context,
-						  IGenericRepository<User> Users,
-						  IGenericRepository<ChatInMessage> ChatInMessage,
-						  IGenericRepository<GroupChat> GroupChat,
-						  IGenericRepository<HistorySearch> HistorySearch,
-						  IGenericRepository<Message> Message,
-						  IGenericRepository<PostNotification> PostNotification,
-						  IGenericRepository<RequestNotification> RequestNotification,
-						  IGenericRepository<Relationship> Relationship,
-						  IGenericRepository<Media> Media,
-						  IGenericRepository<UserMedia> UserMedia,
-						  IGenericRepository<MainTopic> main,
-			              IGenericRepository<Post> post,
-			              IGenericRepository<PostMedia> postMedia,
-			              IGenericRepository<ReactsPost> reactPost
+		public UnitOfWork(SocialMediaContext context,
+		                  IGenericRepository<User> Users,
+		                  IGenericRepository<ChatInMessage> ChatInMessage,
+		                  IGenericRepository<GroupChat> GroupChat,
+		                  IGenericRepository<HistorySearch> HistorySearch,
+		                  IGenericRepository<Message> Message,
+		                  IGenericRepository<PostNotification> PostNotification,
+		                  IGenericRepository<RequestNotification> RequestNotification,
+		                  IGenericRepository<Relationship> Relationship,
+		                  IGenericRepository<Media> Media,
+		                  IGenericRepository<UserMedia> UserMedia,
+		                  IGenericRepository<MainTopic> main,
+		                  IGenericRepository<Post> post,
+		                  IGenericRepository<PostMedia> postMedia,
+		                  IGenericRepository<ReactsPost> reactPost,
+		                  IGenericRepository<Comment> comment,
+		                  IGenericRepository<ReactsComment> reactComment
 						  )
 						  
 		{
@@ -57,9 +61,11 @@ namespace Backend.Repositories.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
-      _userGroup = userGroup;
+			_userGroup = userGroup;
 			_postMedia = postMedia;
 			_reactPost = reactPost;
+			_comment = comment;
+			_reactComment = reactComment;	
 		}
 
 		// Các property chỉ đọc cho các repository
@@ -78,6 +84,9 @@ namespace Backend.Repositories.Repository
 
 		public IGenericRepository<PostMedia> PostMedia => _postMedia;
 		public IGenericRepository<ReactsPost> ReactsPost => _reactPost;
+		public IGenericRepository<Comment> Comment => _comment;
+		public IGenericRepository<ReactsComment> ReactsComment => _reactComment;
+			
 		public IGenericRepository<Post> Post => _post;
 
         // Phương thức SaveChanges
