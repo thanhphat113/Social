@@ -36,10 +36,10 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
 						  IGenericRepository<UserMedia> UserMedia,
-              IGenericRepository<UserGroup> userGroup,
+						  IGenericRepository<UserGroup> userGroup,
 						  IGenericRepository<MainTopic> main,
 						  IGenericRepository<Post> post,
-			  			IGenericRepository<PostMedia> postMedia)
+			  			  IGenericRepository<PostMedia> postMedia)
 
 		{
 			_context = context;

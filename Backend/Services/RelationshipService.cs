@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,12 +18,43 @@ namespace Backend.Services
 			_unit = unit;
 		}
 
-		public Task<Relationship> Add(Relationship value)
-		{
-			throw new NotImplementedException();
-		}
+        // kiem tra xem co ton tai trong bang relationship va bang friendrequest chua
+        public async Task<bool> CheckExist(int fromUserId, int toUserId)
+        {
+            var exists = await _unit.Relationship.GetByConditionAsync<object>(
+                x =>
+                    (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                    (x.FromUserId == toUserId && x.ToUserId == fromUserId)
+            );
 
-		public Task<bool> Delete(int id)
+            if (exists != null)
+                return true;
+
+            var pendingRequest = await _unit.RequestNotification.GetByConditionAsync<object>(
+                x => x.FromUserId == fromUserId && x.ToUserId == toUserId && x.IsAccept == null
+            );
+
+            return pendingRequest != null;
+        }
+
+
+
+        // tao moi 1 quan he
+        public async Task<Relationship> Add(Relationship value)
+        {
+            try
+            {
+                var result = await _unit.Relationship.AddAsync(value);
+                await _unit.CompleteAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to add relationship.", ex);
+            }
+        }
+
+        public Task<bool> Delete(int id)
 		{
 			throw new NotImplementedException();
 		}
