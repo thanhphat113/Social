@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
+using Backend.Services.Interface;
 
 namespace Backend.Controllers
 {
@@ -9,10 +10,10 @@ namespace Backend.Controllers
     [ApiController]
     public class PostController : ControllerBase
     {
-        private readonly PostService _postService;
+        private readonly IPostService _postService;
         private readonly ILogger<PostController> _logger;
         
-        public PostController(PostService postService, ILogger<PostController> logger)
+        public PostController(IPostService postService, ILogger<PostController> logger)
         {
             _postService = postService;
             _logger = logger;

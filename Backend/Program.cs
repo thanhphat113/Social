@@ -66,7 +66,7 @@ builder.Services.AddScoped<ReactPostService>();
 
 //Post
 
-builder.Services.AddScoped<PostService>();
+/*builder.Services.AddScoped<PostService>();*/
 
 //Comment
 builder.Services.AddScoped<ICommentService, CommentService>();

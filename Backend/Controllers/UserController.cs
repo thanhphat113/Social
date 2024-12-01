@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +26,7 @@ namespace Backend.Controllers
 		private readonly PostNotiService _PostContext;
 		private readonly MediaService _media;
 
-		private readonly PostService _Post;
+		/*private readonly PostService _Post;#1#
 
 
 		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext, PostService postService)
@@ -36,7 +36,7 @@ namespace Backend.Controllers
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
-			_Post = postService;
+			/*_Post = postService;#1#
 			_media = media;
 		}
 
@@ -58,7 +58,7 @@ namespace Backend.Controllers
 			var groupchat = await _group.FindByUserId(userId);
 			var requests = await _NotiContext.FindByUserId(userId);
 			var media = await _media.FindProfilePictureByUserId(userId);
-			var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
+			/*var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();#1#
 			//Console.WriteLine("User post: " + string.Join(", ", friends.ToList()));
 			var postrequests = await _PostContext.FindByUserId(userId);
 			Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
@@ -131,7 +131,7 @@ namespace Backend.Controllers
 
             var friends = await _userContext.GetFriends(userId);
             var user = await _userContext.GetLoginById(userId);
-            var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
+            /*var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();#1#
 
             if (user == null)
             {
@@ -174,4 +174,4 @@ namespace Backend.Controllers
         }
 
     }
-}
+}*/
