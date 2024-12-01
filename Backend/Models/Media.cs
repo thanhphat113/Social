@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -33,3 +33,4 @@ public partial class Media
 
     public virtual ICollection<ChatInGroup> ChatInGroup { get; set; }
 }
+

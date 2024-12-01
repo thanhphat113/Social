@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -71,3 +71,4 @@ public partial class User
     [JsonIgnore]
     public virtual ICollection<GroupChat> GroupChats { get; set; } = new List<GroupChat>();
 }
+

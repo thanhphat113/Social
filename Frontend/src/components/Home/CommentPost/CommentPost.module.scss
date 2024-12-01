@@ -237,29 +237,99 @@
                     height: 30px;
                     border-radius: 50%;
                     background-color: #ccc;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                    }
                 }
                 .commentContentContainer {
                     display: flex;
                     flex-direction: column;
-                    .commentContent {
-                        background: #f0f2f5;
-                        border-radius: 16px;
-                        padding: 8px 12px;
-                        margin-left: 10px;
-                        font-size: 14px;
-                        height: 3.5rem;
+                    .commentHeader{
+                        display: flex;
+                        align-items: center;
+
+                        .commentContent {
+                            background: #f0f2f5;
+                            border-radius: 16px;
+                            padding: 8px 12px;
+                            margin-left: 10px;
+                            font-size: 14px;
+                            height: auto; 
+                            margin-right: 20px;
+                            span {
+                                display: inline-block; // Đặt display thành inline-block để có thể điều chỉnh chiều rộng
+                                margin: 2px 0;
+                                font-size: 1.2rem; 
+                                color: #333;
+                                max-width: 40rem; // Đặt chiều rộng tối đa cho span
+                                word-wrap: break-word; // Đảm bảo từ dài sẽ xuống dòng
+                                overflow-wrap: break-word; // Tương tự như word-wrap, hỗ trợ cho các trình duyệt hiện đại
+                                white-space: normal;
+                            }
+                        }
+
+                        .commentActions {
+                            position: relative;
+                        
+                            .actionDropdown {
+                                position: absolute;
+                                top: 100%;
+                                left: 0;
+                                background: white;
+                                border: 1px solid #ccc;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                                z-index: 10;
+                                
+                                button {
+                                    display: block;
+                                    width: 120px;
+                                    text-align: left;
+                                    padding: 10px;
+                                    border: none;
+                                    background: none;
+                                    
+                                    &:hover {
+                                        background-color: #f0f0f0;
+                                    }
+                                }
+                            }
+                        
+                            .editCommentInput {
+                                display: flex;
+                                align-items: center;
+                                
+                                input {
+                                    flex-grow: 1;
+                                    margin-right: 10px;
+                                }
+                        
+                                .editButtons {
+                                    display: flex;
+                                    gap: 5px;
+                                }
+                            }
+                        }
+                
                     }
 
                     .commentReact {
-                        margin-left: 3rem;
                         cursor: pointer;
-                        
+                        margin-left: 1.6rem;
+
+
+                        .likeActive{
+                            color: #5f5fe7;
+                        }
+
+                        .likeComment:hover {
+                            color: #5f5fe7;
+                        }
+
                         span {
                             font-size: 1.2rem;
-                            
-                            &:hover {
-                                color: #5f5fe7;
-                            }
+                            margin-right: 1rem;
                         }
                     }
                 }
@@ -283,6 +353,7 @@
         }
         
         .commentContentInput {
+            display: flex;
             height: 3.5rem;
             width: 100%;
             input {
@@ -291,6 +362,16 @@
                 margin: 0 3rem;
                 border-radius: 1rem;
                 font-size: 1.6rem
+            }
+
+            button {
+                background-color: #5f5fe7;
+                color: white;
+                border: none;
+                padding: 0.8rem 1.5rem;
+                border-radius: 1rem;
+                font-size: 1.6rem;
+                cursor: pointer;
             }
         }
     }

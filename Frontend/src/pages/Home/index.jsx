@@ -6,7 +6,7 @@ import RightBar from '../../components/Home/RightBar/RightBar.jsx'
 import PostInput from '../../components/Home/PostInput/PostInput.jsx';
 import styles from './Home.module.scss';
 
-export default function Home() {
+function Home() {
   return (
     <>
       <div className={styles.homeContainer}>
@@ -25,4 +25,4 @@ export default function Home() {
   )
 }
 
-
+export default Home;

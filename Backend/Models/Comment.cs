@@ -8,11 +8,11 @@ public partial class Comment
 
     public int UserId { get; set; }
 
-    public string Content { get; set; } = null!;
+    public string? Content { get; set; } = null!;
 
-    public DateTime DateCreated { get; set; }
+    public DateTime? DateCreated { get; set; }
 
-    public DateTime DateUpdated { get; set; }
+    public DateTime? DateUpdated { get; set; }
 
     public int? ChildOf { get; set; }
 
@@ -24,5 +24,5 @@ public partial class Comment
 
     public virtual ICollection<ReactsComment> ReactsComments { get; set; } = new List<ReactsComment>();
 
-    public virtual User User { get; set; } = null!;
+    public virtual User? User { get; set; } = null!;
 }

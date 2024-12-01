@@ -91,7 +91,7 @@ function App() {
                     path="/information"
                     element={
                         <Authentication>
-                            `<Information />
+                            <Information />
                         </Authentication>
                     }
                 />
@@ -110,6 +110,14 @@ function App() {
                     <Route path="/login" element={<Navigate to="/" />} />
                 )}
                 <Route path="*" element={<Login />} />
+                {/* <Route
+                    path="/new-group"
+                    element={
+                        <Authentication>
+                            <NewGroupPage />
+                        </Authentication>
+                    }
+                /> */}
             </Route>
         </Routes>
     );
