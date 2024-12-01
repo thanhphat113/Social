@@ -36,6 +36,18 @@ namespace Backend.Services
 
             return pendingRequest != null;
         }
+        public async Task<int> CheckRelationshipType(int fromUserId, int toUserId)
+        {
+            // Lấy quan hệ dựa trên điều kiện FromUserId và ToUserId
+            var relationship = await _unit.Relationship.GetByConditionAsync<Relationship>(
+                x =>
+                    (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                    (x.FromUserId == toUserId && x.ToUserId == fromUserId)
+            );
+
+            // Nếu tồn tại, trả về TypeRelationship; nếu không, trả về 0 (mặc định không có quan hệ)
+            return relationship?.TypeRelationship ?? 0;
+        }
 
 
 
@@ -51,6 +63,36 @@ namespace Backend.Services
             catch (Exception ex)
             {
                 throw new Exception("Failed to add relationship.", ex);
+            }
+        }
+        public async Task<bool> Delete(int fromUserId, int toUserId)
+        {
+            try
+            {
+                // Tìm mối quan hệ giữa hai người dùng
+                var relationship = await _unit.Relationship.GetByConditionAsync<Relationship>(
+                    x =>
+                        (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                        (x.FromUserId == toUserId && x.ToUserId == fromUserId)
+                );
+
+                if (relationship == null)
+                    return false;
+
+                // Sử dụng DeleteAsync để xóa
+                await _unit.Relationship.DeleteAsync(x =>
+                    (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                    (x.FromUserId == toUserId && x.ToUserId == fromUserId)
+                );
+
+                // Hoàn tất và kiểm tra kết quả
+                bool isDeleted = await _unit.CompleteAsync();
+                return isDeleted;
+            }
+            catch (Exception ex)
+            {
+                // Bảo toàn thông tin lỗi gốc
+                throw new Exception($"Failed to delete relationship between User {fromUserId} and User {toUserId}.", ex);
             }
         }
 

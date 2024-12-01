@@ -72,6 +72,27 @@ namespace Backend.Controllers
         }
 
 
+        [HttpGet("check-exist/{toUserId}")]
+        public async Task<IActionResult> CheckExist(int toUserId)
+        {
+            var fromUserId = MiddleWare.GetUserIdFromCookie(Request);
+
+            var result = await _RelaContext.CheckRelationshipType(fromUserId, toUserId);
+
+            return Ok(result);
+        }
+
+        [HttpGet("unfriend/{toUserId}")]
+        public async Task<IActionResult> Unfriend(int toUserId)
+        {
+            var fromUserId = MiddleWare.GetUserIdFromCookie(Request);
+
+            var result = await _RelaContext.Delete(fromUserId, toUserId);
+
+            return Ok(result);
+        }
+
+
         [HttpGet]
 		public ActionResult<IEnumerable<string>> Get()
 		{

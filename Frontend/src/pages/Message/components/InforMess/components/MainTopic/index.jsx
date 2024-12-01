@@ -4,7 +4,7 @@ import styles from "./MainTopic.module.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
-import {  staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
+// import {  staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
 
 function MainTopic() {
     const mainTopic = useSelector((state) => state.message.currentMessage);
@@ -44,7 +44,7 @@ function MainTopic() {
                     withCredentials: true,
                 }
             );
-            dispatch(staticMess({chat:response.data.result, id:currentFriendId}))
+            // dispatch(staticMess({chat:response.data.result, id:currentFriendId}))
             dispatch(setTopic(response.data.mainTopic));
         } catch (error){
             console.log(error)

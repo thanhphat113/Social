@@ -1,4 +1,5 @@
 import { axiosInstance } from '~/utils/axiosInstance';
+import axios from 'axios';
 
 ///////////////// Auth API ///////////////////
 
@@ -58,5 +59,52 @@ export const fetchUserPosts = async () => {
     return response.data;
   } catch (error) {
     throw error.response.data;
+  }
+}
+
+
+export const sendFriendRequest = async (toUserId) => {
+  try {
+    const response = await axios.post(
+      `https://localhost:7294/api/Relationship/request`,
+      { ToUserId: toUserId }, 
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error sending friend request:", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const checkExistRelationship = async (toUserId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Relationship/check-exist/${toUserId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking relationship:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const unfriend = async (toUserId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Relationship/unfriend/${toUserId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error unfriending:", error);
+    throw error.response?.data || error.message;
   }
 }

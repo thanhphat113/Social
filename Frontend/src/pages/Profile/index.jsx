@@ -82,6 +82,8 @@ function Profile() {
     const {userId} = useParams()
     const dispatch = useDispatch()
     const {profile, loading, error} = useSelector((state)=>state.profile)
+    const currentUser = useSelector((state)=>state.user)
+    
     useEffect(()=>{
         dispatch(getUserProfile(userId))
         return ()=>{
@@ -93,6 +95,8 @@ function Profile() {
     if (error) return <p>Error: {error}</p>;
     if (!profile) return <p>No profile found</p>;
 
+
+
     return (
         <>
         {profile &&(
@@ -101,7 +105,7 @@ function Profile() {
                 <Button color='primary'
                     size='large'
                     className={clsx(styles.editButton)}>
-                        edit profile
+                        Chỉnh sửa thông tin
                 </Button>
             </SubHeader>
             <div className={clsx(styles.main)}>

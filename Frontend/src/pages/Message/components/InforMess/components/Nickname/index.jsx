@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useSelector, useDispatch } from "react-redux";
 import { setNN, setTopic } from "../../../../../../components/Redux/Slices/MessageSlice";
 import axios from "axios";
-import { staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
+// import { staticMess } from "../../../../../../components/Redux/Slices/FriendSlice";
 
 function Nickname({ user }) {
     const message = useSelector((state) => state.message.currentMessage);
@@ -29,7 +29,7 @@ function Nickname({ user }) {
                 { withCredentials: true }
             );
 
-            dispatch(staticMess({chat:response.data.result, id: friendId}));
+            // dispatch(staticMess({chat:response.data.result, id: friendId}));
             // console.log(response.data.message)
             dispatch(setNN(response.data.message));
         } catch (error) {
