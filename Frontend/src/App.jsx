@@ -13,7 +13,7 @@ import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
 import Authentication from "./components/Authentication";
 import { SetUser } from "./components/Redux/Actions/UserAction";
-// import Call from "./components/Call";
+// import Call from "./Pages/Call";
 import LoadingPage from "./pages/Loading/index.jsx";
 // import { connectSignalR } from "./components/Redux/Actions/ConnectSignalR.jsx";
 
@@ -47,7 +47,6 @@ function App() {
                         </Authentication>
                     }
                 />
-                <Route
                 {/* <Route
                     path="/call"
                     element={
@@ -73,7 +72,7 @@ function App() {
                     }
                 /> */}
                 <Route
-                    path="/profile/:userId"
+                    path="/:userId"
                     element={
                         <Authentication>
                             <Profile/>

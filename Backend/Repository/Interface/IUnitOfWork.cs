@@ -1,6 +1,6 @@
 using Backend.Models;
 
-namespace Backend.Repositories.Interface;
+namespace Backend.Repository.Interface;
 public interface IUnitOfWork : IDisposable
 {
 	IGenericRepository<User> Users { get; }
@@ -14,9 +14,8 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<RequestNotification> RequestNotification { get; }
 	IGenericRepository<Relationship> Relationship { get; }
 	IGenericRepository<Media> Media { get; }
-	IGenericRepository<UserMedia> UserMedia { get; }
-  IGenericRepository<UserGroup> userGroup { get; }
+
+	IGenericRepository<UserGroup> userGroup { get; }
 	IGenericRepository<Post> Post { get; }
-  IGenericRepository<PostMedia> PostMedia { get; }
-  Task<bool> CompleteAsync();
+	Task<bool> CompleteAsync();
 }

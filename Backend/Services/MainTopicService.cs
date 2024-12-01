@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 using Backend.Services.Interface;
 
 namespace Backend.Services

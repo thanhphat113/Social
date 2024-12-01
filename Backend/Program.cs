@@ -4,8 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Backend.Data;
 
-using Backend.Repositories.Repository;
-using Backend.Repositories.Interface;
+using Backend.Repository.Repository;
+using Backend.Repository.Interface;
+using Backend.Repository;
 using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
@@ -60,7 +61,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
 
-builder.Services.AddScoped<PostService>();
+// builder.Services.AddScoped<PostService>();
 
 
 builder.Services.AddCors(options =>

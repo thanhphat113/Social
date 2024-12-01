@@ -1,8 +1,9 @@
-using Backend.Repositories.Interface;
+
 using Backend.Models;
 using Backend.Data;
+using Backend.Repository.Interface;
 
-namespace Backend.Repositories.Repository
+namespace Backend.Repository
 {
 	public class UnitOfWork : IUnitOfWork
 	{
@@ -16,16 +17,13 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<Message> _Message;
 		private readonly IGenericRepository<Media> _Media;
 		private readonly IGenericRepository<MainTopic> _main;
-		private readonly IGenericRepository<UserMedia> _UserMedia;
 		private readonly IGenericRepository<PostNotification> _PostNotification;
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
 		private readonly IGenericRepository<Post> _post;
-		private readonly IGenericRepository<PostMedia> _postMedia;
-
 		private readonly IGenericRepository<UserGroup> _userGroup;
 
-        public UnitOfWork(SocialMediaContext context,
+		public UnitOfWork(SocialMediaContext context,
 						  IGenericRepository<User> Users,
 						  IGenericRepository<ChatInMessage> ChatInMessage,
 						  IGenericRepository<GroupChat> GroupChat,
@@ -35,18 +33,15 @@ namespace Backend.Repositories.Repository
 						  IGenericRepository<RequestNotification> RequestNotification,
 						  IGenericRepository<Relationship> Relationship,
 						  IGenericRepository<Media> Media,
-						  IGenericRepository<UserMedia> UserMedia,
-              IGenericRepository<UserGroup> userGroup,
+			  IGenericRepository<UserGroup> userGroup,
 						  IGenericRepository<MainTopic> main,
-						  IGenericRepository<Post> post,
-			  			IGenericRepository<PostMedia> postMedia)
+						  IGenericRepository<Post> post)
 
 		{
 			_context = context;
 			_main = main;
 			_Users = Users;
 			_post = post;
-			_UserMedia = UserMedia;
 			_ChatInMessage = ChatInMessage;
 			_GroupChat = GroupChat;
 			_HistorySearch = HistorySearch;
@@ -55,8 +50,7 @@ namespace Backend.Repositories.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
-      _userGroup = userGroup;
-			_postMedia = postMedia;
+			_userGroup = userGroup;
 		}
 
 		// Các property chỉ đọc cho các repository
@@ -68,17 +62,14 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<MainTopic> MainTopic => _main;
 		public IGenericRepository<Post> Post => _post;
-		public IGenericRepository<PostMedia> PostMedia => _postMedia;
-
-		public IGenericRepository<UserMedia> UserMedia => _UserMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
 
-        public IGenericRepository<UserGroup> userGroup => _userGroup;
+		public IGenericRepository<UserGroup> userGroup => _userGroup;
 
-        // Phương thức SaveChanges
-        public async Task<bool> CompleteAsync()
+		// Phương thức SaveChanges
+		public async Task<bool> CompleteAsync()
 		{
 			var result = await _context.SaveChangesAsync();
 			return result > 0;

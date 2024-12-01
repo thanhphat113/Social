@@ -1,12 +1,14 @@
 using Backend.Models;
 using Backend.DTO;
 using Backend.Services.Interface;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 using Backend.Services;
+using System.Linq.Expressions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper.QueryableExtensions;
 
 namespace Backend.Services
 {
@@ -47,18 +49,17 @@ namespace Backend.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<User>> FriendsWithChat(int UserId, IEnumerable<User> friends)
+        public async Task<IEnumerable<UserPrivate>> FriendsWithChat(int UserId, IEnumerable<UserPrivate> friends)
         {
             foreach (var item in friends)
             {
-                var predicate = (Expression<Func<Message, bool>>)(m =>
+                var mess = (ICollection<ChatInMessage>)await _unit.Message.FindAsync(query => query
+                                    .Where(m =>
                 (m.User1 == item.UserId && m.User2 == UserId) ||
-                (m.User1 == UserId && m.User2 == item.UserId));
-                var selector = (Func<IQueryable<Message>, IQueryable<ChatInMessage>>)(query =>
-                    query.Include(m => m.ChatInMessages)
+                (m.User1 == UserId && m.User2 == item.UserId)).Include(m => m.ChatInMessages)
                             .ThenInclude(c => c.Media)
                             .SelectMany(m => m.ChatInMessages));
-                var mess = (ICollection<ChatInMessage>)await _unit.Message.FindAsyncMany(predicate, selector);
+
                 foreach (var x in mess)
                 {
                     if (x.Media == null) continue;
@@ -71,13 +72,12 @@ namespace Backend.Services
 
                 item.ChatInMessages = mess;
             }
-
             return friends;
         }
 
         public async Task<User> FindToLogin(string email, string password)
         {
-            var user = await _unit.Users.GetByConditionAsync<User>(u => u.Email == email);
+            var user = await _unit.Users.GetByConditionAsync<User>(query => query.Where(u => u.Email == email));
 
             if (user == null) return null;
 
@@ -117,7 +117,7 @@ namespace Backend.Services
             if (string.IsNullOrEmpty(email))
                 return new ValidateEmail("Vui lòng nhập email", false);
 
-            var item = await _unit.Users.GetByConditionAsync<User>(u => u.Email == email);
+            var item = await _unit.Users.GetByConditionAsync<User>(query => query.Where(u => u.Email == email));
 
             if (item != null)
                 return new ValidateEmail("Email này đã được đăng ký vui lòng nhập lại", false);
@@ -133,23 +133,29 @@ namespace Backend.Services
             var selector = (Expression<Func<Relationship, User>>)
                     (r => r.FromUserId == id ? r.ToUser : r.FromUser);
 
-            var users = await _unit.Relationship.FindAsync<User>(predicate, selector);
+            // var users = await _unit.Relationship.FindAsync<User>(predicate, selector);
+            var users = await _unit.Relationship.FindAsync<UserPrivate>(query =>
+                    query.Where(r =>
+                            (r.FromUserId == id || r.ToUserId == id) &&
+                            r.TypeRelationship == 2)
+                            .Include(r => r.FromUser)
+                            .Include(r => r.ToUser)
+                            .Select(r => r.FromUserId == id ? r.ToUser : r.FromUser)
+                            .ProjectTo<UserPrivate>(_mapper.ConfigurationProvider));
 
             foreach (var item in users)
             {
-                var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == item.UserId && u.IsProfilePicture == true);
-                if (UserMedia == null)
+                var MediaIsProfile = await _unit.Post.GetByConditionAsync<Media>(query => query
+                            .Where(p => p.CreatedByUserId == item.UserId && p.IsPictureProfile == true)
+                            .SelectMany(p => p.Medias));
+
+                if (MediaIsProfile != null)
                 {
-                    continue;
-                };
+                    MediaIsProfile.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{MediaIsProfile.Src}";
 
-                var profilePicture = await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
-                profilePicture.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{profilePicture.Src}";
-
-
-                item.ProfilePicture = profilePicture;
+                    item.ProfilePicture = MediaIsProfile;
+                }
             }
-
             var withChat = await FriendsWithChat(id, users);
 
             var result = withChat.Select(user => _mapper.Map<UserPrivate>(user));
@@ -166,9 +172,11 @@ namespace Backend.Services
 
         public async Task<IEnumerable<UserPrivate>> GetListByName(string name, int UserId)
         {
-            var users = await _unit.Users.FindAsync<User>(u => u.UserId != UserId &&
-                    (u.LastName.Contains(name) || u.FirstName.Contains(name)));
-            var result = _mapper.Map<IEnumerable<UserPrivate>>(users);
+            var result = await _unit.Users.FindAsync<UserPrivate>(query => query
+                                .Where(u => u.UserId != UserId &&
+                                (u.LastName.Contains(name) ||
+                                u.FirstName.Contains(name)))
+                                .ProjectTo<UserPrivate>(_mapper.ConfigurationProvider));
             return result;
         }
 
