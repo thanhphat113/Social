@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -20,8 +20,6 @@ public partial class User
     public string? Bio { get; set; }
 
     public string? Location { get; set; }
-    [NotMapped]
-    public virtual Media? ProfilePicture { get; set; } = null;
 
     public int? GenderId { get; set; }
 
@@ -52,7 +50,6 @@ public partial class User
     public virtual ICollection<Message> MessageUser2Navigations { get; set; } = new List<Message>();
     [JsonIgnore]
     public virtual ICollection<PostNotification> PostNotifications { get; set; } = new List<PostNotification>();
-    [JsonIgnore]
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 
     [JsonIgnore]
@@ -73,6 +70,4 @@ public partial class User
     public virtual ICollection<UserInGroup> UserInGroups { get; set; } = new List<UserInGroup>();
     [JsonIgnore]
     public virtual ICollection<GroupChat> GroupChats { get; set; } = new List<GroupChat>();
-    [JsonIgnore]
-    public virtual ICollection<UserMedia> UserMedia { get; set; } = new List<UserMedia>();
 }

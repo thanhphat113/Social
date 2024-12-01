@@ -41,28 +41,11 @@ function DetailMessage({ onShow }) {
     const messagesEndRef = useRef(null);
     const listRef = useRef(null);
     const scrollPosition = useRef(0);
-    const audioRef = useRef(null);
 
     const InforCurrentFriend = friends.find(
         (u) => u.userId === currentFriendId
     );
 
-    useEffect(() => {
-        // connection.on("ReceiveMessage", async (message) => {
-        //     await dispatch(receiveMess(message));
-        // });
-        // connection.on("ReceiveTopic", async (message) => {
-        //     // await dispatch(receiveMess(message));
-        //     console.log(message)
-        // });
-        
-    });
-
-    const notifications = () => {
-        if (audioRef.current) {
-            audioRef.current.play();
-        }
-    };
 
     useEffect(() => {
         getMessage();

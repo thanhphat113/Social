@@ -1,4 +1,4 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -26,17 +26,17 @@ namespace Backend.Controllers
 		private readonly PostNotiService _PostContext;
 		private readonly MediaService _media;
 
-		/*private readonly PostService _Post;#1#
+		// private readonly PostService _Post;
 
 
-		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext, PostService postService)
+		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext)
 
 		{
 			_group = group;
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
-			/*_Post = postService;#1#
+			// _Post = postService;
 			_media = media;
 		}
 
@@ -55,14 +55,13 @@ namespace Backend.Controllers
 
 			var information = await _userContext.GetLoginById(userId);
 			var friends = await _userContext.GetFriends(userId);
-			var groupchat = await _group.FindByUserId(userId);
+			// var groupchat = await _group.FindByUserId(userId);
 			var requests = await _NotiContext.FindByUserId(userId);
-			var media = await _media.FindProfilePictureByUserId(userId);
-			/*var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();#1#
+			// var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
 			//Console.WriteLine("User post: " + string.Join(", ", friends.ToList()));
 			var postrequests = await _PostContext.FindByUserId(userId);
 			Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
-			return Ok(new { information = information, media = media, friends = friends, groupchat = groupchat, requests = requests, postrequests = postrequests, post = post });
+			return Ok(new { information = information, friends = friends, requests = requests, postrequests = postrequests });
 		}
 
 		//[AllowAnonymous]
@@ -78,10 +77,10 @@ namespace Backend.Controllers
 		{
 			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 			var list = await _userContext.GetListByName(name, UserId);
-			foreach (var item in list)
-			{
-				item.ProfilePicture = await _media.FindProfilePictureByUserId(item.UserId);
-			}
+			// foreach (var item in list)
+			// {
+			// 	item.ProfilePicture = await _media.FindProfilePictureByUserId(item.UserId);
+			// }
 			return Ok(list);
 		}
 
@@ -125,53 +124,53 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet("{userId}")]
-        public async Task<IActionResult> GetById(int userId)
+		public async Task<IActionResult> GetById(int userId)
 		{
-            if (userId == -1) return null;
+			if (userId == -1) return null;
 
-            var friends = await _userContext.GetFriends(userId);
-            var user = await _userContext.GetLoginById(userId);
-            /*var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();#1#
+			var friends = await _userContext.GetFriends(userId);
+			var user = await _userContext.GetLoginById(userId);
+			// var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
 
-            if (user == null)
-            {
-                return NotFound(new { message = "Không tìm thấy người dùng" });
-            }
-            return Ok(new { information = user, friend= friends , posts = post });
+			if (user == null)
+			{
+				return NotFound(new { message = "Không tìm thấy người dùng" });
+			}
+			return Ok(new { information = user, friend = friends });
 
-        }
+		}
 
 
 
-        [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
-        {
+		[HttpPut("change-password")]
+		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
+		{
 
-            try
-            {
-                var userId = MiddleWare.GetUserIdFromCookie(Request);
-                var token = Request.Cookies["YourCookieName"];
-                Console.WriteLine("Token từ cookie: " + token);
-                Console.WriteLine("UserId từ token: " + userId);
-                if (userId == null)
-                {
-                    return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
-                }
+			try
+			{
+				var userId = MiddleWare.GetUserIdFromCookie(Request);
+				var token = Request.Cookies["YourCookieName"];
+				Console.WriteLine("Token từ cookie: " + token);
+				Console.WriteLine("UserId từ token: " + userId);
+				if (userId == null)
+				{
+					return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+				}
 
-                var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
-                return result
-                    ? Ok(new {status= 200, message = "Đổi mật khẩu thành công" })
-                    : BadRequest(new { message = "Mật khẩu cũ không đúng" });
-            }
-            catch (SecurityTokenExpiredException)
-            {
-                return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
+				var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
+				return result
+					? Ok(new { status = 200, message = "Đổi mật khẩu thành công" })
+					: BadRequest(new { message = "Mật khẩu cũ không đúng" });
+			}
+			catch (SecurityTokenExpiredException)
+			{
+				return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new { Message = ex.Message });
+			}
+		}
 
-    }
-}*/
+	}
+}

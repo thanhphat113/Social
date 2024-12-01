@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 
 using Backend.Services.Interface;
 
@@ -21,17 +21,19 @@ namespace Backend.Services
 		{
 			try
 			{
-				var item = await _unit.RequestNotification.GetByConditionAsync<RequestNotification>(r =>
+				var item = await _unit.RequestNotification.GetByConditionAsync<RequestNotification>(query => query
+							.Where(r =>
 							(r.FromUserId == user1 && r.ToUserId == user2) ||
-					 		(r.FromUserId == user2 && r.ToUserId == user1));
+					 		(r.FromUserId == user2 && r.ToUserId == user1)));
 				if (item == null) return false;
 
 				item.IsAccept = true;
 				item.IsRead = true;
 
-				var relation = await _unit.Relationship.GetByConditionAsync<Relationship>(r =>
+				var relation = await _unit.Relationship.GetByConditionAsync<Relationship>(query => query
+							.Where(r =>
 							(r.FromUserId == user1 && r.ToUserId == user2) ||
-					 		(r.FromUserId == user2 && r.ToUserId == user1));
+					 		(r.FromUserId == user2 && r.ToUserId == user1)));
 
 				relation.TypeRelationship = 2;
 
@@ -67,16 +69,18 @@ namespace Backend.Services
 		{
 			try
 			{
-				var items = await _unit.RequestNotification.FindAsync(r => r.ToUserId == id, u => new
-				{
-					u.FromUser.UserId,
-					u.FromUser.LastName,
-					u.FromUser.FirstName,
-					u.FromUser.GenderId,
-					u.IsAccept,
-					u.NotificationId,
-					u.IsRead
-				});
+				var items = await _unit.RequestNotification.FindAsync(query => query
+							.Where(r => r.ToUserId == id)
+							.Select(u => new
+							{
+								u.FromUser.UserId,
+								u.FromUser.LastName,
+								u.FromUser.FirstName,
+								u.FromUser.GenderId,
+								u.IsAccept,
+								u.NotificationId,
+								u.IsRead
+							}));
 				return items;
 			}
 			catch

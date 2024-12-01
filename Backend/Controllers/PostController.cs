@@ -1,259 +1,183 @@
-using Microsoft.AspNetCore.Mvc;
-using Backend.Models;
-using Backend.Services;
-using Backend.Helper;
-using Backend.Services.Interface;
+// using Microsoft.AspNetCore.Mvc;
+// using Backend.Models;
+// using Backend.Data;
+// using Backend.Services;
+// using Microsoft.AspNetCore.Http;
+// using System.IO;
+// using Microsoft.Extensions.Logging;
+// using Microsoft.EntityFrameworkCore;
+// using Backend.DTO;
+// using Microsoft.Extensions.Logging;
 
-namespace Backend.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PostController : ControllerBase
-    {
-        private readonly IPostService _postService;
-        private readonly ILogger<PostController> _logger;
-        
-        public PostController(IPostService postService, ILogger<PostController> logger)
-        {
-            _postService = postService;
-            _logger = logger;
-        }
+// namespace Backend.Controllers
+// {
+//     [Route("api/[controller]")]
+//     [ApiController]
+//     public class PostController : ControllerBase
+//     {
+//         private readonly PostService _postService;
+//         private readonly ILogger<PostController> _logger;
 
-        #region thêm sửa xóa bài viết
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetAllPost()
-        {
-            try
-            {
-                var posts = await _postService.GetAllPostsWithMedia();
-                return Ok(posts); // Trả về danh sách bài viết cùng với media
-            }
-            catch (Exception ex)
-            {
-                throw;
+//         public PostController(PostService postService, ILogger<PostController> logger)
+//         {
+//             _postService = postService;
+//             _logger = logger;
+//         }
 
-            }
-        }
-        
-        [HttpPost]
-        public async Task<IActionResult> CreatePost([FromForm] Post post)
-        {
-            if (post == null)
-            {
-                return BadRequest("Invalid post data");
-            }
-            var userId = MiddleWare.GetUserIdFromCookie(Request);
+//         [HttpGet]
+//         public async Task<ActionResult<IEnumerable<Post>>> GetAllPost()
+//         {
+//             try
+//             {
+//                 var posts = await _postService.GetAllPostsWithMedia();
+//                 return Ok(posts); // Trả về danh sách bài viết cùng với media
+//             }
+//             catch (Exception ex)
+//             {
+//                 throw;
 
-            var token = Request.Cookies["YourCookieName"];
-            
-            Console.WriteLine($"User id: {userId}");
-            Console.WriteLine("Token từ cookie: " + token);            
-            post.CreatedByUserId = userId;
+//             }
+//         }
 
-            post.DateCreated = DateTime.Now;
-            post.DateUpdated = DateTime.Now;
+//         [HttpPost]
+//         public async Task<IActionResult> CreatePost([FromBody] Post post)
+//         {
+//             if (post == null)
+//             {
+//                 return BadRequest("Invalid post data");
+//             }
 
-            try
-            {
-                var result = await _postService.Add(post);
+//             post.DateCreated = DateTime.Now;
+//             post.DateUpdated = DateTime.Now;
 
-                if (result == null)
-                {
-                    return StatusCode(500, "An error occurred while saving the post");
-                }
+//             try
+//             {
+//                 var result = await _postService.Add(post);
 
-                return CreatedAtAction(nameof(CreatePost), new { id = post.PostId }, post);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while creating post");
-                return StatusCode(500, "Internal server error");
-            }
-        }
+//                 if (result == null)
+//                 {
+//                     return StatusCode(500, "An error occurred while saving the post");
+//                 }
 
-        [HttpPost("WithMedia")]
-        public async Task<IActionResult> CreatePostWithMedia([FromForm] Post post, [FromForm] List<IFormFile> files)
-        {
-            
-            var userId = MiddleWare.GetUserIdFromCookie(Request);
+//                 return CreatedAtAction(nameof(CreatePost), new { id = post.PostId }, post);
+//             }
+//             catch (Exception ex)
+//             {
+//                 _logger.LogError(ex, "Error occurred while creating post");
+//                 return StatusCode(500, "Internal server error");
+//             }
+//         }
 
-            var token = Request.Cookies["YourCookieName"];
-            
-            Console.WriteLine($"User id: {userId}");
-            Console.WriteLine("Token từ cookie: " + token);            
-            post.CreatedByUserId = userId;
-            
-            
-            if (files == null || !files.Any())
-            {
-                Console.WriteLine("Không nhận được files");
-                return BadRequest("Không nhận được files");
-            }
+//         [HttpPost("WithMedia")]
+//         public async Task<IActionResult> CreatePostWithMedia([FromForm] Post post, [FromForm] List<IFormFile> files)
+//         {
 
-            Console.WriteLine($"Content: {post.Content}");
-            Console.WriteLine($"Number of files: {files.Count}");
+//             if (files == null || !files.Any())
+//             {
+//                 return BadRequest("Khoong nhan duoc files ");
+//             }
 
-            foreach (var file in files)
-            {
-                Console.WriteLine($"File name: {file.FileName}");
-            }
+//             var result = await _postService.CreatePostWithMedia(post, files);
 
-            var result = await _postService.CreatePostWithMedia(post, files);
+//              if (result)
+//                 return Ok(new { message = "Post created successfully." });
 
-            if (result)
-                return Ok(new { message = "Post created successfully." });
+//             return BadRequest(new { message = "Failed to create post." });
+//         }
 
-            return BadRequest(new { message = "Failed to create post." });
-        }
-        
+//         [HttpPut]
+//         public async Task<IActionResult> UpdatePost([FromForm] Post post)
+//         {
+//             if (post == null)
+//             {
+//                 return BadRequest("Dữ liệu lỗi");
+//             }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdatePost([FromQuery] int postId ,[FromBody] Post post)
-        {
-            if (post == null)
-            {
-                return BadRequest("Dữ liệu lỗi");
-            }
-            
-            
-            var userId = MiddleWare.GetUserIdFromCookie(Request);
+//             var result = await _postService.UpdatePost(post);
+//             if (result)
+//             {
+//                 return Ok(new {message = "Post updated successfully"});
+//             }
 
-            Console.WriteLine($"PostId: {postId}, comment content: {post.Content}");
-            post.PostId = postId;
-            post.CreatedByUserId = userId;
-            post.DateCreated = DateTime.Now;
-            var result = await _postService.UpdatePost(post);
-            if (result)
-            {
-                return Ok(new {message = "Post updated successfully"});
-            }
+//             return BadRequest(new { message = "Failed to update post" });
+//         }
+//     }
+// }
 
-            return BadRequest(new { message = "Failed to update post" });
-        }
-        
-        #endregion
 
-        
-        #region tương tác bài viết
-        // api/Post/likeuser?postId=1
-        [HttpGet("likeuser")]
-        public async Task<bool> GetLikesUser([FromQuery]int postId)
-        {
-            var userId = MiddleWare.GetUserIdFromCookie(Request);
-            Console.WriteLine("User id trong getlikeduser" + userId);
-            
-            if (userId <= 0)
-            {
-                return false;
-            }
-            try
-            {
-                var likesCount = await _postService.GetLikesUser(postId, userId);
-                if (likesCount == false)
-                {
-                    return false;
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting likes count");
-                return false;
-            }
-        }
-        
-        [HttpGet("likes")]
-        public async Task<ActionResult<ReactsPost>> GetLikesCount([FromQuery]int postId)
-        {
-            try
-            {
-                var likesCount = await _postService.GetLikesCount(postId);
-                if (likesCount == null)
-                {
-                    return BadRequest("Failed to get likes count");
-                }
-                return Ok(likesCount);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting likes count");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-        
-        [HttpGet("comment")]
-        public async Task<ActionResult<int>> GetCommentCount([FromQuery] int postId)
-        {
-            _logger.LogInformation("Received request to get comment count for postId: {PostId}", postId);
 
-            try
-            {
-                if (postId <= 0)
-                {
-                    _logger.LogWarning("Invalid postId: {PostId}", postId);
-                    return BadRequest("Invalid postId.");
-                }
 
-                Console.WriteLine("Đã vào được controller 1" + postId);
-                
-                var commentCount = await _postService.GetCommentCount(postId);
 
-                if (commentCount == null)
-                {
-                    _logger.LogWarning("No comments found for postId: {PostId}", postId);
-                    return NotFound("No comments found.");
-                }
+// //[HttpPost("CreateWithMedia")]
+//     //public async Task<IActionResult> CreatePostWithMedia([FromForm] PostDTO postDTO, [FromForm] List<IFormFile> mediaFiles)
+//     //{
+//     //    if (postDTO.CreatedByUser == null)
+//     //    {
+//     //        return BadRequest("CreateByUser không được null");
+//     //    }
 
-                _logger.LogInformation("Successfully retrieved comment count: {Count} for postId: {PostId}", commentCount, postId);
-                return Ok(commentCount);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting comment count for postId: {PostId}", postId);
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+//     //    try
+//     //    {
 
-        [HttpPost("like")]
-        public async Task<IActionResult> LikePost([FromQuery]int postId)
-        {
-            var userId = MiddleWare.GetUserIdFromCookie(Request); // Lấy userId từ cookie hoặc session
-            if (userId <= 0)
-            {
-                return BadRequest("User  not found.");
-            }
+//     //        var result = await _postService.CreatePostWithMedia(postDTO, mediaFiles);
+//     //        if (result)
+//     //        {
+//     //            return Ok("Bài viết đăng thành công");
+//     //        }
 
-            try
-            {
-                var result = await _postService.AddLike(postId, userId);
-                if (result)
-                {
-                    return Ok();
-                }
-                return BadRequest("Failed to like the post.");
-            }
-            catch (Exception ex)
-            {
-                // Ghi log lỗi
-                _logger.LogError(ex, "Error liking post with ID {PostId}", postId);
-                return StatusCode(500, "Internal server error.");
-            }
-        }
+//     //        return StatusCode(500, "Đã có lỗi xảy ra khi tạo bài viết");
+//     //    }
+//     //    catch (Exception ex)
+//     //    {
+//     //        _logger.LogError(ex, "Lỗi khi tạo bài đăng với media");
+//     //        return StatusCode(500, $"Lỗi từ máy chủ: {ex.Message}");
+//     //    }
+//     //}
 
-        [HttpPost("delete")]
-        public async Task<IActionResult> UnlikePost([FromQuery]int postId)
-        {
-            var userId = MiddleWare.GetUserIdFromCookie(Request); // Lấy userId từ cookie hoặc session
+//     ///*[HttpGet("{id}")]
+//     //public async Task<IActionResult> GetPostById(int id)
+//     //{
+//     //    var post = await _postService.GetPostById(id);
+//     //    if (post == null)
+//     //    {
+//     //        return NotFound(); // Return 404 if post doesn't exist
+//     //    }
+//     //    return Ok(post); // Return the post
+//     //}*/
 
-            if (await _postService.RemoveLike(postId, userId))
-            {
-                return Ok();
-            }
 
-            return BadRequest("Failed to unlike the post.");
-        }
-        
-        #endregion
-        
-    }
-}
+//     //[HttpPut("{id}")]
+//     //public async Task<IActionResult> UpdatePost(int id, [FromBody] PostDTO postDTO)
+//     //{
+//     //    if (postDTO == null || id <= 0)
+//     //    {
+//     //        return BadRequest("Invalid post data.");
+//     //    }
+
+//     //    try
+//     //    {
+//     //        var success = await _postService.UpdatePost(id, postDTO);
+//     //        if (success)
+//     //        {
+//     //            return Ok("Bài viết đã được cập nhật thành công.");
+//     //        }
+
+//     //        return NotFound("Không tìm thấy bài viết để cập nhật.");
+//     //    }
+//     //    catch (Exception ex)
+//     //    {
+//     //        _logger.LogError(ex, "Lỗi khi cập nhật bài viết");
+//     //        return StatusCode(500, $"Lỗi từ máy chủ: {ex.Message}");
+//     //    }
+//     //}
+
+//     ///*[HttpDelete("{id}")]
+//     //public async Task<IActionResult> DeletePost(int id)
+//     //{
+//     //    var result = await _postService.DeletePost(id);
+//     //    if (!result)
+//     //    {
+//     //        return NotFound();
+//     //    }
+//     //    return NoContent();
+//     //}*/

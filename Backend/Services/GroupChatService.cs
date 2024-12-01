@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 
 using Backend.Services.Interface;
 
@@ -27,18 +27,18 @@ namespace Backend.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<IEnumerable<Object>> FindByUserId(int UserId)
-		{
-			try
-			{
-				return await _unit.GroupChat.FindAsync<object>(g => g.Users.Any(u => u.UserId == UserId));
-			}
-			catch (System.Exception ex)
-			{
-				Console.WriteLine("Lỗi đây nè: " + ex);
-				throw;
-			}
-		}
+		// public async Task<IEnumerable<Object>> FindByUserId(int UserId)
+		// {
+		// 	try
+		// 	{
+		// 		return await _unit.GroupChat.FindAsync<object>(g => g.Users.Any(u => u.UserId == UserId));
+		// 	}
+		// 	catch (System.Exception ex)
+		// 	{
+		// 		Console.WriteLine("Lỗi đây nè: " + ex);
+		// 		throw;
+		// 	}
+		// }
 
 		public Task<IEnumerable<GroupChat>> GetAll()
 		{

@@ -5,8 +5,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Backend.Data;
 
-using Backend.Repositories.Repository;
-using Backend.Repositories.Interface;
+using Backend.Repository.Repository;
+using Backend.Repository.Interface;
+using Backend.Repository;
 using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
@@ -76,6 +77,9 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//Post
+
+// builder.Services.AddScoped<PostService>();
 
 
 builder.Services.AddCors(options =>
