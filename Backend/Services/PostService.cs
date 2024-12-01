@@ -1,14 +1,15 @@
-﻿// // namespace Backend.Services;
 using Backend.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Models;
 using Backend.Repositories.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
@@ -23,16 +24,6 @@ namespace Backend.Services
             _hostEnvironment = hostEnvironment;
             _dbContext = dbContext;
         }
-
-        //public Task<Post> Add(Post value)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public Task<bool> Delete(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public async Task<IEnumerable<Post>> GetAll()
         {
@@ -93,26 +84,25 @@ namespace Backend.Services
         {
             throw new NotImplementedException();
         }
-
-
+        
         public async Task<IEnumerable<Post>> GetAllPostsWithMedia()
         {
             var posts = await _unit.Post.GetAll();
 
             foreach (var post in posts)
             {
-                // Tìm các PostMedia liên quan đến bài viết và bao gồm thông tin Media
                 var postMedias = await _unit.PostMedia.FindAsync(pm => pm.PostId == post.PostId, pm => new { pm.PostId, pm.Media });
 
                 // Gán media vào bài viết
                 post.PostMedia = postMedias.Select(pm => new PostMedia
                 {
-                    PostId = post.PostId, // Gán PostId
-                    MediaId = pm.Media.MediaId, // Gán MediaId từ Media
-                    Media = pm.Media // Gán đối tượng Media vào PostMedia
-                }).ToList(); // Chuyển đổi thành danh sách PostMedia
+                    PostId = post.PostId, 
+                    MediaId = pm.Media.MediaId, 
+                    Media = pm.Media 
+                }).ToList(); 
             }
 
+            posts = posts.OrderByDescending(p => p.DateCreated);
             return posts;
         }
 
@@ -137,60 +127,117 @@ namespace Backend.Services
             {
                 foreach (var file in mediaFiles)
                 {
-                    var fileName = Path.GetFileName(file.FileName);
-                    var filePath = Path.Combine(_hostEnvironment.WebRootPath, "media", fileName);
+                    // Tạo tên file duy nhất để tránh trùng lặp
+                    var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                    var filePath = Path.Combine(mediaPath, uniqueFileName);
 
-                    Console.WriteLine(filePath);
+                    Console.WriteLine($"Saving file to: {filePath}");
 
                     try
                     {
+                        // Lưu file
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {
                             await file.CopyToAsync(fileStream);
                         }
+
+                        // Tạo hash code
+                        string hashCode;
+                        using (var stream = new FileStream(filePath, FileMode.Open))
+                        {
+                            using (var sha256 = SHA256.Create())
+                            {
+                                var hashBytes = await sha256.ComputeHashAsync(stream);
+                                hashCode = BitConverter.ToString(hashBytes)
+                                    .Replace("-", "")
+                                    .ToLowerInvariant();
+                            }
+                        }
+
+                        // Tạo đối tượng Media
+                        var media = new Media
+                        {
+                            Src = $"/media/{uniqueFileName}", // Lưu đường dẫn tương đối
+                            HashCode = hashCode,
+                        };
+
+                        mediaList.Add(media);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error saving file: {ex.Message}");
+                        Console.WriteLine($"Error saving file '{file.FileName}': {ex.Message}");
                         throw;
                     }
-
-                    var media = new Media
-                    {
-                        Src = filePath
-                    };
-
-                    mediaList.Add(media);
                 }
             }
 
-            foreach (var i in mediaList)
-            {
-                Console.WriteLine("================" + i);
-            }
+            // Lưu Post trước
+            await _unit.Post.AddAsync(post);
+            await _unit.CompleteAsync(); // Lưu để có PostId
 
+            // Lưu Media
             if (mediaList.Any())
             {
                 await _dbContext.Media.AddRangeAsync(mediaList);
-                await _unit.CompleteAsync();
+                await _unit.CompleteAsync(); // Lưu các Media đã thêm
             }
 
-            await _unit.Post.AddAsync(post);
-            await _unit.CompleteAsync();
-
+            // Tạo liên kết PostMedia
             var postMediaList = mediaList.Select(media => new PostMedia
             {
-                PostId = post.PostId,
+                PostId = post.PostId, // Sử dụng PostId đã lưu
                 MediaId = media.MediaId
             }).ToList();
 
             if (postMediaList.Any())
             {
                 await _dbContext.PostMedia.AddRangeAsync(postMediaList);
-                await _unit.CompleteAsync();
+                await _unit.CompleteAsync(); // Lưu các liên kết PostMedia
             }
 
             return true;
+        }
+        
+        public async Task<bool> GetLikesUser(int postId, int userId)
+        {
+            var data = await _unit.ReactsPost.GetByConditionAsync<ReactsPost>(r => r.PostId == postId && r.UserId == userId);
+            if (data == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public async Task<int> GetLikesCount(int postId)
+        {
+            var data = await _unit.ReactsPost.GetAll();
+            var count = data.Count(r => r.PostId == postId);
+            return count;
+        }
+        
+        public async Task<int> GetCommentCount(int postId)
+        {
+            var data = await _unit.Comment.GetAll();
+            var count = data.Count(r => r.PostId == postId);
+            return count;
+        }
+        
+        public async Task<bool> AddLike(int postId, int userId)
+        {
+            var react = new ReactsPost
+            {
+                PostId = postId,
+                UserId = userId
+            };
+
+            await _unit.ReactsPost.AddAsync(react);
+            return await _unit.CompleteAsync();
+        }
+
+        public async Task<bool> RemoveLike(int postId, int userId)
+        {
+            await _unit.ReactsPost.DeleteAsync(r => r.PostId == postId && r.UserId == userId);
+            return await _unit.CompleteAsync();
         }
 
         public async Task<bool> UpdatePost(Post post)
@@ -225,23 +272,6 @@ namespace Backend.Services
                 throw new Exception($"Có lỗi khi thực hiện cập nhật: {ex.Message} {innerExceptionMessage}");
             }
         }
-
-
-
-        //public async Task<PostDTO> GetPostById(int id)
-        //{
-        //    return await _postRepository.GetById(id);
-        //}
-
-        //public async Task<bool> UpdatePost(int id, PostDTO postDTO)
-        //{
-        //    return await _postRepository.Update(id, postDTO);
-        //}
-
-        /*public async Task<bool> DeletePost(int id)
-        {
-            return await _postRepository.Delete(id);
-        }*/
+        
     }
-
 }

@@ -61,6 +61,18 @@ body {
         color: gray;
         }
     }
+
+    .postEdit {
+        margin-left: auto;
+        margin-right: 2rem;
+        font-size: 2.2rem;
+        color: gray;
+        cursor: pointer;
+
+        &:hover {
+            color: black;
+        }
+    }
 }
 
 .postContent {

@@ -390,7 +390,7 @@ namespace Backend.Migrations
                         .HasColumnType("int(11)")
                         .HasColumnName("created_by_user_id");
 
-                    b.Property<DateTime>("DateCreated")
+                    b.Property<DateTime?>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
                         .HasColumnName("date_created")
@@ -408,6 +408,24 @@ namespace Backend.Migrations
                         .HasColumnType("int(11)")
                         .HasColumnName("group_id");
 
+                    b.Property<bool?>("IsCoverPhoto")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_cover_photo");
+
+                    b.Property<bool>("IsPictureProfile")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_profile_picture");
+
+                    b.Property<bool?>("IsVisible")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_visible");
+
                     b.Property<int?>("PrivacyId")
                         .HasColumnType("int(11)")
                         .HasColumnName("privacy_id");
@@ -422,25 +440,6 @@ namespace Backend.Migrations
                     b.HasIndex(new[] { "CreatedByUserId" }, "idx_created_by_user_id_posts");
 
                     b.ToTable("posts", (string)null);
-                });
-
-            modelBuilder.Entity("Backend.Models.PostMedia", b =>
-                {
-                    b.Property<int>("MediaId")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("media_id");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("post_id");
-
-                    b.HasKey("MediaId", "PostId");
-
-                    b.HasIndex(new[] { "MediaId" }, "fk_media");
-
-                    b.HasIndex(new[] { "PostId" }, "fk_post");
-
-                    b.ToTable("post_media", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.PostNotification", b =>
@@ -915,41 +914,6 @@ namespace Backend.Migrations
                     b.ToTable("user_in_group", (string)null);
                 });
 
-            modelBuilder.Entity("Backend.Models.UserMedia", b =>
-                {
-                    b.Property<int>("MediaId")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("media_id");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int(11)")
-                        .HasColumnName("user_id");
-
-                    b.Property<bool?>("IsCoverPicture")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_cover_picture");
-
-                    b.Property<bool?>("IsProfilePicture")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_profile_picture");
-
-                    b.HasKey("MediaId", "UserId");
-
-                    b.HasIndex("UserId", "IsCoverPicture")
-                        .IsUnique()
-                        .HasFilter("[is_cover_picture] = 1");
-
-                    b.HasIndex("UserId", "IsProfilePicture")
-                        .IsUnique()
-                        .HasFilter("[is_profile_picture] = 1");
-
-                    b.HasIndex(new[] { "MediaId" }, "fk_user_media_media_id");
-
-                    b.HasIndex(new[] { "UserId" }, "fk_user_media_user_id");
-
-                    b.ToTable("user_media", (string)null);
-                });
-
             modelBuilder.Entity("UserInGroupChat", b =>
                 {
                     b.Property<int>("UserId")
@@ -982,6 +946,21 @@ namespace Backend.Migrations
                     b.HasIndex("message_id");
 
                     b.ToTable("media_message");
+                });
+
+            modelBuilder.Entity("post_media", b =>
+                {
+                    b.Property<int>("media_id")
+                        .HasColumnType("int(11)");
+
+                    b.Property<int>("post_id")
+                        .HasColumnType("int(11)");
+
+                    b.HasKey("media_id", "post_id");
+
+                    b.HasIndex("post_id");
+
+                    b.ToTable("post_media");
                 });
 
             modelBuilder.Entity("Backend.Models.ChatInGroup", b =>
@@ -1158,25 +1137,6 @@ namespace Backend.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("Privacy");
-                });
-
-            modelBuilder.Entity("Backend.Models.PostMedia", b =>
-                {
-                    b.HasOne("Backend.Models.Media", "Media")
-                        .WithMany("PostMedia")
-                        .HasForeignKey("MediaId")
-                        .IsRequired()
-                        .HasConstraintName("fk_media");
-
-                    b.HasOne("Backend.Models.Post", "Post")
-                        .WithMany("PostMedia")
-                        .HasForeignKey("PostId")
-                        .IsRequired()
-                        .HasConstraintName("fk_post");
-
-                    b.Navigation("Media");
-
-                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("Backend.Models.PostNotification", b =>
@@ -1389,25 +1349,6 @@ namespace Backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Backend.Models.UserMedia", b =>
-                {
-                    b.HasOne("Backend.Models.Media", "Media")
-                        .WithMany("UserMedia")
-                        .HasForeignKey("MediaId")
-                        .IsRequired()
-                        .HasConstraintName("fk_user_media_media_id");
-
-                    b.HasOne("Backend.Models.User", "User")
-                        .WithMany("UserMedia")
-                        .HasForeignKey("UserId")
-                        .IsRequired()
-                        .HasConstraintName("fk_user_media_user_id");
-
-                    b.Navigation("Media");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UserInGroupChat", b =>
                 {
                     b.HasOne("Backend.Models.GroupChat", null)
@@ -1442,6 +1383,21 @@ namespace Backend.Migrations
                         .HasConstraintName("fk_message_media");
                 });
 
+            modelBuilder.Entity("post_media", b =>
+                {
+                    b.HasOne("Backend.Models.Media", null)
+                        .WithMany()
+                        .HasForeignKey("media_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.Post", null)
+                        .WithMany()
+                        .HasForeignKey("post_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Backend.Models.Comment", b =>
                 {
                     b.Navigation("InverseChildOfNavigation");
@@ -1471,10 +1427,6 @@ namespace Backend.Migrations
                     b.Navigation("ChatInGroup");
 
                     b.Navigation("ChatInMessage");
-
-                    b.Navigation("PostMedia");
-
-                    b.Navigation("UserMedia");
                 });
 
             modelBuilder.Entity("Backend.Models.Message", b =>
@@ -1485,8 +1437,6 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Post", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("PostMedia");
 
                     b.Navigation("PostNotifications");
 
@@ -1550,8 +1500,6 @@ namespace Backend.Migrations
                     b.Navigation("UserGroups");
 
                     b.Navigation("UserInGroups");
-
-                    b.Navigation("UserMedia");
                 });
 
             modelBuilder.Entity("Backend.Models.UserGroup", b =>
