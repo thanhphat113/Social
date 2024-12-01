@@ -1,6 +1,6 @@
 using Backend.Controllers;
 using Backend.Models;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 using Backend.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,26 +33,29 @@ namespace Backend.Services
 
 
 
-		public async Task<Media> FindProfilePictureByUserId(int UserId)
-		{
-			var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == UserId && u.IsProfilePicture == true);
-			if (UserMedia == null) return null;
-			var item = await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
-			item.Src = GetFullSrc(item.Src);
+		// public async Task<Media> FindProfilePictureByUserId(int UserId)
+		// {
+		// 	var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == UserId && u.IsProfilePicture == true);
+		// 	if (UserMedia == null) return null;
+		// 	var item = await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
+		// 	item.Src = GetFullSrc(item.Src);
 
-			return item;
-		}
+		// 	return item;
+		// }
 
-		public async Task<Media> FindCoverPictureByUserId(int UserId)
-		{
-			var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == UserId && u.IsCoverPicture == true);
-			if (UserMedia == null) return null;
-			return await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
-		}
+		// public async Task<Media> FindCoverPictureByUserId(int UserId)
+		// {
+		// 	var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == UserId && u.IsCoverPicture == true);
+		// 	if (UserMedia == null) return null;
+		// 	return await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
+		// }
 
 		public async Task<IEnumerable<Media>> FindByUserId(int UserId)
 		{
-			return await _unit.UserMedia.FindAsync<Media>(m => m.UserId == UserId, m => m.Media);
+			return await _unit.Users.FindAsync<Media>(query => query
+						.Where(u => u.UserId == UserId)
+						.SelectMany(u => u.Posts.SelectMany(p => p.Medias))
+						);
 		}
 
 		public async Task<IEnumerable<Media>> FindByMessageId(int MessageId, string? type = "media")
@@ -61,15 +64,16 @@ namespace Backend.Services
 			try
 			{
 				var item = await _unit.Message
-						.FindAsyncMany(m => m.MessagesId == MessageId, query =>
-					  			query.SelectMany(m => m.Medias)
-								.Where(p => p.MediaType == 1 || p.MediaType == 2));
+						.FindAsync(query => query.Where(m => m.MessagesId == MessageId)
+						.SelectMany(m => m.Medias)
+						.Where(p => p.MediaType == 1 ||
+						p.MediaType == 2));
 				if (type == "file")
 				{
 					item = await _unit.Message
-						.FindAsyncMany(m => m.MessagesId == MessageId, query =>
-								query.SelectMany(m => m.Medias)
-								  .Where(p => p.MediaType == 3));
+						.FindAsync(query => query.Where(m => m.MessagesId == MessageId)
+						.SelectMany(m => m.Medias)
+						.Where(p => p.MediaType == 3));
 				}
 				foreach (var media in item)
 				{
@@ -119,7 +123,7 @@ namespace Backend.Services
 		{
 			try
 			{
-				var item = await _unit.Media.GetByConditionAsync<Media>(m => m.HashCode == hash);
+				var item = await _unit.Media.GetByConditionAsync<Media>(query => query.Where(m => m.HashCode == hash));
 				if (item == null) return -1;
 				return item.MediaId;
 			}

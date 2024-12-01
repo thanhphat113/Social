@@ -1,5 +1,5 @@
 
-﻿namespace Backend.Repositories
+namespace Backend.Repository.Repository
 {
     using Microsoft.EntityFrameworkCore;
     using Backend.Data;

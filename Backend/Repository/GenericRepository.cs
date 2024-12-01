@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Repositories.Repository
+namespace Backend.Repository
 {
 	public class GenericRepository<T> : IGenericRepository<T> where T : class
 	{
@@ -21,8 +21,8 @@ namespace Backend.Repositories.Repository
 
 		public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
 		{
-			var item = await GetByConditionAsync<T>(predicate);
-			_context.Remove(item); 
+			var item = _context.Set<T>().Where(predicate);
+			_context.Remove(item);
 		}
 
 		public async Task<T> GetByIdAsync(int id)
@@ -30,45 +30,21 @@ namespace Backend.Repositories.Repository
 			return await _context.Set<T>().FindAsync(id);
 		}
 
-		public async Task<TResult> GetByConditionAsync<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>>? selector = null)
+		public async Task<TResult> GetByConditionAsync<TResult>(Func<IQueryable<T>, IQueryable<TResult>> selector)
 		{
 
-			var query = _context.Set<T>().Where(predicate);
+			var query = _context.Set<T>();
 
-			if (selector != null)
-			{
-				var resultQuery = query.Select(selector);
+			var result = await selector(query).FirstOrDefaultAsync();
 
-				return await resultQuery.FirstOrDefaultAsync();
-			}
-
-			return await query.Cast<TResult>().FirstOrDefaultAsync();
+			return result;
 		}
 
 
-		public async Task<IEnumerable<TResult>> FindAsync<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>>? selector = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
-		{
-			var query = _context.Set<T>().Where(predicate);
-
-			if (orderBy != null)
-			{
-				query = orderBy(query);
-			}
-
-			if (selector != null)
-			{
-				var resultQuery = query.Select(selector);
-
-				return await resultQuery.ToListAsync();
-			}
-			return await query.Cast<TResult>().ToListAsync();
-		}
-
-
-		public async Task<IEnumerable<TResult>> FindAsyncMany<TResult>(Expression<Func<T, bool>> predicate, Func<IQueryable<T>, IQueryable<TResult>> selector)
+		public async Task<IEnumerable<TResult>> FindAsync<TResult>(Func<IQueryable<T>, IQueryable<TResult>> selector)
 		{
 
-			var query = _context.Set<T>().Where(predicate);
+			var query = _context.Set<T>();
 
 			var result = await selector(query).ToListAsync();
 

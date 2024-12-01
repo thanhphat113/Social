@@ -1,6 +1,6 @@
 using Backend.Models;
-using Backend.Repositories;
-using Backend.Repositories.Interface;
+using Backend.Repository;
+using Backend.Repository.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

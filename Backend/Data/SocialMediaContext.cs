@@ -38,9 +38,7 @@ public partial class SocialMediaContext : DbContext
     public virtual DbSet<Message> Messages { get; set; }
 
     public virtual DbSet<Post> Posts { get; set; }
-    public virtual DbSet<UserMedia> UserMedia { get; set; }
 
-    public virtual DbSet<PostMedia> PostMedia { get; set; }
 
     public virtual DbSet<PostNotification> PostNotifications { get; set; }
 
@@ -437,6 +435,18 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.PrivacyId)
                             .HasColumnType("int(11)")
                             .HasColumnName("privacy_id");
+            entity.Property(e => e.IsCoverPhoto)
+                    .HasColumnType("tinyint(1)")
+                    .HasDefaultValue(false)
+                    .HasColumnName("is_cover_photo");
+            entity.Property(e => e.IsPictureProfile)
+                    .HasColumnType("tinyint(1)")
+                    .HasDefaultValue(false)
+                    .HasColumnName("is_profile_picture");
+            entity.Property(e => e.IsVisible)
+                    .HasColumnType("tinyint(1)")
+                    .HasDefaultValue(false)
+                    .HasColumnName("is_visible");
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.Posts)
                             .HasForeignKey(d => d.CreatedByUserId)
@@ -446,6 +456,16 @@ public partial class SocialMediaContext : DbContext
                             .HasForeignKey(d => d.GroupId)
                             .OnDelete(DeleteBehavior.SetNull)
                             .HasConstraintName("fk_posts_group_id");
+            entity.HasMany(d => d.Medias).WithMany(p => p.Posts)
+                .UsingEntity<Dictionary<string, object>>(
+                    "post_media",
+                    j => j.HasOne<Media>()
+                        .WithMany()
+                        .HasForeignKey("media_id"),
+                    j => j.HasOne<Post>()
+                        .WithMany()
+                        .HasForeignKey("post_id")
+                    );
 
             entity.HasOne(d => d.Privacy).WithMany(p => p.Posts)
                             .HasForeignKey(d => d.PrivacyId)
@@ -453,73 +473,6 @@ public partial class SocialMediaContext : DbContext
                             .HasConstraintName("fk_posts_privacy_id");
         });
 
-        modelBuilder.Entity<UserMedia>(entity =>
-        {
-            entity.HasKey(ui => new { ui.MediaId, ui.UserId });
-            entity.ToTable("user_media");
-
-            entity.HasIndex(e => e.MediaId, "fk_user_media_media_id");
-
-            entity.HasIndex(e => e.UserId, "fk_user_media_user_id");
-
-            entity.Property(e => e.MediaId)
-                .HasColumnType("int(11)")
-                .HasColumnName("media_id");
-            entity.Property(e => e.UserId)
-                .HasColumnType("int(11)")
-                .HasColumnName("user_id");
-            entity.Property(e => e.IsProfilePicture)
-                .HasColumnType("tinyint(1)")
-                .HasColumnName("is_profile_picture");
-            entity.Property(e => e.IsCoverPicture)
-                .HasColumnType("tinyint(1)")
-                .HasColumnName("is_cover_picture");
-
-            entity.HasOne(d => d.Media).WithMany(m => m.UserMedia)
-                .HasForeignKey(d => d.MediaId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_user_media_media_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserMedia)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_user_media_user_id");
-
-            entity.HasIndex(ui => new { ui.UserId, ui.IsProfilePicture })
-            .IsUnique()
-            .HasFilter("[is_profile_picture] = 1");
-
-            entity.HasIndex(ui => new { ui.UserId, ui.IsCoverPicture })
-            .IsUnique()
-            .HasFilter("[is_cover_picture] = 1");
-        });
-
-        modelBuilder.Entity<PostMedia>(entity =>
-        {
-            entity.HasKey(ui => new { ui.MediaId, ui.PostId });
-            entity.ToTable("post_media");
-
-            entity.HasIndex(e => e.MediaId, "fk_media");
-
-            entity.HasIndex(e => e.PostId, "fk_post");
-
-            entity.Property(e => e.MediaId)
-                .HasColumnType("int(11)")
-                .HasColumnName("media_id");
-            entity.Property(e => e.PostId)
-                .HasColumnType("int(11)")
-                .HasColumnName("post_id");
-
-            entity.HasOne(d => d.Media).WithMany(m => m.PostMedia)
-                .HasForeignKey(d => d.MediaId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_media");
-
-            entity.HasOne(d => d.Post).WithMany(p => p.PostMedia)
-                .HasForeignKey(d => d.PostId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_post");
-        });
 
         modelBuilder.Entity<PostNotification>(entity =>
         {

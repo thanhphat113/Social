@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Backend.Models;
-using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 
 using Backend.Services.Interface;
 
@@ -38,14 +38,16 @@ namespace Backend.Services
 		{
 			try
 			{
-				var item = await _unit.PostNotification.FindAsync(p => p.Post.CreatedByUserId == userid, u => new
-				{
-					u.PostNotificationId,
-					u.PostId,
-					u.FromUser,
-					u.Type,
-					u.IsRead
-				});
+				var item = await _unit.PostNotification.FindAsync(query => query
+									.Where(p => p.Post.CreatedByUserId == userid)
+									.Select(u => new
+									{
+										u.PostNotificationId,
+										u.PostId,
+										u.FromUser,
+										u.Type,
+										u.IsRead
+									}));
 				return item;
 			}
 			catch (Exception e)
@@ -63,18 +65,18 @@ namespace Backend.Services
 		public Task<PostNotification> GetById(int id)
 		{
 			try
-            {
-                var item = _unit.PostNotification.GetByIdAsync(id);
-                return item;
+			{
+				var item = _unit.PostNotification.GetByIdAsync(id);
+				return item;
 
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Lỗi: " + e.Data);
-                return null;
-            }
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("Lỗi: " + e.Data);
+				return null;
+			}
 
-        }
+		}
 
 		public Task<IEnumerable<PostNotification>> GetListById(int userid)
 		{
@@ -92,8 +94,8 @@ namespace Backend.Services
 			try
 			{
 				Console.WriteLine("Service PostNotificationId: " + PostNotificationId);
-                var item = await _unit.PostNotification.GetByIdAsync(PostNotificationId);
-                
+				var item = await _unit.PostNotification.GetByIdAsync(PostNotificationId);
+
 				if (item == null)
 				{
 					return false;

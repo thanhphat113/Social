@@ -1,8 +1,9 @@
-using Backend.Repositories.Interface;
+
 using Backend.Models;
 using Backend.Data;
+using Backend.Repository.Interface;
 
-namespace Backend.Repositories.Repository
+namespace Backend.Repository
 {
 	public class UnitOfWork : IUnitOfWork
 	{
@@ -16,7 +17,6 @@ namespace Backend.Repositories.Repository
 		private readonly IGenericRepository<Message> _Message;
 		private readonly IGenericRepository<Media> _Media;
 		private readonly IGenericRepository<MainTopic> _main;
-		private readonly IGenericRepository<UserMedia> _UserMedia;
 		private readonly IGenericRepository<PostNotification> _PostNotification;
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
@@ -44,15 +44,12 @@ namespace Backend.Repositories.Repository
 		                  IGenericRepository<PostMedia> postMedia,
 		                  IGenericRepository<ReactsPost> reactPost,
 		                  IGenericRepository<Comment> comment,
-		                  IGenericRepository<ReactsComment> reactComment
-						  )
-						  
+		                  IGenericRepository<ReactsComment> reactComment)
 		{
 			_context = context;
 			_main = main;
 			_Users = Users;
 			_post = post;
-			_UserMedia = UserMedia;
 			_ChatInMessage = ChatInMessage;
 			_GroupChat = GroupChat;
 			_HistorySearch = HistorySearch;
@@ -77,20 +74,17 @@ namespace Backend.Repositories.Repository
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<MainTopic> MainTopic => _main;
 		public IGenericRepository<UserGroup> userGroup { get; }
-		public IGenericRepository<UserMedia> UserMedia => _UserMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
-
-		public IGenericRepository<PostMedia> PostMedia => _postMedia;
 		public IGenericRepository<ReactsPost> ReactsPost => _reactPost;
 		public IGenericRepository<Comment> Comment => _comment;
 		public IGenericRepository<ReactsComment> ReactsComment => _reactComment;
-			
 		public IGenericRepository<Post> Post => _post;
+		public IGenericRepository<UserGroup> userGroup => _userGroup;
 
-        // Phương thức SaveChanges
-        public async Task<bool> CompleteAsync()
+		// Phương thức SaveChanges
+		public async Task<bool> CompleteAsync()
 		{
 			var result = await _context.SaveChangesAsync();
 			return result > 0;

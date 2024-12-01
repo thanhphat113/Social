@@ -1,6 +1,6 @@
 using Backend.Models;
 
-namespace Backend.Repositories.Interface;
+namespace Backend.Repository.Interface;
 public interface IUnitOfWork : IDisposable
 {
 	IGenericRepository<User> Users { get; }
