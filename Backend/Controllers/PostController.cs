@@ -107,13 +107,20 @@ namespace Backend.Controllers
         
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePost([FromForm] Post post)
+        public async Task<IActionResult> UpdatePost([FromQuery] int postId ,[FromBody] Post post)
         {
             if (post == null)
             {
                 return BadRequest("Dữ liệu lỗi");
             }
+            
+            
+            var userId = MiddleWare.GetUserIdFromCookie(Request);
 
+            Console.WriteLine($"PostId: {postId}, comment content: {post.Content}");
+            post.PostId = postId;
+            post.CreatedByUserId = userId;
+            post.DateCreated = DateTime.Now;
             var result = await _postService.UpdatePost(post);
             if (result)
             {
@@ -186,6 +193,8 @@ namespace Backend.Controllers
                     return BadRequest("Invalid postId.");
                 }
 
+                Console.WriteLine("Đã vào được controller 1" + postId);
+                
                 var commentCount = await _postService.GetCommentCount(postId);
 
                 if (commentCount == null)

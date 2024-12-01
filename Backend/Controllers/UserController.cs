@@ -29,7 +29,7 @@ namespace Backend.Controllers
 		private readonly PostService _Post;
 
 
-		public UserController(MediaService media, GroupChatService group, ChatInMessageService detailmess, UserService UserContext, MessageService mess, RequestNotiService NotiContext, PostNotiService PostContext, PostService postService)
+		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext, PostService postService)
 
 		{
 			_group = group;

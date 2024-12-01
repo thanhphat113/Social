@@ -32,6 +32,8 @@ const CommentPost = ({
     const [checkUserLikeComment, setCheckUserLikeComment] = useState(false);
     const [activeCommentOptionsId, setActiveCommentOptionsId] = useState(null);
     const [editingComment, setEditingComment] = useState(null);
+    const [replyContent, setReplyContent] = useState('');
+    const [activeReplyCommentId, setActiveReplyCommentId] = useState(null);
 
 
     const isCurrentUserComment = (comment) => {
@@ -67,25 +69,29 @@ const CommentPost = ({
 
     // Hàm lưu comment đã chỉnh sửa
     const handleSaveEditComment = async () => {
-        console.log(editingComment.commentId)
         try {
+            console.log('editingComment', editingComment.content, " Và đây cx là postId", postId);
             const response = await axios.put(
                 `http://localhost:5164/api/Comment?commentId=${editingComment.commentId}`, 
                 { 
+                    postId: postId, // Gửi postId
+                    content: editingComment.content, // Gửi nội dung đã chỉnh sửa
+                },
+                {
                     headers: {
                         "Content-Type": "application/json",
                     },
                     withCredentials: true 
                 }
             );
-
-
+    
+            // Cập nhật comment trong danh sách
             setComments(comments.map(comment => 
                 comment.commentId === editingComment.commentId 
                     ? {...comment, content: editingComment.content} 
                     : comment
             ));
-
+    
             // Reset trạng thái chỉnh sửa
             setEditingComment(null);
         } catch (error) {
@@ -103,6 +109,7 @@ const CommentPost = ({
             
             // Cập nhật danh sách comment sau khi xóa
             setComments(comments.filter(comment => comment.commentId !== commentId));
+            setCommentCount(prevCount => prevCount - 1);
         } catch (error) {
             console.error('Error deleting comment:', error);
             alert('Không thể xóa bình luận. Vui lòng thử lại.');
@@ -146,7 +153,7 @@ const CommentPost = ({
             }
         };
         fetchLikesCount();
-    }, [postId]);
+    }, [postId  ]);
 
 
     useEffect(() => {
@@ -286,12 +293,12 @@ const CommentPost = ({
         };
 
         fetchComments();
-    }, [postId, commentCount]); // Thêm commentCount vào dependency array
+    }, [postId, commentCount ]);
 
     const formatTimeAgo = (date) => {
         const now = new Date();
         const commentDate = new Date(date);
-        commentDate.setHours(commentDate.getHours() + 7); 
+        commentDate.setHours(commentDate.getHours()); 
         const diffInSeconds = Math.floor((now - commentDate) / 1000);
 
         if (diffInSeconds < 60) {
@@ -328,6 +335,38 @@ const CommentPost = ({
         }
     };
 
+
+    const handleReplyComment = async (commentId) => {
+        if (!replyContent.trim()) return;
+
+        try {
+            const response = await axios.post(`http://localhost:5164/api/Comment/reply?commentId=${commentId}`, {
+                content: replyContent,
+                postId: postId
+            }, {
+                withCredentials: true
+            });
+
+            // Thêm bình luận con vào danh sách
+            setComments(prevComments => {
+                return prevComments.map(comment => {
+                    if (comment.commentId === commentId) {
+                        return {
+                            ...comment,
+                            InverseChildOfNavigation: [...(comment.InverseChildOfNavigation || []), response.data]
+                        };
+                    }
+                    return comment;
+                });
+            });
+
+            // Reset nội dung reply
+            setReplyContent('');
+            setActiveReplyCommentId(null);
+        } catch (error) {
+            console.error('Error replying to comment:', error);
+        }
+    };
     
     return (
         <div className={styles.postContainer}>
@@ -393,7 +432,7 @@ const CommentPost = ({
                         </div>
                         <div className={styles.postComments}>
                             <a href="">
-                                <span>{commentCounts} bình luận</span>
+                                <span>{comments.length} bình luận</span>
                             </a>
                         </div>
                         <div className={styles.postShares}>
@@ -414,103 +453,187 @@ const CommentPost = ({
                 </div>
                 <div className={styles.commentSection}>
                     {comments.map(comment => (
-                        <div key={comment.commentId} className={styles.comment}>
-                            <div className={styles.commentProfilePic}>
-                                <img
-                                    src={comment.user?.profilePicture || (comment.user?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')} // Sử dụng avatar từ API
-                                />
-                            </div>
-                            <div className={styles.commentContentContainer}>
-                                <div className={styles.commentHeader}>
-                                    {editingComment?.commentId === comment.commentId ? (
-                                        <div className={styles.editCommentContainer}>
-                                            <input 
-                                                type="text"
-                                                value={editingComment.content}
-                                                onChange={handleEditCommentChange}
-                                                className={styles.editCommentInput}
-                                                autoFocus // Tự động focus vào input khi chỉnh sửa
-                                            />
-                                            <div className={styles.editCommentActions}>
-                                                <button 
-                                                    onClick={handleSaveEditComment}
-                                                    className={styles.saveButton}
-                                                >
-                                                    Lưu
-                                                </button>
-                                                <button 
-                                                    onClick={() => setEditingComment(null)}
-                                                    className={styles.cancelButton}
-                                                >
-                                                    Hủy
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div style={{display: 'flex', alignItems: 'center'}}>
-                                            <div className={styles.commentContent}>
-                                                <span>
-                                                    <strong>
-                                                        {comment.user 
-                                                            ? `${comment.user.firstName} ${comment.user.lastName}` 
-                                                            : 'Ẩn danh'}
-                                                    </strong>
-                                                </span>
-                                                <br></br>
-                                                <span>{comment.content}</span>
-                                            </div>
-                                            {/* Nút chỉnh sửa chỉ hiện với comment của người dùng hiện tại */}
-                                            {isCurrentUserComment(comment) && (
-                                                <div className={styles.commentActions}>
-                                                    <IoIosMore 
-                                                        onClick={() => toggleCommentOptions(comment.commentId)} 
-                                                    />
-                                                    {activeCommentOptionsId === comment.commentId && (
-                                                        <div className={styles.actionDropdown}>
-                                                            <button onClick={() => handleStartEditComment(comment)}>
-                                                                Chỉnh sửa
-                                                            </button>
-                                                            <button onClick={() => handleDeleteComment(comment.commentId)}>
-                                                                Xóa
-                                                            </button>
-                                                        </div>
-                                                    )}
+                        <div key={comment.commentId} className={styles.commentWrapper}>
+                            <div key={comment.commentId} className={styles.comment}>
+                                <div className={styles.commentProfilePic}>
+                                    <img
+                                        src={comment.user?.profilePicture || (comment.user?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')} // Sử dụng avatar từ API
+                                    />
+                                </div>
+                                <div className={styles.commentContentContainer}>
+                                    <div className={styles.commentHeader}>
+                                        {editingComment?.commentId === comment.commentId ? (
+                                            <div className={styles.editCommentContainer}>
+                                                <textarea 
+                                                    type="text"
+                                                    value={editingComment.content}
+                                                    onChange={handleEditCommentChange}
+                                                    className={styles.editCommentInput}
+                                                    autoFocus
+                                                    onFocus={(e) => {
+                                                        const valueLength = e.target.value.length;
+                                                        e.target.setSelectionRange(valueLength, valueLength); // Đặt con trỏ ở cuối nội dung
+                                                    }}
+                                                    onInput={(e) => {
+                                                        e.target.style.height = "auto"; // Đặt chiều cao về tự động trước
+                                                        e.target.style.height = `${e.target.scrollHeight}px`; // Cập nhật chiều cao theo nội dung
+                                                    }}
+                                                />
+                                                <div className={styles.editCommentActions}>
+                                                    <button 
+                                                        onClick={handleSaveEditComment}
+                                                        className={styles.saveButton}
+                                                    >
+                                                        Lưu
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => setEditingComment(null)}
+                                                        className={styles.cancelButton}
+                                                    >
+                                                        Hủy
+                                                    </button>
                                                 </div>
-                                            )}
-                                        </div>
+                                            </div>
+                                        ) : (
+                                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                                <div className={styles.commentContent}>
+                                                    <span>
+                                                        <strong>
+                                                            {comment.user 
+                                                                ? `${comment.user.firstName} ${comment.user.lastName}` 
+                                                                : 'Ẩn danh'}
+                                                        </strong>
+                                                    </span>
+                                                    <br></br>
+                                                    <span>{comment.content}</span>
+                                                </div>
+                                                {/* Nút chỉnh sửa chỉ hiện với comment của người dùng hiện tại */}
+                                                {isCurrentUserComment(comment) && (
+                                                    <div className={styles.commentActions}>
+                                                        <IoIosMore 
+                                                            onClick={() => toggleCommentOptions(comment.commentId)} 
+                                                        />
+                                                        {activeCommentOptionsId === comment.commentId && (
+                                                            <div className={styles.actionDropdown}>
+                                                                <button onClick={() => handleStartEditComment(comment)}>
+                                                                    Chỉnh sửa
+                                                                </button>
+                                                                <button onClick={() => handleDeleteComment(comment.commentId)}>
+                                                                    Xóa
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
 
-                                    )}  
-                            
-                                    
-                                </div>
-                                <div className={styles.commentReact}>
-                                    <span>{formatTimeAgo(comment.dateCreated)}</span>
-                                    <span className={`
-                                        ${styles.likeComment} 
-                                        ${commentLikeStatus[comment.commentId] ? styles.likeActive : ''}
-                                        `} 
-                                        onClick={() => handleLikeCommentClick(comment.commentId)}
-                                    >
-                                        Thích
-                                    </span>
-                                    <span>{(likedComments[comment.commentId] || 0).toLocaleString()}</span>
-                                    <span>Phản hồi</span>
+                                        )}  
+                                    </div>
+                                    <div className={styles.commentReact}>
+                                    {/* {formatTimeAgo(comment.dateCreated)} */}
+                                        <span>{formatTimeAgo(comment.dateCreated)}</span>
+                                        <span className={`
+                                            ${styles.likeComment} 
+                                            ${commentLikeStatus[comment.commentId] ? styles.likeActive : ''}
+                                            `} 
+                                            onClick={() => handleLikeCommentClick(comment.commentId)}
+                                        >
+                                            Thích
+                                        </span>
+                                        <span>{(likedComments[comment.commentId] || 0).toLocaleString()}</span>
+                                        <span 
+                                            onClick={() => setActiveReplyCommentId(
+                                                activeReplyCommentId === comment.commentId ? null : comment.commentId
+                                            )}
+                                        >
+                                            Phản hồi
+                                        </span>
+                                    </div>
+                                    {/* Thêm phần input phản hồi */}
+                                    {activeReplyCommentId === comment.commentId && (
+                                        <div className={styles.replySection}>
+                                            <div className={styles.replyInput}>
+                                                <textarea
+                                                    type="text"
+                                                    placeholder="Nhập phản hồi..."
+                                                    value={replyContent}
+                                                    onChange={(e) => setReplyContent(e.target.value)}
+                                                    onKeyPress={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handleReplyComment(comment.commentId);
+                                                        }
+                                                    }}
+                                                    onInput={(e) => {
+                                                        e.target.style.height = "auto"; // Đặt chiều cao về tự động trước
+                                                        e.target.style.height = `${e.target.scrollHeight}px`; // Cập nhật chiều cao theo nội dung
+                                                    }}
+                                                />
+                                                <button onClick={() => handleReplyComment(comment.commentId)}>
+                                                    Gửi
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
+                            {/* Phần phản hồi */}
+                            {comment.inverseChildOfNavigation && comment.inverseChildOfNavigation.length > 0 && (
+                                <div className={styles.replySection}>
+                                    {comment.inverseChildOfNavigation.map(reply => (
+                                        <div key={reply.commentId} className={styles.replyComment}>
+                                            <div className={styles.commentProfilePicReply}>
+                                                <img
+                                                    src={reply.user?.profilePicture || 
+                                                        (reply.user?.genderId === 2 
+                                                            ? './../../../../public/img/default/woman_default.png' 
+                                                            : './../../../../public/img/default/man_default.png')
+                                                    }
+                                                    alt="Avatar"
+                                                />
+                                            </div>
+                                            <div className={styles.commentContentContainer}>
+                                                <div className={styles.commentHeader}>
+                                                    <div className={styles.commentContent}>
+                                                        <span>
+                                                            <strong>
+                                                                {reply.user 
+                                                                    ? `${reply.user.firstName} ${reply.user.lastName}` 
+                                                                    : 'Ẩn danh'}
+                                                            </strong>
+                                                        </span>
+                                                        <br />
+                                                        <span>{reply.content}</span>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.commentReact}>
+                                                    <span>{formatTimeAgo(reply.dateCreated)}</span>
+                                                    <span>Thích</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
 
+                
+                
                 <div className={styles.commentInput}>
                     <div className={styles.commentProfilePic}>
                         {/* Thêm ảnh avatar người dùng hiện tại */}
                     </div>
                     <div className={styles.commentContentInput}>
-                        <input 
+                        <textarea 
                             type="text" 
                             placeholder="Bình luận dưới tên Đức Toàn"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
+                            onInput={(e) => {
+                                e.target.style.height = "auto"; // Đặt chiều cao về tự động trước
+                                e.target.style.height = `${e.target.scrollHeight}px`; // Cập nhật chiều cao theo nội dung
+                            }}
                             onKeyPress={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSubmitComment();

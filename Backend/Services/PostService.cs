@@ -60,7 +60,8 @@ namespace Backend.Services
 
         public Task<Post> GetById(int id)
         {
-            throw new NotImplementedException();
+            var post = _unit.Post.GetByIdAsync(id);
+            return post;
         }
 
         Task<IEnumerable<Post>> IService<Post>.GetListById(int userid)
@@ -218,6 +219,7 @@ namespace Backend.Services
         
         public async Task<int> GetCommentCount(int postId)
         {
+            Console.WriteLine("Da vao duoc service");
             var data = await _unit.Comment.GetAll();
             var count = data.Count(r => r.PostId == postId);
             return count;
@@ -243,29 +245,12 @@ namespace Backend.Services
 
         public async Task<bool> UpdatePost(Post post)
         {
-            var userExists = _dbContext.Users.Any(u => u.UserId == post.CreatedByUserId);
-            if (!userExists)
-            {
-                throw new Exception($"User với ID {post.CreatedByUserId} không tồn tại.");
-            }
-
             try
             {
-                var postUpdate = await _unit.Post.GetByIdAsync(post.PostId);
-
-                if (postUpdate != null)
-                {
-                    // Cập nhật các thuộc tính cần thiết
-                    postUpdate.Content = post.Content;
-                    postUpdate.DateUpdated = DateTime.Now;
-                    postUpdate.CreatedByUserId = post.CreatedByUserId;
-
-                    _unit.Post.UpdateAsync(postUpdate);
-                    var postCheck = await _unit.CompleteAsync();
-                    return postCheck;
-                }
-
-                return false;
+                post.DateUpdated = DateTime.UtcNow.AddHours(7);
+                post.DateCreated = DateTime.UtcNow.AddHours(7);
+                _unit.Post.UpdateAsync(post);
+                return await _unit.CompleteAsync();
             }
             catch (Exception ex)
             {

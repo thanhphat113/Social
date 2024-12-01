@@ -250,6 +250,28 @@
                         display: flex;
                         align-items: center;
 
+                        .editCommentContainer {
+                            margin-left: 10px;
+
+                            .editCommentInput {
+                                padding: 10px;
+                                margin-bottom: 10px;
+                                border-radius: 10px;
+                                border: 1px solid #ccc;
+                                word-wrap: break-word;
+                                white-space: normal;
+                                width: 450px;
+                                resize: none;
+                                overflow: hidden; /* Ẩn thanh cuộn */
+                                transition: height 0.2s ease-out;
+
+                                &:focus {
+                                    outline: none;
+                                    border: 1px solid #5f5fe7;
+                                }
+                            }
+                        }
+
                         .commentContent {
                             background: #f0f2f5;
                             border-radius: 16px;
@@ -332,6 +354,46 @@
                             margin-right: 1rem;
                         }
                     }
+
+                    .commentWrapper {
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    
+
+                    
+
+                    .replyInput {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    
+                        textarea {
+                            flex: 1;
+                            padding: 8px;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 4px;
+                            outline: none;
+                            overflow: hidden;
+                            resize: none;
+                            width: 450px;
+                            height: 40px;
+                        }
+                    
+                        button {
+                            padding: 8px 12px;
+                            background-color: #007bff;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                    
+                            &:hover {
+                                background-color: #0056b3;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -356,12 +418,17 @@
             display: flex;
             height: 3.5rem;
             width: 100%;
-            input {
-                padding: 0.8rem;
+            textarea {
+                padding: 1rem;
                 width: 90%;
                 margin: 0 3rem;
                 border-radius: 1rem;
-                font-size: 1.6rem
+                font-size: 1.6rem;
+                resize: none; /* Tắt thay đổi kích thước thủ công */
+                outline: none;
+                border: 1px solid #ccc;
+                overflow: hidden; /* Ẩn thanh cuộn */
+                transition: height 0.2s ease-out; /* Thay đổi chiều cao mượt mà */
             }
 
             button {
@@ -376,6 +443,74 @@
         }
     }
     
+    .replySection {
+        margin-top: 8px;
+        margin-left: 50px;
+
+        .replyComment {
+            display: flex;
+            margin-bottom: 8px;
+            
+            .commentProfilePicReply {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background-color: red;
+                img {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                }
+            }
+
+            .commentContentContainer {
+                display: flex;
+                    flex-direction: column;
+                .commentHeader {
+                    display: flex;
+                    align-items: center;
+                    .commentContent {
+                        background: #f0f2f5;
+                        border-radius: 16px;
+                        padding: 8px 12px;
+                        margin-left: 10px;
+                        font-size: 14px;
+                        height: auto; 
+                        margin-right: 20px;
+                        span {
+                            display: inline-block; // Đặt display thành inline-block để có thể điều chỉnh chiều rộng
+                            margin: 2px 0;
+                            font-size: 1.2rem; 
+                            color: #333;
+                            max-width: 40rem; // Đặt chiều rộng tối đa cho span
+                            word-wrap: break-word; // Đảm bảo từ dài sẽ xuống dòng
+                            overflow-wrap: break-word; // Tương tự như word-wrap, hỗ trợ cho các trình duyệt hiện đại
+                            white-space: normal;
+                        }
+                    }
+                }
+
+                .commentReact {
+                    cursor: pointer;
+                        margin-left: 1.6rem;
+
+
+                        .likeActive{
+                            color: #5f5fe7;
+                        }
+
+                        .likeComment:hover {
+                            color: #5f5fe7;
+                        }
+
+                        span {
+                            font-size: 1.2rem;
+                            margin-right: 1rem;
+                        }
+                }
+            }
+        }
+    }
     
     // .overlay {
     //     position: fixed;
