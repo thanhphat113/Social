@@ -25,7 +25,7 @@ builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
-    options.UseLazyLoadingProxies()
+    options
         .EnableSensitiveDataLogging() // Bật logging nhạy cảm
         .LogTo(Console.WriteLine, LogLevel.Information)
         .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
@@ -46,7 +46,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IChatInMessService, ChatInMessageService>();
 builder.Services.AddScoped<RequestNotiService>();
@@ -62,7 +62,6 @@ builder.Services.AddScoped<MainTopicService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
-builder.Services.AddScoped<GroupChatService>();
 builder.Services.AddScoped<ReactPostService>();
 
 //Post

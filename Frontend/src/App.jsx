@@ -95,7 +95,6 @@ function App() {
                         </Authentication>
                     }
                 />
-                <Route path="/login" element={<Login />} />
                 {/* <Route
                     path="/new-group"
                     element={

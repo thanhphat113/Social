@@ -9,7 +9,6 @@ function User() {
 
     const [search, setSearch] = useState('');
     const [isShow, setIsShow] = useState(false);
-    const [ischoice, setIsChoice] = useState("mess");
     const [findFriend, setFindFriend] = useState([]);
 
     const list = findFriend.length > 0 ? findFriend : friends;
@@ -45,20 +44,6 @@ function User() {
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Tìm kiếm bạn bè"
                 />
-            </div>
-            <div className={styles.choice}>
-                <button
-                    onClick={() => setIsChoice("mess")}
-                    className={clsx({ [styles.active]: ischoice === "mess" })}
-                >
-                    Hộp thư
-                </button>
-                <button
-                    onClick={() => setIsChoice("group")}
-                    className={clsx({ [styles.active]: ischoice === "group" })}
-                >
-                    Nhóm
-                </button>
             </div>
             <div className={styles.content}>
                 {list && list.length > 0 ? (

@@ -5,7 +5,6 @@ public interface IUnitOfWork : IDisposable
 {
 	IGenericRepository<User> Users { get; }
 	IGenericRepository<ChatInMessage> ChatInMessage { get; }
-	IGenericRepository<GroupChat> GroupChat { get; }
 	IGenericRepository<HistorySearch> HistorySearch { get; }
 	IGenericRepository<Message> Message { get; }
 	IGenericRepository<MainTopic> MainTopic { get; }

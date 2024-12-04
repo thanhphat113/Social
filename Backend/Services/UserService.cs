@@ -2,11 +2,8 @@ using Backend.Models;
 using Backend.DTO;
 using Backend.Services.Interface;
 using Backend.Repository.Interface;
-using Backend.Services;
-using System.Linq.Expressions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper.QueryableExtensions;
 
@@ -49,31 +46,7 @@ namespace Backend.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<UserPrivate>> FriendsWithChat(int UserId, IEnumerable<UserPrivate> friends)
-        {
-            foreach (var item in friends)
-            {
-                var mess = (ICollection<ChatInMessage>)await _unit.Message.FindAsync(query => query
-                                    .Where(m =>
-                (m.User1 == item.UserId && m.User2 == UserId) ||
-                (m.User1 == UserId && m.User2 == item.UserId)).Include(m => m.ChatInMessages)
-                            .ThenInclude(c => c.Media)
-                            .SelectMany(m => m.ChatInMessages));
 
-                foreach (var x in mess)
-                {
-                    if (x.Media == null) continue;
-                    string type = (x.Media.MediaType == 1 || x.Media.MediaType == 2) ? "media" : "file";
-                    if (!x.Media.Src.StartsWith($"{_httpContextAccessor.HttpContext.Request.Scheme}://"))
-                    {
-                        x.Media.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{type}/{x.Media.Src}";
-                    }
-                }
-
-                item.ChatInMessages = mess;
-            }
-            return friends;
-        }
 
         public async Task<User> FindToLogin(string email, string password)
         {
@@ -102,7 +75,20 @@ namespace Backend.Services
         public async Task<UserLogin> GetLoginById(int id)
         {
             var item = await _unit.Users.GetByIdAsync(id);
-            return _mapper.Map<UserLogin>(item);
+
+            var result = _mapper.Map<UserLogin>(item);
+
+            var MediaIsProfile = await _unit.Post.GetByConditionAsync<Media>(query => query
+                            .Where(p => p.CreatedByUserId == item.UserId && p.IsPictureProfile == true)
+                            .SelectMany(p => p.Medias));
+
+            if (MediaIsProfile != null)
+            {
+                MediaIsProfile.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{MediaIsProfile.Src}";
+
+                result.ProfilePicture = MediaIsProfile;
+            }
+            return result;
         }
 
         public Task<IEnumerable<User>> GetListById(int id)
@@ -125,21 +111,41 @@ namespace Backend.Services
             return new ValidateEmail("Email hợp lệ", true);
         }
 
+        public async Task<IEnumerable<UserPrivate>> FriendsWithChat(int UserId, IEnumerable<UserPrivate> friends)
+        {
+            foreach (var item in friends)
+            {
+                var mess = (ICollection<ChatInMessage>)await _unit.Message.FindAsync(query => query
+                                    .Where(m =>
+                (m.User1 == item.UserId && m.User2 == UserId) ||
+                (m.User1 == UserId && m.User2 == item.UserId)).Include(m => m.ChatInMessages)
+                            .ThenInclude(c => c.Media)
+                            .SelectMany(m => m.ChatInMessages));
+
+                foreach (var x in mess)
+                {
+                    if (x.Media == null) continue;
+                    string type = (x.Media.MediaType == 1 || x.Media.MediaType == 2) ? "media" : "file";
+                    if (!x.Media.Src.StartsWith($"{_httpContextAccessor.HttpContext.Request.Scheme}://"))
+                    {
+                        x.Media.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{type}/{x.Media.Src}";
+                    }
+                }
+
+                item.ChatInMessages = mess;
+            }
+            return friends;
+        }
 
         public async Task<IEnumerable<UserPrivate>> GetFriends(int id)
         {
-            var predicate = (Expression<Func<Relationship, bool>>)(r =>
-            (r.FromUserId == id || r.ToUserId == id) && r.TypeRelationship == 2);
-            var selector = (Expression<Func<Relationship, User>>)
-                    (r => r.FromUserId == id ? r.ToUser : r.FromUser);
-
             // var users = await _unit.Relationship.FindAsync<User>(predicate, selector);
             var users = await _unit.Relationship.FindAsync<UserPrivate>(query =>
                     query.Where(r =>
                             (r.FromUserId == id || r.ToUserId == id) &&
                             r.TypeRelationship == 2)
-                            .Include(r => r.FromUser)
-                            .Include(r => r.ToUser)
+                            // .Include(r => r.FromUser)
+                            // .Include(r => r.ToUser)
                             .Select(r => r.FromUserId == id ? r.ToUser : r.FromUser)
                             .ProjectTo<UserPrivate>(_mapper.ConfigurationProvider));
 
@@ -156,13 +162,32 @@ namespace Backend.Services
                     item.ProfilePicture = MediaIsProfile;
                 }
             }
+
             var withChat = await FriendsWithChat(id, users);
 
             var result = withChat.Select(user => _mapper.Map<UserPrivate>(user));
 
-            return result;
+            return users;
         }
 
+
+        public async Task<UserPrivate> FindById(int id)
+        {
+            var item = await _unit.Users.GetByIdAsync(id);
+            if (item == null) return null;
+            var result = _mapper.Map<UserPrivate>(item);
+            var MediaIsProfile = await _unit.Post.GetByConditionAsync<Media>(query => query
+                            .Where(p => p.CreatedByUserId == item.UserId && p.IsPictureProfile == true)
+                            .SelectMany(p => p.Medias));
+
+            if (MediaIsProfile != null)
+            {
+                MediaIsProfile.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{MediaIsProfile.Src}";
+                result.ProfilePicture = MediaIsProfile;
+            }
+
+            return result;
+        }
 
         public Task<User> GetById(int id)
         {

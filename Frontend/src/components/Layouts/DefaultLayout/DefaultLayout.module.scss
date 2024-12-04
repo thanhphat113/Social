@@ -1,8 +1,134 @@
 .wrapper {
-	display: flex;
-	flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 
-	.container{
-		flex:1;
+    .container {
+        flex: 1;
+    }
+
+    .receiveCall {
+        width: 100%;
+        height: 100vh;
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.3);
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--background-second);
+            width: 28rem;
+			height: 100%;
+			z-index: 101;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            height: 30rem;
+
+			img{
+				width: 8rem;
+				height: auto;
+				border-radius: 50%;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+			}
+			.action{
+				display: flex;
+				gap: 2rem;
+				justify-content: center;
+				align-items: center;
+				i{
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					width: 4rem;
+					border-radius: 50%;
+					height: 4rem;
+					cursor: pointer;
+					&:hover{
+						box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+					}
+				}
+				.accept{
+					background-color: rgb(96, 250, 130);
+					color: whitesmoke;
+				}
+				.cancel{
+					background-color: red;
+					// color: whitesmoke;
+				}
+			}
+        }
+    }
+
+	.callFrame {
+		height: 100vh;
+		width: 100%;
+		background-color: rgba(0,0,0,0.3);
+		z-index: 100;
+		position: fixed;
+	
+		.video {
+			width: 100%;
+			height: 100vh;
+		}
+	
+		.userScreen {
+			position: absolute;
+			right: 2rem;
+			bottom: 100px;
+			width: 30rem;
+			height: 15rem;
+			video {
+				box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+				border-radius: 10px;
+				width: 100%;
+				height: auto;
+				object-fit: cover;
+			}
+		}
+	
+		.actions {
+			position: absolute;
+			display: flex;
+			gap: 10px;
+			bottom: 40px;
+			z-index: 1;
+			left: 50%;
+			transform: translateX(-50%);
+	
+			i {
+				font-size: 2rem;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 6rem;
+				height: 6rem;
+				background-color: aliceblue;
+				opacity: 0.8;
+				cursor: pointer;
+				border-radius: 50%;
+				&:hover {
+					opacity: 1;
+				}
+			}
+	
+			.camera {
+				background-color: rgb(141, 135, 135);
+				color: aliceblue;
+			}
+	
+			.stop {
+				background-color: red;
+				color: aliceblue;
+			}
+		}
 	}
+	
 }

@@ -1,17 +1,16 @@
-﻿using Backend.Repositories;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Backend.Models;
 using Backend.DTO;
 using Microsoft.IdentityModel.Tokens;
 using Backend.Repository.Interface;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Backend.Services.Interface;
 
 
 namespace Backend.Services;
 
 public class AuthService
 {
-    private readonly UserService _user;
+    private readonly IUserService _user;
     private readonly JwtService _jwtService;
     private readonly PasswordHasher<User> _passwordHasher;
     private readonly IUnitOfWork _unit;
@@ -19,7 +18,7 @@ public class AuthService
 
 
 
-    public AuthService(UserService user, JwtService jwtService, IUnitOfWork unit)
+    public AuthService(IUserService user, JwtService jwtService, IUnitOfWork unit)
     {
         _user = user;
         _jwtService = jwtService;

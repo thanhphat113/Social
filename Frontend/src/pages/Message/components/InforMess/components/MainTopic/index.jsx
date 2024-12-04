@@ -25,6 +25,11 @@ function MainTopic() {
         getMainTopic();
     }, []);
 
+    useEffect( () => {
+        // connection.on("ReceiveMessage", async (message) => {
+        //     await dispatch(receiveMess(message));
+        // });
+    })
 
     const updateTopic = async (TopicId, MessageId, currentFriendId) => {
         if (isLoading) return

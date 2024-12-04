@@ -12,7 +12,6 @@ namespace Backend.Repository
 		// Khai báo các repository riêng tư
 		private readonly IGenericRepository<User> _Users;
 		private readonly IGenericRepository<ChatInMessage> _ChatInMessage;
-		private readonly IGenericRepository<GroupChat> _GroupChat;
 		private readonly IGenericRepository<HistorySearch> _HistorySearch;
 		private readonly IGenericRepository<Message> _Message;
 		private readonly IGenericRepository<Media> _Media;
@@ -31,7 +30,6 @@ namespace Backend.Repository
 		public UnitOfWork(SocialMediaContext context,
 						  IGenericRepository<User> Users,
 						  IGenericRepository<ChatInMessage> ChatInMessage,
-						  IGenericRepository<GroupChat> GroupChat,
 						  IGenericRepository<HistorySearch> HistorySearch,
 						  IGenericRepository<Message> Message,
 						  IGenericRepository<PostNotification> PostNotification,
@@ -51,7 +49,6 @@ namespace Backend.Repository
 			_Users = Users;
 			_post = post;
 			_ChatInMessage = ChatInMessage;
-			_GroupChat = GroupChat;
 			_HistorySearch = HistorySearch;
 			_Message = Message;
 			_PostNotification = PostNotification;
@@ -68,7 +65,6 @@ namespace Backend.Repository
 		// Các property chỉ đọc cho các repository
 		public IGenericRepository<User> Users => _Users;
 		public IGenericRepository<ChatInMessage> ChatInMessage => _ChatInMessage;
-		public IGenericRepository<GroupChat> GroupChat => _GroupChat;
 		public IGenericRepository<HistorySearch> HistorySearch => _HistorySearch;
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;

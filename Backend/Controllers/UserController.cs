@@ -8,6 +8,7 @@ using Backend.Helper;
 using Backend.Services;
 using Backend.DTO;
 using Microsoft.IdentityModel.Tokens;
+using Backend.Services.Interface;
 
 
 namespace Backend.Controllers
@@ -18,9 +19,7 @@ namespace Backend.Controllers
 	public class UserController : ControllerBase
 	{
 
-		private readonly UserService _userContext;
-
-		private readonly GroupChatService _group;
+		private readonly IUserService _userContext;
 
 		private readonly RequestNotiService _NotiContext;
 		private readonly PostNotiService _PostContext;
@@ -29,10 +28,9 @@ namespace Backend.Controllers
 		// private readonly PostService _Post;
 
 
-		public UserController(MediaService media, GroupChatService group, UserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext)
+		public UserController(MediaService media, IUserService UserContext, RequestNotiService NotiContext, PostNotiService PostContext)
 
 		{
-			_group = group;
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
@@ -55,12 +53,8 @@ namespace Backend.Controllers
 
 			var information = await _userContext.GetLoginById(userId);
 			var friends = await _userContext.GetFriends(userId);
-			// var groupchat = await _group.FindByUserId(userId);
 			var requests = await _NotiContext.FindByUserId(userId);
-			// var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
-			//Console.WriteLine("User post: " + string.Join(", ", friends.ToList()));
 			var postrequests = await _PostContext.FindByUserId(userId);
-			Console.WriteLine("User friends: " + string.Join(", ", friends.ToList()));
 			return Ok(new { information = information, friends = friends, requests = requests, postrequests = postrequests });
 		}
 
