@@ -12,7 +12,7 @@ using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
 using Backend.Services.Interface;
-using ReactPostService = Backend.Services.ReactPostService;
+// using ReactPostService = Backend.Services.ReactPostService;
 using Backend.RealTime;
 
 //var builder = WebApplication.CreateBuilder(args);
@@ -58,7 +58,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MainTopicService>();
 
-builder.Services.AddScoped<GroupService>();
+// builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
@@ -67,10 +67,10 @@ builder.Services.AddScoped<ReactPostService>();
 
 //Post
 
-builder.Services.AddScoped<PostService>();
+// builder.Services.AddScoped<PostService>();
 
 //Comment
-builder.Services.AddScoped<ICommentService, CommentService>();
+// builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);

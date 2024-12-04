@@ -14,13 +14,12 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<RequestNotification> RequestNotification { get; }
 	IGenericRepository<Relationship> Relationship { get; }
 	IGenericRepository<Media> Media { get; }
-	IGenericRepository<UserMedia> UserMedia { get; }
-	IGenericRepository<UserGroup> userGroup { get; }
+	IGenericRepository<UserGroup> UserGroup { get; }
 	IGenericRepository<Post> Post { get; }
-    IGenericRepository<PostMedia> PostMedia { get; }
-    IGenericRepository<ReactsPost> ReactsPost { get; }
-    IGenericRepository<Comment> Comment { get; }
-    IGenericRepository<ReactsComment> ReactsComment { get; }
-    
-    Task<bool> CompleteAsync();
+	IGenericRepository<PostMedia> PostMedia { get; }
+	IGenericRepository<ReactsPost> ReactsPost { get; }
+	IGenericRepository<Comment> Comment { get; }
+	IGenericRepository<ReactsComment> ReactsComment { get; }
+
+	Task<bool> CompleteAsync();
 }
