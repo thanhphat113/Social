@@ -28,51 +28,51 @@ namespace Backend.Controllers
 		}
 
 
-        [HttpPost("change-profile-picture")]
-        public async Task<IActionResult> ChangeProfilePicture([FromForm] IFormFile newProfilePicture)
-        {
-            if (newProfilePicture == null || newProfilePicture.Length == 0)
-            {
-                return BadRequest("Profile picture file is required.");
-            }
+        //[HttpPost("change-profile-picture")]
+        //public async Task<IActionResult> ChangeProfilePicture([FromForm] IFormFile newProfilePicture)
+        //{
+        //    if (newProfilePicture == null || newProfilePicture.Length == 0)
+        //    {
+        //        return BadRequest("Profile picture file is required.");
+        //    }
 
-            var userId = MiddleWare.GetUserIdFromCookie(Request);
-            if (userId == null)
-            {
-                return Unauthorized("User not logged in.");
-            }
+        //    var userId = MiddleWare.GetUserIdFromCookie(Request);
+        //    if (userId == null)
+        //    {
+        //        return Unauthorized("User not logged in.");
+        //    }
 
-            bool result = await _media.ChangeProfilePicture(userId, newProfilePicture);
-            if (result)
-            {
-                return Ok(new { message = "Profile picture updated successfully." });
-            }
+        //    bool result = await _media.ChangeProfilePicture(userId, newProfilePicture);
+        //    if (result)
+        //    {
+        //        return Ok(new { message = "Profile picture updated successfully." });
+        //    }
 
-            return StatusCode(500, "Failed to update profile picture.");
-        }
+        //    return StatusCode(500, "Failed to update profile picture.");
+        //}
 
 
-        [HttpPost("change-cover-photo")]
-        public async Task<IActionResult> ChangeCoverPhoto([FromForm] IFormFile newCoverPhoto)
-        {
-            if (newCoverPhoto == null || newCoverPhoto.Length == 0)
-            {
-                return BadRequest("Cover photo file is required.");
-            }
+        //[HttpPost("change-cover-photo")]
+        //public async Task<IActionResult> ChangeCoverPhoto([FromForm] IFormFile newCoverPhoto)
+        //{
+        //    if (newCoverPhoto == null || newCoverPhoto.Length == 0)
+        //    {
+        //        return BadRequest("Cover photo file is required.");
+        //    }
 
-            var userId = MiddleWare.GetUserIdFromCookie(Request);
-            if (userId == null)
-            {
-                return Unauthorized("User not logged in.");
-            }
+        //    var userId = MiddleWare.GetUserIdFromCookie(Request);
+        //    if (userId == null)
+        //    {
+        //        return Unauthorized("User not logged in.");
+        //    }
 
-            bool result = await _media.ChangeProfilePicture(userId, newCoverPhoto);
-            if (result)
-            {
-                return Ok(new { message = "Cover photo updated successfully." });
-            }
+        //    bool result = await _media.ChangeProfilePicture(userId, newCoverPhoto);
+        //    if (result)
+        //    {
+        //        return Ok(new { message = "Cover photo updated successfully." });
+        //    }
 
-            return StatusCode(500, "Failed to update cover photo.");
-        }
+        //    return StatusCode(500, "Failed to update cover photo.");
+        //}
     }
 }

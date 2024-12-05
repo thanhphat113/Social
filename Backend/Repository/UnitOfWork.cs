@@ -21,7 +21,7 @@ namespace Backend.Repository
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
 		private readonly IGenericRepository<Post> _post;
-		private readonly IGenericRepository<PostMedia> _postMedia;
+		//private readonly IGenericRepository<PostMedia> _postMedia;
 		private readonly IGenericRepository<ReactsPost> _reactPost;
 
 		private readonly IGenericRepository<UserGroup> _userGroup;
@@ -41,7 +41,7 @@ namespace Backend.Repository
 		                  // IGenericRepository<UserMedia> UserMedia,
 		                  IGenericRepository<MainTopic> main,
 		                  IGenericRepository<Post> post,
-		                  IGenericRepository<PostMedia> postMedia,
+		                  //IGenericRepository<PostMedia> postMedia,
 		                  IGenericRepository<ReactsPost> reactPost,
 		                  IGenericRepository<Comment> comment,
 		                  IGenericRepository<ReactsComment> reactComment)
@@ -59,7 +59,7 @@ namespace Backend.Repository
 			_Relationship = Relationship;
 			_Media = Media;
 			_userGroup = userGroup;
-			_postMedia = postMedia;
+			//_postMedia = postMedia;
 			_reactPost = reactPost;
 			_comment = comment;
 			_reactComment = reactComment;	
