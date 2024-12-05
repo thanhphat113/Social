@@ -6,7 +6,6 @@
   import { useSelector } from "react-redux";
   import { useEffect } from 'react';
   import * as Yup from 'yup';
-  import { updateUser, changePassword } from '../../apis';
   import { updateIsRead } from '../../components/Redux/Actions/UserAction';
   import { useDispatch } from 'react-redux';
 

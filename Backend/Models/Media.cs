@@ -28,9 +28,5 @@ public partial class Media
     [JsonIgnore]
 
     public virtual ICollection<ChatInMessage> ChatInMessage { get; set; }
-
-    [JsonIgnore]
-
-    public virtual ICollection<ChatInGroup> ChatInGroup { get; set; }
 }
 

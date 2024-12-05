@@ -12,7 +12,7 @@ using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
 using Backend.Services.Interface;
-using ReactPostService = Backend.Services.ReactPostService;
+// using ReactPostService = Backend.Services.ReactPostService;
 using Backend.RealTime;
 
 //var builder = WebApplication.CreateBuilder(args);
@@ -25,7 +25,7 @@ builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
-    options.UseLazyLoadingProxies()
+    options
         .EnableSensitiveDataLogging() // Bật logging nhạy cảm
         .LogTo(Console.WriteLine, LogLevel.Information)
         .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
@@ -46,7 +46,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IChatInMessService, ChatInMessageService>();
 builder.Services.AddScoped<RequestNotiService>();
@@ -58,19 +58,18 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MainTopicService>();
 
-builder.Services.AddScoped<GroupService>();
+// builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
-builder.Services.AddScoped<GroupChatService>();
 builder.Services.AddScoped<ReactPostService>();
 
 //Post
 
-builder.Services.AddScoped<PostService>();
+// builder.Services.AddScoped<PostService>();
 
 //Comment
-builder.Services.AddScoped<ICommentService, CommentService>();
+// builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);

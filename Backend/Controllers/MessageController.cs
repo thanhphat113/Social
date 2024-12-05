@@ -16,10 +16,12 @@ namespace Backend.Controllers
 	{
 		private readonly IMessageService _mess;
 		private readonly MainTopicService _main;
+		private readonly IUserService _user;
 		private readonly IHubContext<OnlineHub> _hub;
 
-		public MessageController(IHubContext<OnlineHub> hub, IMessageService mess, MainTopicService main)
+		public MessageController(IUserService user, IHubContext<OnlineHub> hub, IMessageService mess, MainTopicService main)
 		{
+			_user = user;
 			_main = main;
 			_hub = hub;
 			_mess = mess;
@@ -33,7 +35,6 @@ namespace Backend.Controllers
 			var result = await _mess.FindBy2User(UserId, id);
 			return Ok(result);
 		}
-
 
 		[HttpPut("topic")]
 		public async Task<IActionResult> Put([FromBody] UpdateTopic value)
@@ -55,6 +56,36 @@ namespace Backend.Controllers
 			return Ok(new { result, MainTopic });
 		}
 
+		[HttpGet("call-user")]
+		public async Task<IActionResult> Calling([FromQuery] int FriendId)
+		{
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
+			try
+			{
+				var User = await _user.FindById(UserId);
+				if (OnlineHub.IsOnline(FriendId))
+				{
+					if (OnlineHub.UserIdCalling.Contains(FriendId))
+					{
+						return Ok(new { IsConnect = false, Message = "Người dùng đang có một cuộc gọi khác..." });
+					}
+					var connectionId = OnlineHub.UserIdConnections[FriendId];
+					await _hub.Clients.Client(connectionId).SendAsync("ConnectCall", User);
+					OnlineHub.UserIdCalling.Add(UserId);
+					return Ok(new { IsConnect = true, Message = "Đang chờ sự chấp nhận từ người dùng..." });
+				}
+
+				return Ok(new { IsConnect = false, Message = "Người dùng hiện tại không online, hãy liên hệ lại sau!!!" });
+			}
+			catch (System.Exception ex)
+			{
+				Console.WriteLine("Lỗi: " + ex);
+				throw;
+			}
+		}
+
+
+
 		[HttpPut("nickname")]
 		public async Task<IActionResult> PutNickName([FromBody] UpdateNickname value)
 		{
@@ -75,6 +106,7 @@ namespace Backend.Controllers
 
 			return Ok(new { result, message });
 		}
+
 
 		[HttpDelete("{id}")]
 		public void Delete(int id)
