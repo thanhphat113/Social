@@ -32,73 +32,68 @@ namespace Backend.Controllers
 			_message = message;
 		}
 
-		// [HttpPost("chat-with-file")]
-		// [Consumes("multipart/form-data")]
+		[HttpPost("chat-with-file")]
+		public async Task<IActionResult> PostFile([FromForm] RequestPostFile data)
+		{
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 
-		// public async Task<IActionResult> PostFile([FromForm] IFormFile file,
-		// 										[FromForm] int fileType,
-		// 										[FromForm] int messageId)
-		// {
-		// 	Console.WriteLine("file: " + file.FileName + ", " + "type: " + fileType + messageId);
-		// 	var UserId = MiddleWare.GetUserIdFromCookie(Request);
-		// 	if (file == null || file.Length == 0)
-		// 	{
-		// 		return BadRequest("Không có tệp được chọn.");
-		// 	}
+			var chat = new ChatInMessage
+			{
+				MessagesId = data.MessageId,
+				FromUser = UserId,
+				Otheruser = data.OtheruserId
+			};
 
-		// 	string uploadsFolder;
-		// 	if (fileType == 1 || fileType == 2)
-		// 	{
-		// 		uploadsFolder = Path.Combine(_env.WebRootPath, "media");
-		// 	}
-		// 	else
-		// 	{
-		// 		uploadsFolder = Path.Combine(_env.WebRootPath, "file");
-		// 	}
+			string uploadsFolder;
+			if (data.FileType == 1 || data.FileType == 2)
+			{
+				uploadsFolder = Path.Combine(_env.WebRootPath, "media");
+			}
+			else
+			{
+				uploadsFolder = Path.Combine(_env.WebRootPath, "file");
+			}
 
-		// 	var fileHash = await MiddleWare.GetFileHashAsync(file);
+			var fileHash = await MiddleWare.GetFileHashAsync(data.File);
 
 
-		// 	var filePath = Path.Combine(uploadsFolder, file.FileName);
+			var filePath = Path.Combine(uploadsFolder, data.File.FileName);
 
 
-		// 	var item = await _media.IsHas(fileHash);
+			var item = await _media.IsHas(fileHash);
 
-		// 	string newName = file.FileName;
-		// 	if (item == -1)
-		// 	{
-		// 		if (System.IO.File.Exists(filePath))
-		// 		{
-		// 			var fileExtension = Path.GetExtension(file.FileName);
-		// 			newName = Guid.NewGuid().ToString() + fileExtension;
-		// 			filePath = Path.Combine(uploadsFolder, newName);
-		// 		}
-		// 		using var stream = new FileStream(filePath, FileMode.Create);
-		// 		await file.CopyToAsync(stream);
-		// 	}
+			string newName = data.File.FileName;
+			if (item == -1)
+			{
+				if (System.IO.File.Exists(filePath))
+				{
+					var fileExtension = Path.GetExtension(data.File.FileName);
+					newName = Guid.NewGuid().ToString() + fileExtension;
+					filePath = Path.Combine(uploadsFolder, newName);
+				}
+				using var stream = new FileStream(filePath, FileMode.Create);
+				await data.File.CopyToAsync(stream);
+			}
 
 
-		// 	var media = new Media
-		// 	{
-		// 		Src = newName,
-		// 		MediaType = fileType,
-		// 		HashCode = fileHash
-		// 	};
+			var media = new Media
+			{
+				Src = newName,
+				MediaType = data.FileType,
+				HashCode = fileHash
+			};
 
-		// 	var result = await _chat.AddWithMedia(media, UserId, messageId, fileType);
-		// 	return Ok(result);
-		// }
+			var result = await _chat.AddWithMedia(media, data.FileType, chat);
+
+			var ConnectionId = OnlineHub.GetConnectionId(data.OtheruserId);
+			if (ConnectionId != null) await _Hub.Clients.Client(ConnectionId).SendAsync("ReceiveMessage", result);
+
+			return Ok(result);
+		}
 
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] ChatInMessage mess)
 		{
-			if (mess.MessagesId == -1)
-			{
-				var item = await _message.Add(new() { User1 = mess.FromUser, User2 = mess.Otheruser });
-				if (item == null) return BadRequest("Lỗi việc tạo chat mới");
-				mess.MessagesId = (int)item.MessagesId;
-			}
-
 			var result = await _chat.Add(mess);
 
 			if (result == null) return BadRequest("Lỗi việc tạo tin nhắn mới");
@@ -106,6 +101,8 @@ namespace Backend.Controllers
 			if (OnlineHub.IsOnline(mess.Otheruser))
 			{
 				var connectionId = OnlineHub.UserIdConnections[mess.Otheruser];
+				Console.WriteLine("đây là: " + connectionId);
+				Console.WriteLine(result.ChatId + " " + result.Content);
 				await _Hub.Clients.Client(connectionId).SendAsync("ReceiveMessage", result);
 			}
 
@@ -125,17 +122,50 @@ namespace Backend.Controllers
 			return Ok(friends);
 		}
 
-		[HttpPost("recall")]
-		public async Task<IActionResult> Recall([FromBody] int id)
+		[HttpPut("recall")]
+		public async Task<IActionResult> Recall([FromBody] UpdateChat value)
 		{
-			Console.WriteLine("Đây là recall: " + id);
-			return Ok(await _chat.Recall(id));
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
+			var result = await _chat.Recall(value.ChatId);
+			if (result)
+			{
+				var ConnectionId = OnlineHub.GetConnectionId(value.OtherId);
+				if (ConnectionId != null) await _Hub.Clients.Client(ConnectionId).SendAsync("receiveRecallChat", value.ChatId, UserId);
+			}
+			return Ok(result);
 		}
 
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(int id)
+		[HttpDelete]
+		public async Task<IActionResult> Delete(int id, int OtherId)
 		{
-			return Ok(await _chat.Delete(id));
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
+			var item = await _chat.Delete(id);
+			if (item)
+			{
+				var ConnectionId = OnlineHub.GetConnectionId(OtherId);
+				if (ConnectionId != null) await _Hub.Clients.Client(ConnectionId).SendAsync("receiveDeleteChat", id, UserId);
+			}
+			return Ok(item);
 		}
+	}
+
+	public class RequestPostFile
+	{
+		public IFormFile? File { get; set; }
+
+		public int OtheruserId { get; set; }
+		public int MessageId { get; set; }
+
+		public int FileType { get; set; }
+
+	}
+
+	public class UpdateChat
+	{
+
+		public int OtherId { get; set; }
+
+		public int ChatId { get; set; }
+
 	}
 }

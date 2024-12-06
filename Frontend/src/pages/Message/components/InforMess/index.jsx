@@ -7,6 +7,7 @@ import Nickname from "./components/Nickname";
 import MainTopic from "./components/MainTopic";
 import Media from "./components/Media";
 import File from "./components/File";
+import { useNavigate } from "react-router-dom";
 
 function InforMess() {
     const friends = useSelector((state) => state.friends.allFriends);
@@ -20,6 +21,8 @@ function InforMess() {
     const [click, setClick] = useState(false);
     const [dropSetting, setDropSetting] = useState(false);
     const [dropFile, setDropFile] = useState(false);
+
+    const navigate = useNavigate()
 
     return (
         <div className={styles.wrapper}>
@@ -39,15 +42,7 @@ function InforMess() {
             </div>
             <div className={styles.action}>
                 <CustomTooltip title="Trang cá nhân">
-                    <i className="fa-solid fa-circle-user"></i>
-                </CustomTooltip>
-                <CustomTooltip title="Tìm kiếm">
-                    <i
-                        onClick={() => setClick(!click)}
-                        className={clsx("fa-solid fa-magnifying-glass", {
-                            [styles.active]: click,
-                        })}
-                    ></i>
+                    <i onClick={() => navigate(`/${currentFriendId}`)} className="fa-solid fa-circle-user"></i>
                 </CustomTooltip>
             </div>
             {click && <input placeholder="Nhập nội dung tin nhắn"></input>}

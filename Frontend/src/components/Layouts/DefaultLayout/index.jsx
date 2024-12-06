@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as signalR from "@microsoft/signalr";
 import { useEffect, useRef, useState, createContext } from "react";
-import { receiveMess } from "../../Redux/Slices/FriendSlice";
+import { receiveMess, receiveUpdateChat, updateOnline } from "../../Redux/Slices/FriendSlice";
 import { setNNPassive, setTopicPassive } from "../../Redux/Slices/MessageSlice";
 import styles from "./DefaultLayout.module.scss";
 import Header from "./Header";
@@ -14,24 +14,24 @@ export const messageContext = createContext();
 function DefaultLayout() {
     const user = useSelector((state) => state.user.information);
     const [caller, setCaller] = useState();
-    const [haveCalling, setHaveCalling] = useState(false);
-    const [haveUser, setHaveUser] = useState();
+    const [haveUser, setHaveUser] = useState(null);
     const location = useLocation();
     const audioRef = useRef();
     const callingRef = useRef();
     const [request, setRequest] = useState();
     const [accept, setAccept] = useState();
     const [connection, setConnection] = useState();
-    const [isLoading, setIsLoading] = useState(false)
-
-    const [toggleCamera, setToggleCamera] = useState(true);
-    const [toggleVolume, setToggleVolume] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const peerConnect = useRef(null);
+    const localStream = useRef(null);
+    const remoteStream = useRef(null);
+
+    const [toggleCamera, setToggleCamera] = useState(true);
+    const [toggleVolume, setToggleVolume] = useState(true);
 
     const userVideo = useRef(null);
     const otherVideo = useRef(null);
-    const localStream = useRef(null);
 
     const dispatch = useDispatch();
 
@@ -69,10 +69,8 @@ function DefaultLayout() {
             }
             if (peerConnect.current) {
                 peerConnect.current.close();
-                peerConnect.current = null;
             }
             setCaller();
-            setHaveCalling(false);
             setHaveUser();
         };
     }, [user]);
@@ -81,62 +79,62 @@ function DefaultLayout() {
         cancelCall();
     };
 
+    const createPeerConnection = async () => {
+        try {
+            peerConnect.current = new RTCPeerConnection();
 
-    const handleAcceptCall = async () => {
-        if (isLoading) return
-        setIsLoading(true)
-        if (callingRef.current) {
-            callingRef.current.pause();
-            callingRef.current.currentTime = 0;
+            remoteStream.current = new MediaStream();
+            if (otherVideo.current) {
+                otherVideo.current.srcObject = remoteStream.current;
+            }
+
+            localStream.current = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true,
+            });
+
+            if (userVideo.current) {
+                userVideo.current.srcObject = localStream.current;
+            }
+
+            localStream.current.getTracks().forEach((track) => {
+                peerConnect.current.addTrack(track, localStream.current);
+            });
+
+            peerConnect.current.ontrack = (event) => {
+                event.streams[0].getTracks().forEach((track) => {
+                    remoteStream.current.addTrack(track);
+                });
+            };
+        } catch (err) {
+            console.log("khởi tạo: ", err);
         }
-        setHaveUser({ callerId: caller.userId, calleeId: user.userId });
-        setHaveCalling(true);
-        setCaller(null);
+    };
 
-        peerConnect.current = new RTCPeerConnection();
-
-        peerConnect.current.ontrack = (event) => {
-            console.log(peerConnect.current)
-            console.log("Caller received track from callee:", event.track.id);
-        
-            if (event.track.kind === "video") {
-                const remoteStream = new MediaStream();
-                remoteStream.addTrack(event.track);
-                otherVideo.current.srcObject = remoteStream;
-            }
-        };
-
-        localStream.current = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false,
-        }).then((stream) => {
-            userVideo.current.srcObject = stream;
-
-            stream.getTracks().forEach((track) => {
-                console.log(track)
-                peerConnect.current.addTrack(track, stream);})
-        })
-
-        peerConnect.current.getSenders().forEach((sender) => {
-            if (sender.track) {
-                console.log("Caller is sending track:", sender.track.id);
-                console.log("Kind:", sender.track.kind);
-            }
-        });
+    const sendOffer = async () => {
+        if (isLoading) return;
+        setIsLoading(true);
 
         try {
-            const offer = await peerConnect.current.createOffer();
+            await createPeerConnection();
 
-            await peerConnect.current.setLocalDescription(new RTCSessionDescription(offer));
-
-            await connection
-                .invoke("AcceptCall", caller.userId, offer)
-                .catch((err) => console.log("Lỗi", err));
-        } catch (err) {
-            console.error("Error accessing media devices:", err);
-        }
-        finally{
-            setIsLoading(false)
+            if (peerConnect.current) {
+                const offer = await peerConnect.current.createOffer();
+                await peerConnect.current.setLocalDescription(offer);
+                await connection
+                    .invoke("AcceptCall", caller.userId, offer)
+                    .catch((err) => console.log("Lỗi gửi offer", err));
+            }
+        } catch (error) {
+            console.log("lỗi", error);
+        } finally {
+            if (callingRef.current) {
+                callingRef.current.pause();
+                callingRef.current.currentTime = 0;
+            }
+            setHaveUser({ callerId: caller.userId, calleeId: user.userId });
+            setCaller(null);
+            setIsLoading(false);
         }
     };
 
@@ -151,6 +149,11 @@ function DefaultLayout() {
 
     useEffect(() => {
         if (connection) {
+            connection.off("UpdateOnlineStatus")
+            connection.on("UpdateOnlineStatus", async (userId, isOnline) => {
+                dispatch(updateOnline({userId: userId, isOnline: isOnline}));
+            });
+
             connection.on("ReceiveMessage", async (message) => {
                 await dispatch(receiveMess(message));
                 notifications();
@@ -166,8 +169,33 @@ function DefaultLayout() {
                 dispatch(setNNPassive({ userId, message }));
             });
 
-            connection.on("ConnectCall", async (value) => {
-                setCaller(value);
+            connection.on("ConnectCall", async (user) => {
+                setCaller(user);
+            });
+
+            connection.on("receiveRecallChat", async (chatId, userId) => {
+                console.log(chatId, userId);
+
+                await dispatch(
+                    receiveUpdateChat({
+                        friendId: userId,
+                        chatId: chatId,
+                        type: "recall",
+                    })
+                );
+                notifications();
+            });
+
+            connection.on("receiveDeleteChat", async (id, userId) => {
+                console.log(id, userId);
+                await dispatch(
+                    receiveUpdateChat({
+                        friendId: userId,
+                        chatId: id,
+                        type: "delete",
+                    })
+                );
+                notifications();
             });
 
             connection.on("CallDeclined", async (value) => {
@@ -175,89 +203,52 @@ function DefaultLayout() {
                 setAccept(value);
             });
 
+            connection.off("RequestCall");
             connection.on("RequestCall", async (value) => {
+                await createPeerConnection();
                 try {
-                    peerConnect.current = new RTCPeerConnection();
-
-                    peerConnect.current.ontrack = (event) => {
-                        console.log("Caller received track from callee:", event.track.kind);
-                    
-                        if (event.track.kind === "video") {
-                            const remoteStream = new MediaStream();
-                            remoteStream.addTrack(event.track);
-                            otherVideo.current.srcObject = remoteStream
-                        }
-                    };
-
-                    await peerConnect.current.setRemoteDescription(
-                        new RTCSessionDescription(value.offer)
-                    );
-                    
-                    peerConnect.current.onicecandidate = async (event) => {
-                        if (
-                            peerConnect.current.iceConnectionState ===
-                                "connected" ||
-                            peerConnect.current.iceConnectionState ===
-                                "completed"
-                        ) {
-                            console.log(
-                                "Skipping ICE candidate, connection is already stable."
-                            );
-                            return;
-                        }
-
-                        if (
-                            event.candidate &&
-                            event.candidate.candidate !== ""
-                        ) {
-
-                            await connection.invoke(
-                                "SendCandidate",
-                                value.calleeId,
-                                event.candidate
-                            );
-                        } else {
-                            console.log(
-                                "All ICE candidates have been gathered."
-                            );
-                        }
-                    };
-
-                    localStream.current =
-                        await navigator.mediaDevices.getUserMedia({
-                            video: true,
-                            audio: false,
-                        }).then((stream) => {
-                            userVideo.current.srcObject = stream;
-                
-                            stream.getTracks().forEach((track) => {
-                                peerConnect.current.addTrack(track, stream);
-                        })})
-                        console.log(localStream.current)
-
-
-                        peerConnect.current.getSenders().forEach((sender) => {
-                            if (sender.track) {
-                                console.log("Caller is sending track:", sender.track.id);
-                                console.log("Kind:", sender.track.kind); // "audio" hoặc "video"
+                    if (peerConnect.current) {
+                        peerConnect.current.onicecandidate = async (event) => {
+                            if (
+                                event.candidate &&
+                                event.candidate.candidate !== ""
+                            ) {
+                                await connection.invoke(
+                                    "SendCandidate",
+                                    value.calleeId,
+                                    event.candidate
+                                );
+                                console.log(
+                                    "Sent ICE candidate:",
+                                    event.candidate
+                                );
+                            } else {
+                                console.log(
+                                    "All ICE candidates have been gathered."
+                                );
                             }
-                        });
-                        console.log(peerConnect.current)
+                        };
 
-                    const answer = await peerConnect.current.createAnswer();
-                    await peerConnect.current.setLocalDescription(answer);
+                        await peerConnect.current.setRemoteDescription(
+                            new RTCSessionDescription(value.offer)
+                        );
 
-                    await connection
-                        .invoke("SendAnswer", value.calleeId, answer)
-                        .catch((err) => console.log("Lỗi", err));
+                        const answer = await peerConnect.current.createAnswer();
+                        await peerConnect.current.setLocalDescription(
+                            new RTCSessionDescription(answer)
+                        );
+
+                        await connection
+                            .invoke("SendAnswer", value.calleeId, answer)
+                            .catch((err) => console.log("Lỗi", err));
+                    }
                 } catch (error) {
-                    console.error("Error handling WebRTC signaling:", error);
+                    console.log("Lỗi thêm offer vào remote của caller", error);
                 } finally {
                     setHaveUser({
                         calleeId: value.calleeId,
                         callerId: value.callerId,
                     });
-                    setHaveCalling(true);
                     setRequest(null);
                 }
             });
@@ -292,78 +283,45 @@ function DefaultLayout() {
 
             connection.on("sendLeaveCall", async (value) => {
                 stopMedia();
-                setHaveCalling(false);
                 setHaveUser(value);
             });
 
             connection.on("receiveAnswer", async (value) => {
-                await peerConnect.current.setRemoteDescription(
-                    new RTCSessionDescription(value.answer)
-                );
+                peerConnect.current.onicecandidate = async (event) => {
+                    if (event.candidate && event.candidate.candidate !== "") {
+                        await connection.invoke(
+                            "SendCandidate",
+                            value.callerId,
+                            event.candidate
+                        );
+                    } else {
+                        console.log("All ICE candidates have been gathered.");
+                    }
+                };
 
-                try {
-                    peerConnect.current.onicecandidate = async (event) => {
-                        if (
-                            peerConnect.current.iceConnectionState ===
-                                "connected" ||
-                            peerConnect.current.iceConnectionState ===
-                                "completed"
-                        ) {
-                            console.log(
-                                "Skipping ICE candidate, connection is already stable."
-                            );
-                            return;
-                        }
+                if (!peerConnect.current.currentRemoteDescription) {
+                    await peerConnect.current.setRemoteDescription(
+                        new RTCSessionDescription(value.answer)
+                    );
+                } 
 
-                        if (
-                            event.candidate &&
-                            event.candidate.candidate !== ""
-                        ) {
-                            await connection.invoke(
-                                "SendCandidate",
-                                value.callerId,
-                                event.candidate
-                            );
-                            console.log("Sent ICE candidate:", event.candidate);
-                        } else {
-                            console.log(
-                                "All ICE candidates have been gathered."
-                            );
-                        }
-                    };
-
-                    pendingCandidates.forEach(async (candidate) => {
-                        try {
-                            await peerConnect.current
-                                .addIceCandidate(new RTCIceCandidate(candidate))
-                                .then(() => {
-                                    console.log(
-                                        "Caller added ICE candidate successfully."
-                                    );
-                                })
-                                .catch((error) => {
-                                    console.error(
-                                        "Error adding ICE candidate:",
-                                        error
-                                    );
-                                });
-                        } catch (error) {
-                            console.error("Error adding ICE candidate:", error);
-                        }
-                    });
-                } catch (error) {
-                    console.log("Lỗi", error);
-                }
+                pendingCandidates.forEach(async (candidate) => {
+                    try {
+                        await peerConnect.current
+                            .addIceCandidate(new RTCIceCandidate(candidate))
+                            .catch((error) => {
+                                console.error(
+                                    "Error adding ICE candidate:",
+                                    error
+                                );
+                            });
+                    } catch (error) {
+                        console.error("Error adding ICE candidate:", error);
+                    }
+                });
             });
         }
     });
-
-    const turnOffVideo = () => {
-        if (userVideo.current && userVideo.current.srcObject) {
-            const tracks = userVideo.current.srcObject.getTracks();
-            tracks.forEach((track) => track.stop());
-        }
-    };
 
     const notifications = () => {
         if (audioRef.current) {
@@ -386,24 +344,39 @@ function DefaultLayout() {
         await connection
             .invoke("LeaveCall", haveUser.callerId, haveUser.calleeId)
             .catch((err) => console.log("Lỗi", err));
-        turnOffVideo();
-        setHaveCalling(false);
         setHaveUser();
         stopMedia();
     };
 
-    async function stopMedia() {
+    const toggleCameraFc = async () => {
+        let cameraTrack = await localStream.current
+            .getTracks()
+            .find((track) => track.kind === "video");
+
+        cameraTrack.enabled = !cameraTrack.enabled;
+        setToggleCamera(!toggleCamera);
+    };
+
+    const toggleAudioFc = async () => {
+        let audioTrack = await localStream.current
+            .getTracks()
+            .find((track) => track.kind === "audio");
+
+        audioTrack.enabled = !audioTrack.enabled;
+        setToggleVolume(!toggleVolume);
+    };
+
+    const stopMedia = async () => {
         stopMediaStream(localStream.current);
-        if (peerConnect.current) {
+        stopMediaStream(remoteStream.current);
+        if (peerConnect) {
             await peerConnect.current.close();
         }
-    }
+    };
 
-    const stopMediaStream = async (stream) => {
+    const stopMediaStream = (stream) => {
         if (stream) {
-            await stream.getTracks().forEach((track) => {
-                track.stop();
-            });
+            stream.getTracks().forEach((track) => track.stop());
         }
     };
 
@@ -448,7 +421,7 @@ function DefaultLayout() {
                             <h1>{`${caller.lastName} ${caller.firstName}`}</h1>
                             <div className={styles.action}>
                                 <i
-                                    onClick={() => handleAcceptCall()}
+                                    onClick={() => sendOffer()}
                                     className={clsx(
                                         "fa-solid fa-check",
                                         styles.accept
@@ -487,18 +460,17 @@ function DefaultLayout() {
                     ))}
                 <div
                     className={styles.callFrame}
-                    style={{ display: !haveCalling && `none` }}
+                    style={{ display: !haveUser && `none` }}
                 >
                     <video
                         className={styles.video}
                         ref={otherVideo}
                         autoPlay
                         playsInline
-                        muted
                     ></video>
                     <div className={styles.actions}>
                         <i
-                            onClick={() => setToggleCamera(!toggleCamera)}
+                            onClick={() => toggleCameraFc()}
                             className={clsx(
                                 styles.camera,
                                 toggleCamera
@@ -507,7 +479,7 @@ function DefaultLayout() {
                             )}
                         ></i>
                         <i
-                            onClick={() => setToggleVolume(!toggleVolume)}
+                            onClick={() => toggleAudioFc()}
                             className={clsx(
                                 styles.camera,
                                 toggleVolume

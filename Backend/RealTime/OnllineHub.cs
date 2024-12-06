@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Backend.DTO;
 using Backend.Helper;
 using Backend.Services.Interface;
@@ -7,6 +8,7 @@ namespace Backend.RealTime;
 public class OnlineHub : Hub
 {
 	private readonly IMessageService _mess;
+
 	public OnlineHub(IMessageService mess)
 	{
 		_mess = mess;
@@ -17,11 +19,6 @@ public class OnlineHub : Hub
 
 	public static bool IsOnline(int userId)
 	{
-		foreach (var item in UserIdConnections)
-		{
-			Console.WriteLine("đây là user: " + item);
-		}
-
 		return UserIdConnections.ContainsKey(userId);
 	}
 
@@ -29,7 +26,6 @@ public class OnlineHub : Hub
 	{
 		int UserId = GetUserIdFromContext();
 		var connectionId = Context.ConnectionId;
-		Console.WriteLine(connectionId + " hêhheheh");
 		UserIdConnections[UserId] = connectionId;
 
 		NotifyOnlineStatus(UserId, true);
@@ -86,6 +82,7 @@ public class OnlineHub : Hub
 	{
 		try
 		{
+			Console.WriteLine(offer.type);
 			var CalleeId = GetUserIdFromContext();
 			UserIdCalling.Add(CalleeId);
 			var Message = await _mess.FindBy2User(CalleeId, callerId);
@@ -110,6 +107,7 @@ public class OnlineHub : Hub
 
 	public async Task SendAnswer(int calleeId, RTCSessionDescription answer)
 	{
+		Console.WriteLine(answer.type);
 		var callerId = GetUserIdFromContext();
 		var connectionId = UserIdConnections[calleeId];
 		await Clients.Client(connectionId).SendAsync("receiveAnswer", new { answer = answer, callerId = callerId });
@@ -125,6 +123,15 @@ public class OnlineHub : Hub
 	private int GetUserIdFromContext()
 	{
 		return MiddleWare.GetUserIdFromCookie(Context.GetHttpContext()?.Request);
+	}
+
+	public static string GetConnectionId(int userid)
+	{
+		if (UserIdConnections.ContainsKey(userid))
+		{
+			return UserIdConnections[userid];
+		}
+		return null;
 	}
 
 }

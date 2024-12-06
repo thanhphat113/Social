@@ -9,6 +9,7 @@ using Backend.Services;
 using Backend.DTO;
 using Microsoft.IdentityModel.Tokens;
 using Backend.Services.Interface;
+using Backend.RealTime;
 
 
 namespace Backend.Controllers
@@ -53,6 +54,10 @@ namespace Backend.Controllers
 
 			var information = await _userContext.GetLoginById(userId);
 			var friends = await _userContext.GetFriends(userId);
+			foreach (var item in friends)
+			{
+				if (OnlineHub.IsOnline(item.UserId)) item.IsOnline = true;
+			}
 			var requests = await _NotiContext.FindByUserId(userId);
 			var postrequests = await _PostContext.FindByUserId(userId);
 			return Ok(new { information = information, friends = friends, requests = requests, postrequests = postrequests });
