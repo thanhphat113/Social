@@ -24,7 +24,6 @@ function SubHeader({children}) {
             setIsActive(index)
           }
 
-        console.log(profile)
         const avatarSize = window.innerWidth <= 768 ? '100px' : '120px'
 
         const isCurrentUser = isGroup

@@ -52,7 +52,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MainTopicService>();
 
-// builder.Services.AddScoped<GroupService>();
+builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();

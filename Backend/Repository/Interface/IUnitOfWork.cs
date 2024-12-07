@@ -8,7 +8,6 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<HistorySearch> HistorySearch { get; }
 	IGenericRepository<Message> Message { get; }
 	IGenericRepository<MainTopic> MainTopic { get; }
-
 	IGenericRepository<PostNotification> PostNotification { get; }
 	IGenericRepository<RequestNotification> RequestNotification { get; }
 	IGenericRepository<Relationship> Relationship { get; }

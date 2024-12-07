@@ -131,13 +131,13 @@ namespace Backend.Controllers
 
 			var friends = await _userContext.GetFriends(userId);
 			var user = await _userContext.GetLoginById(userId);
-			// var post = await _Post.GetAllPostsWithMedia() ?? new List<Post>();
+			var post =  new List<Post>();
 
 			if (user == null)
 			{
 				return NotFound(new { message = "Không tìm thấy người dùng" });
 			}
-			return Ok(new { information = user, friend = friends });
+			return Ok(new { information = user, friend = friends , posts = post});
 
 		}
 

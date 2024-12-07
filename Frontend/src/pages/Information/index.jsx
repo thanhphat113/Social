@@ -8,6 +8,8 @@
   import * as Yup from 'yup';
   import { updateIsRead } from '../../components/Redux/Actions/UserAction';
   import { useDispatch } from 'react-redux';
+  import { updateUser, changePassword } from '~/apis/index';
+  
 
   // import { Password } from '@mui/icons-material';
 
@@ -49,7 +51,7 @@
       if (editedUserInfo) {
         updateUser(editedUserInfo) // Giả sử `currentUser` có `id`
           .then((response) => {
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 204) {
               alert('User information updated successfully!');
               setIsChanged(false);
             } else {

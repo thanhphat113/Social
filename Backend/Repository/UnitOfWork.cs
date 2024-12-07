@@ -56,7 +56,7 @@ namespace Backend.Repository
 			_Relationship = Relationship;
 			_Media = Media;
 			_userGroup = userGroup;
-			//_postMedia = postMedia;
+			_postMedia = postMedia;
 			_reactPost = reactPost;
 			_comment = comment;
 			_reactComment = reactComment;
@@ -69,9 +69,7 @@ namespace Backend.Repository
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<MainTopic> MainTopic => _main;
-		// public IGenericRepository<PostMedia> PostMedia => _postMedia;
-
-
+		 public IGenericRepository<PostMedia> PostMedia => _postMedia;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;

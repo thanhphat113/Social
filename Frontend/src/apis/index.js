@@ -34,14 +34,24 @@ export const fetchGroupInfo = async (groupId) => {
 };
 
 
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userData) => {
   try {
     const response = await axiosInstance.put(`/api/User/`, userData);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+export const changePassword = async (passwordData) => {
+  try {
+    const response = await axiosInstance.put(`/api/User/change-password`, passwordData);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 }
+
 
 
 export const getLikeUser = async (postId) => {
@@ -77,7 +87,7 @@ export const UnlikePost = async (postId) => {
     throw error.response.data;
   }
 }
-}
+
 
 
 export const sendFriendRequest = async (toUserId) => {

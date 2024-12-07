@@ -72,7 +72,6 @@ function App() {
                     }
                 /> */}
                 <Route
-                    path="/:userId"
                     path="/profile/:userId"
                     element={
                         <Authentication>
