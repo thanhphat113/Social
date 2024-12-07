@@ -21,8 +21,13 @@ namespace Backend.Repository
 
 		public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
 		{
-			var item = _context.Set<T>().Where(predicate);
-			_context.Remove(item);
+			var items = await _context.Set<T>().Where(predicate).ToListAsync();
+
+
+			if (items.Any())
+			{
+				_context.RemoveRange(items);
+			}
 		}
 
 		public async Task<T> GetByIdAsync(int id)

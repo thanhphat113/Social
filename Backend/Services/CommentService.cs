@@ -1,6 +1,8 @@
 ﻿using Backend.Models;
 using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services;
 
@@ -28,11 +30,11 @@ public class CommentService : ICommentService
 
     public async Task<IEnumerable<Comment>> GetCommentsByPostId(int postId)
     {
-        return await _unit.Comment.FindAsync<Comment>(
-            c => c.PostId == postId, 
-            c => c, 
-            q => q.OrderByDescending(c => c.DateCreated)
-        );
+        return await _unit.Comment.FindAsync<Comment>(query =>
+            query.Where(c => c.PostId == postId)
+                .Include(c => c.Post)
+                .Include(c => c.User)
+                .OrderByDescending(c => c.DateCreated));
     }
 
     public async Task<Comment> GetById(int id)
@@ -104,11 +106,9 @@ public class CommentService : ICommentService
     // Thêm method để lấy comment con (reply)
     public async Task<IEnumerable<Comment>> GetChildComments(int parentCommentId)
     {
-        return await _unit.Comment.FindAsync<Comment>(
-            c => c.ChildOf == parentCommentId, 
-            c => c, 
-            q => q.OrderByDescending(c => c.DateCreated)
-        );
+        return await _unit.Comment.FindAsync<Comment>(query =>
+            query.Where(c => c.ChildOf == parentCommentId)
+                .OrderByDescending(c => c.DateCreated));
     }
 
     #region Tương tác với comment
@@ -122,11 +122,14 @@ public class CommentService : ICommentService
     
     public async Task<bool> GetLikesUser(int commentId, int userId)
     {
-        var data = await _unit.ReactsComment.GetByConditionAsync<ReactsComment>(r => r.CommentId == commentId && r.UserId == userId);
+        var data = await _unit.ReactsComment.GetByConditionAsync(query =>
+            query.Where(r => r.CommentId == commentId && r.UserId == userId));
+
         if (data == null)
         {
             return false;
         }
+
         Console.WriteLine("==================================================================");
         Console.WriteLine(data);
         return true;

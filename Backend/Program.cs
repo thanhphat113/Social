@@ -24,11 +24,18 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<SocialMediaContext>(options =>
+/*builder.Services.AddDbContext<SocialMediaContext>(options =>
     options.UseLazyLoadingProxies()
         .EnableSensitiveDataLogging() // Bật logging nhạy cảm
         .LogTo(Console.WriteLine, LogLevel.Information)
         .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+);*/
+
+builder.Services.AddDbContext<SocialMediaContext>(options =>
+        options.EnableSensitiveDataLogging() // Bật logging nhạy cảm
+            .LogTo(Console.WriteLine, LogLevel.Information)
+            .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    // Loại bỏ UseLazyLoadingProxies()
 );
 
 // Add services to the container.
@@ -67,7 +74,8 @@ builder.Services.AddScoped<ReactPostService>();
 
 //Post
 
-/*builder.Services.AddScoped<PostService>();*/
+builder.Services.AddScoped< IPostService, PostService>();
+
 
 //Comment
 builder.Services.AddScoped<ICommentService, CommentService>();

@@ -22,21 +22,25 @@ namespace Backend.Repository
 		private readonly IGenericRepository<Relationship> _Relationship;
 		private readonly IGenericRepository<Post> _post;
 		private readonly IGenericRepository<UserGroup> _userGroup;
-
+		private readonly IGenericRepository<ReactsComment> _reactsComment;
+		private readonly IGenericRepository<ReactsPost> _reactsPost;
+		private readonly IGenericRepository<Comment> _comment;
 		public UnitOfWork(SocialMediaContext context,
-						  IGenericRepository<User> Users,
-						  IGenericRepository<ChatInMessage> ChatInMessage,
-						  IGenericRepository<GroupChat> GroupChat,
-						  IGenericRepository<HistorySearch> HistorySearch,
-						  IGenericRepository<Message> Message,
-						  IGenericRepository<PostNotification> PostNotification,
-						  IGenericRepository<RequestNotification> RequestNotification,
-						  IGenericRepository<Relationship> Relationship,
-						  IGenericRepository<Media> Media,
-			  IGenericRepository<UserGroup> userGroup,
-						  IGenericRepository<MainTopic> main,
-						  IGenericRepository<Post> post)
-
+		                  IGenericRepository<User> Users,
+		                  IGenericRepository<ChatInMessage> ChatInMessage,
+		                  IGenericRepository<GroupChat> GroupChat,
+		                  IGenericRepository<HistorySearch> HistorySearch,
+		                  IGenericRepository<Message> Message,
+		                  IGenericRepository<PostNotification> PostNotification,
+		                  IGenericRepository<RequestNotification> RequestNotification,
+		                  IGenericRepository<Relationship> Relationship,
+		                  IGenericRepository<Media> Media,
+		                  IGenericRepository<UserGroup> userGroup,
+		                  IGenericRepository<MainTopic> main,
+		                  IGenericRepository<Post> post,
+		                  IGenericRepository<Comment> comment,
+		                  IGenericRepository<ReactsComment> reactsComment,
+		                  IGenericRepository<ReactsPost> reactsPost)
 		{
 			_context = context;
 			_main = main;
@@ -50,7 +54,10 @@ namespace Backend.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
-			_userGroup = userGroup;
+			_userGroup = userGroup ?? throw new ArgumentNullException(nameof(userGroup));
+			_comment = comment;
+			_reactsComment = reactsComment;
+			_reactsPost = reactsPost;
 		}
 
 		// Các property chỉ đọc cho các repository
@@ -62,6 +69,9 @@ namespace Backend.Repository
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<MainTopic> MainTopic => _main;
 		public IGenericRepository<Post> Post => _post;
+		public IGenericRepository<Comment> Comment => _comment;
+		public IGenericRepository<ReactsComment> ReactsComment => _reactsComment;
+		public IGenericRepository<ReactsPost> ReactsPost => _reactsPost;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;

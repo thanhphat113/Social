@@ -98,13 +98,17 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
     const handleEditPost = async () => {
         // Gọi API để cập nhật bài viết
         try {
-            const response = await axios.put(`http://localhost:5164/api/Post?postId=${postId}`, 
-                {
-                    content: editContent
-                },
+            
+            const formData = new FormData();
+            formData.append('PostId', postId);
+            formData.append('Content', editContent);
+
+
+            const response = await axios.put(`http://localhost:5164/api/Post`, 
+                formData,
                 {
                     headers: {
-                        'Content-Type': 'application/json' // Không cần thiết nhưng rõ ràng
+                        'Content-Type': 'multipart/form-data'
                     }, 
                     withCredentials: true 
                 }
@@ -123,8 +127,10 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
         // Xác nhận và gọi API để xóa bài viết
         if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
             try {
-                await axios.delete(`http://localhost:5164/api/Post/${postId}`);
-                // Xử lý sau khi xóa, ví dụ: gọi lại API để lấy danh sách bài viết
+                await axios.delete(`http://localhost:5164/api/Post?postId=${postId}`);
+
+                window.location.reload();
+
             } catch (error) {
                 console.error("Error deleting post:", error);
             }

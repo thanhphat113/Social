@@ -1,6 +1,7 @@
 ﻿using Backend.Data;
 using Backend.Models;
 using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
 using Backend.Services.Interface;
 
 namespace Backend.Services;
@@ -42,17 +43,21 @@ public class ReactPostService : IReactPostService
 
     public async Task<ReactsPost> Add(ReactsPost react)
     {
-        var existingReact = await _unit.ReactsPost.GetByConditionAsync<ReactsPost>(r => r.UserId == react.UserId && r.PostId == react.PostId);
+        // Kiểm tra xem phản hồi đã tồn tại hay chưa
+        var existingReact = await _unit.ReactsPost.GetByConditionAsync(query =>
+            query.Where(r => r.UserId == react.UserId && r.PostId == react.PostId));
 
         if (existingReact != null)
         {
-            return null;
+            return null; // Nếu tồn tại, trả về null
         }
 
+        // Nếu không tồn tại, thêm phản hồi mới
         await _unit.ReactsPost.AddAsync(react);
         await _unit.CompleteAsync();
-        return react;
+        return react; // Trả về phản hồi vừa thêm
     }
+
 
     public Task<bool> Update(ReactsPost value)
     {
@@ -61,17 +66,20 @@ public class ReactPostService : IReactPostService
     
     public async Task<bool> RemoveReact(int userId, int postId)
     {
-        var existingReact = await _unit.ReactsPost.GetByConditionAsync<ReactsPost>(r =>
-            r.UserId == userId && r.PostId == postId);
+        // Sử dụng GetByConditionAsync để lấy phản hồi
+        var existingReact = await _unit.ReactsPost.GetByConditionAsync(query =>
+            query.Where(r => r.UserId == userId && r.PostId == postId));
 
         if (existingReact != null)
         {
-            await  _unit.ReactsPost.DeleteAsync(r => r.UserId == userId && r.PostId == postId);
+            // Xóa phản hồi nếu tồn tại
+            await _unit.ReactsPost.DeleteAsync(r => r.UserId == userId && r.PostId == postId);
             return true;
         }
 
         return false;
     }
+
 
     public Task<bool> Delete(int id)
     {
