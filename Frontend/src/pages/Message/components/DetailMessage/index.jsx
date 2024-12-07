@@ -17,7 +17,7 @@ import axios from "axios";
 import { messageContext } from "../../../../components/Layouts/DefaultLayout";
 
 function DetailMessage({ onShow }) {
-    const {setRequest, setOffer} = useContext(messageContext)
+    const { setRequest } = useContext(messageContext);
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
     const currentFriendId = useSelector((state) => state.message.currentUserId);
@@ -72,17 +72,18 @@ function DetailMessage({ onShow }) {
 
     const handleCall = async () => {
         try {
-            const response = await axios.get(`http://localhost:5164/api/Message/call-user`,
+            const response = await axios.get(
+                `http://localhost:5164/api/Message/call-user`,
                 {
                     withCredentials: true,
                     params: {
-                        FriendId: currentFriendId
-                    }
+                        FriendId: currentFriendId,
+                    },
                 }
-            )
-            setRequest(response.data)
+            );
+            setRequest(response.data);
         } catch (error) {
-            console.log("Lỗi", error)
+            console.log("Lỗi", error);
         }
     };
 
@@ -253,14 +254,11 @@ function DetailMessage({ onShow }) {
                         color: mainTopic?.color,
                     }}
                 >
-                    <CustomTooltip title="Gọi">
+                    <CustomTooltip title="Gọi video">
                         <i
                             onClick={() => handleCall()}
-                            className="fa-solid fa-phone"
+                            className="fa-solid fa-video"
                         ></i>
-                    </CustomTooltip>
-                    <CustomTooltip title="Gọi video">
-                        <i className="fa-solid fa-video"></i>
                     </CustomTooltip>
                     <CustomTooltip title="Xem thông tin">
                         <i
@@ -352,10 +350,11 @@ function DetailMessage({ onShow }) {
                                         <div
                                             className={clsx(styles.mess)}
                                             style={{
-                                                backgroundColor:
-                                                    userid === mess.fromUser &&
-                                                    mainTopic &&
-                                                    mainTopic.color,
+                                                background: mess.mediaId
+                                                    ? `none`
+                                                    : userid ===
+                                                          mess.fromUser &&
+                                                      mainTopic?.color,
                                             }}
                                         >
                                             {mess.media && !mess.isRecall ? (
@@ -389,7 +388,10 @@ function DetailMessage({ onShow }) {
                                                 >
                                                     {!mess.isRecall
                                                         ? mess.content
-                                                        : "Bạn đã thu hồi tin nhắn"}
+                                                        : mess.fromUser ===
+                                                          userid
+                                                        ? "Bạn đã thu hồi tin nhắn"
+                                                        : "Tin nhắn đã bị thu hồi"}
                                                 </p>
                                             )}
                                         </div>

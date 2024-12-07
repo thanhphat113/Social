@@ -23,6 +23,7 @@ public partial class User
 
     public int? GenderId { get; set; }
 
+    [NotMapped]
     public bool? IsOnline { get; set; } = false;
 
     public DateTime DateCreated { get; set; }

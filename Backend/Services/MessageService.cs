@@ -41,18 +41,6 @@ namespace Backend.Services
 
 		public async Task<Message> FindBy2User(int user1, int user2)
 		{
-			// var predicate = (Expression<Func<Message, bool>>)();
-			// var selector = (Expression<Func<Message, Message>>)
-			// 		(m => new Message
-			// 		{
-			// 			MessagesId = m.MessagesId,
-			// 			User1 = m.User1,
-			// 			User2 = m.User2,
-			// 			NickName1 = m.NickName1,
-			// 			NickName2 = m.NickName2,
-			// 			MainTopicNavigation = m.MainTopicNavigation,
-			// 		});
-
 			return await _unit.Message.GetByConditionAsync(query => query
 					.Where(u =>
 					(u.User1 == user1 && u.User2 == user2) ||
@@ -157,6 +145,14 @@ namespace Backend.Services
 				Console.WriteLine(ex);
 				throw;
 			}
+		}
+
+		public async Task<bool> CheckUserInMessage(int MessageId, int UserId)
+		{
+			var item = await _unit.Message.GetByConditionAsync(query => query
+						.Where(m => m.MessagesId == MessageId &&
+						m.User1 == UserId || m.User2 == UserId));
+			return !(item == null);
 		}
 	}
 }

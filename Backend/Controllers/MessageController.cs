@@ -36,6 +36,15 @@ namespace Backend.Controllers
 			return Ok(result);
 		}
 
+		[HttpGet("check-user-in-mess")]
+		public async Task<IActionResult> GetIn([FromQuery] int messageId)
+		{
+			var UserId = MiddleWare.GetUserIdFromCookie(Request);
+			var result = await _mess.CheckUserInMessage(messageId, UserId);
+			return Ok(result);
+		}
+
+
 		[HttpPut("topic")]
 		public async Task<IActionResult> Put([FromBody] UpdateTopic value)
 		{
@@ -57,7 +66,7 @@ namespace Backend.Controllers
 		}
 
 		[HttpGet("call-user")]
-		public async Task<IActionResult> Calling([FromQuery] int FriendId)
+		public async Task<IActionResult> Calling(int FriendId)
 		{
 			var UserId = MiddleWare.GetUserIdFromCookie(Request);
 			try
