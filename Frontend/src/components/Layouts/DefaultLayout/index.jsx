@@ -467,7 +467,6 @@ function DefaultLayout() {
                         ref={otherVideo}
                         autoPlay
                         playsInline
-                        style={{ display: remoteStream.current.getTr && `none` }}
                     ></video>
                     <div className={styles.actions}>
                         <i

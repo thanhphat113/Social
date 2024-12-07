@@ -11,11 +11,9 @@ public partial class UserGroup
 
     public string? Bio { get; set; }
 
-    public string? ProfilePicture { get; set; }
 
     public int? MemberCount { get; set; }
 
-    public string? CoverPhoto { get; set; }
 
     public DateTime DateCreated { get; set; }
 

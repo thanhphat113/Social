@@ -72,8 +72,8 @@ namespace Backend.Services
             }
 
             // Tìm kiếm nhóm theo tên chứa từ khóa
-            return await _unit.UserGroup.GetByConditionAsync(query => query.Where(
-                g => g.GroupName.Contains(name, StringComparison.OrdinalIgnoreCase)));
+            return await _unit.UserGroup.FindAsync(query => query.Where(
+                g => g.GroupName.Contains(name)));
         }
     }
 }

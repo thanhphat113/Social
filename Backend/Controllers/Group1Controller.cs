@@ -64,7 +64,7 @@ namespace Backend.Controllers
             }
 
             var item = await _unit.SearchGroupsByName(name);
-            if (item == null || item.Count() == 0)
+            if (item == null)
             {
                 return NotFound("Không tìm thấy nhóm.");
             }
