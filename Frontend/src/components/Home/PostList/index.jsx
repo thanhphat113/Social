@@ -42,19 +42,19 @@ export default function PostList() {
                 posts.map((post) => (
                     <PostCard
                         key={post.postId}
-                        author={post.createdByUser  ? `${post.createdByUser .firstName} ${post.createdByUser .lastName}` : 'Ẩn danh'}  // Lấy tên tác giả từ createdByUser  
+                        author={post.createdByUser  ? `${post.createdByUser .firstName} ${post.createdByUser .lastName}` : 'Ẩn danh'}
                         time={new Date(post.dateCreated).toLocaleString()}
                         status={post.content || ''}
-                        imageUrls={post.postMedia && Array.isArray(post.postMedia) 
-                            ? post.postMedia.map(m => `http://localhost:5164/${m.media.src.split('\\').slice(-2).join('/')}`) // Đảm bảo đường dẫn hợp lệ
+                        imageUrls={post.medias && Array.isArray(post.medias) 
+                            ? post.medias.map(m => `http://localhost:5164/${m.src.split('\\').slice(-2).join('/')}`) 
                             : []}
-                            avatar={post.createdByUser?.profilePicture || (post.createdByUser?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')}
+                        avatar={post.createdByUser ?.profilePicture || (post.createdByUser ?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')}
                         postId={post.postId}
-                        userId={post.createdByUser.userId}
+                        userId={post.createdByUser .userId}
                     />
                 ))
             ) : (
-                <p>Không có bài viết.</p>  // Thông báo khi không có bài viết
+                <p>Không có bài viết.</p>
             )}
         </div>
     );

@@ -1,277 +1,340 @@
-// using Backend.Models;
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Security.Cryptography;
-// using System.Threading.Tasks;
-// using Backend.Data;
-// using Backend.Models;
-// using Backend.Repository.Interface;
-// using Microsoft.AspNetCore.Http.HttpResults;
-// using Backend.Services.Interface;
-// using Microsoft.EntityFrameworkCore;
+using Backend.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using Backend.Data;
+using Backend.Models;
+using Backend.Repositories.Interface;
+using Backend.Repository.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
-// namespace Backend.Services
-// {
-//     public class PostService : IPostService
-//     {
-//         private readonly IUnitOfWork _unit;
-//         private readonly IWebHostEnvironment _hostEnvironment;
-//         private readonly SocialMediaContext _dbContext;
-//         public PostService(IUnitOfWork unit, IWebHostEnvironment hostEnvironment, SocialMediaContext dbContext)
-//         {
-//             _unit = unit;
-//             _hostEnvironment = hostEnvironment;
-//             _dbContext = dbContext;
-//         }
+namespace Backend.Services
+{
+    public class PostService : IPostService
+    {
+        private readonly IUnitOfWork _unit;
+        private readonly IWebHostEnvironment  _hostEnvironment;
+        private readonly SocialMediaContext _dbContext;
+        private readonly ILogger<PostService> _logger;
 
-//         public async Task<IEnumerable<Post>> GetAll()
-//         {
-//             try
-//             {
-//                 // Lấy toàn bộ dữ liệu từ repository của Post
-//                 var posts = await _unit.Post.GetAll();
-//                 return posts;
-//             }
-//             catch (Exception ex)
-//             {
-//                 // Xử lý lỗi
-//                 Console.WriteLine("Lỗi khi lấy dữ liệu: " + ex.Message);
-//                 throw;
-//             }
-//         }
+        public PostService(IUnitOfWork unit, IWebHostEnvironment  hostEnvironment, SocialMediaContext dbContext, ILogger<PostService> logger)
+        {
+            _logger = logger;
+            _unit = unit;
+            _hostEnvironment = hostEnvironment;
+            _dbContext = dbContext;
+        }
 
-//         public async Task<Post> GetListById(int id)
-//         {
-//             try
-//             {
-//                 // Lấy toàn bộ dữ liệu từ repository của Post
-//                 var posts = await _unit.Post.GetByIdAsync(id);
-//                 return posts;
-//             }
-//             catch (Exception ex)
-//             {
-//                 // Xử lý lỗi
-//                 Console.WriteLine("Lỗi khi lấy dữ liệu: " + ex.Message);
-//                 throw;
-//             }
-//         }
+        public async Task<IEnumerable<Post>> GetAll()
+        {
+            try
+            {
+                // Lấy toàn bộ dữ liệu từ repository của Post
+                var posts = await _unit.Post.GetAll();
+                return posts;
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi
+                Console.WriteLine("Lỗi khi lấy dữ liệu: " + ex.Message);
+                throw;
+            }
+        }
 
-//         public Task<Post> GetById(int id)
-//         {
-//             throw new NotImplementedException();
-//         }
+        public async Task<Post> GetListById(int id)
+        {
+            try
+            {
+                // Lấy toàn bộ dữ liệu từ repository của Post
+                var posts = await _unit.Post.GetByIdAsync(id);
+                return posts;
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi
+                Console.WriteLine("Lỗi khi lấy dữ liệu: " + ex.Message);
+                throw;
+            }
+        }
 
-//         Task<IEnumerable<Post>> IService<Post>.GetListById(int userid)
-//         {
-//             throw new NotImplementedException();
-//         }
+        public Task<Post> GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
 
-//         public async Task<Post> Add(Post post)
-//         {
-//             var posts = await _unit.Post.AddAsync(post);
-//             var result = await _unit.CompleteAsync();
-//             if (result) return posts;
-//             return null;
-//         }
+        Task<IEnumerable<Post>> IService<Post>.GetListById(int userid)
+        {
+            throw new NotImplementedException();
+        }
 
-//         public Task<bool> Update(Post value)
-//         {
-//             throw new NotImplementedException();
-//         }
+        public async Task<Post> Add(Post post)
+        {
+            var posts = await _unit.Post.AddAsync(post);
+            var result = await _unit.CompleteAsync();
+            if(result) 
+                return posts;
+            return null;
+        }
 
-//         public Task<bool> Delete(int id)
-//         {
-//             throw new NotImplementedException();
-//         }
+        public Task<bool> Update(Post value)
+        {
+            throw new NotImplementedException();
+        }
 
-//         public async Task<IEnumerable<Post>> GetAllPostsWithMedia()
-//         {
-//             var posts = await _unit.Post.GetAll();
+        public async Task<bool> Delete(int postId)
+        {
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                try 
+                {
+                    // Tìm post
+                    var post = await _dbContext.Posts
+                        .Include(p => p.Comments)
+                        .Include(p => p.Medias)
+                        .Include(p => p.PostNotifications)
+                        .Include(p => p.SharePosts)
+                        .FirstOrDefaultAsync(p => p.PostId == postId);
 
-//             foreach (var post in posts)
-//             {
-//                 var postMedias = await _unit.PostMedia.FindAsync(pm => pm.PostId == post.PostId, pm => new { pm.PostId, pm.Media });
+                    if (post == null)
+                        return false;
 
-//                 // Gán media vào bài viết
-//                 post.PostMedia = postMedias.Select(pm => new PostMedia
-//                 {
-//                     PostId = post.PostId,
-//                     MediaId = pm.Media.MediaId,
-//                     Media = pm.Media
-//                 }).ToList();
-//             }
+                    // Xóa các reacts của comments
+                    var commentIds = post.Comments.Select(c => c.CommentId).ToList();
+                    var reactsComments = await _dbContext.ReactsComments
+                        .Where(rc => commentIds.Contains(rc.CommentId))
+                        .ToListAsync();
+                    _dbContext.ReactsComments.RemoveRange(reactsComments);
 
-//             posts = posts.OrderByDescending(p => p.DateCreated);
-//             return posts;
-//         }
+                    // Xóa comments
+                    _dbContext.Comments.RemoveRange(post.Comments);
 
-//         public async Task<bool> CreatePostWithMedia(Post post, List<IFormFile> mediaFiles)
-//         {
-//             if (string.IsNullOrEmpty(_hostEnvironment.WebRootPath))
-//             {
-//                 throw new InvalidOperationException("WebRootPath is not set.");
-//             }
+                    // Xóa media
+                    if (post.Medias != null)
+                        _dbContext.Media.RemoveRange(post.Medias);
 
-//             var mediaPath = Path.Combine(_hostEnvironment.WebRootPath, "media");
+                    // Xóa notifications
+                    _dbContext.PostNotifications.RemoveRange(post.PostNotifications);
 
-//             // Tạo thư mục media nếu chưa tồn tại
-//             if (!Directory.Exists(mediaPath))
-//             {
-//                 Directory.CreateDirectory(mediaPath);
-//             }
+                    // Xóa share posts
+                    _dbContext.SharePosts.RemoveRange(post.SharePosts);
 
-//             var mediaList = new List<Media>();
+                    // Xóa post
+                    _dbContext.Posts.Remove(post);
 
-//             if (mediaFiles != null && mediaFiles.Any())
-//             {
-//                 foreach (var file in mediaFiles)
-//                 {
-//                     // Tạo tên file duy nhất để tránh trùng lặp
-//                     var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
-//                     var filePath = Path.Combine(mediaPath, uniqueFileName);
+                    await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
 
-//                     Console.WriteLine($"Saving file to: {filePath}");
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError($"Error deleting post {postId}: {ex.Message}");
+                    return false;
+                }
+            }
+        }
+        
+        public async Task<IEnumerable<Post>> GetAllPostsWithMedia()
+        {
+            var posts = await _dbContext.Posts
+                .Include(p => p.Comments) // Tải các bình luận
+                .Include(p => p.Medias)   // Tải các media
+                .Include(p => p.CreatedByUser )
+                .OrderByDescending(p =>  p.DateCreated)
+                .ToListAsync();
 
-//                     try
-//                     {
-//                         // Lưu file
-//                         using (var fileStream = new FileStream(filePath, FileMode.Create))
-//                         {
-//                             await file.CopyToAsync(fileStream);
-//                         }
+            return posts.Select(p => new Post 
+            {
+                PostId = p.PostId,
+                Content = p.Content,
+                CreatedByUserId = p.CreatedByUserId,
+                DateCreated = p.DateCreated,
+                DateUpdated = p.DateUpdated,
+                Comments = p.Comments?.Select(c => new Comment 
+                {
+                    CommentId = c.CommentId,
+                    Content = c.Content,
+                    DateCreated = c.DateCreated,
+                    DateUpdated = c.DateUpdated,
+                    PostId = c.PostId,
+                    UserId = c.UserId
+                }).ToList() ?? new List<Comment>(),
+                CreatedByUser  = p.CreatedByUser  != null ? new User 
+                {
+                    UserId = p.CreatedByUser .UserId,
+                    FirstName = p.CreatedByUser .FirstName,
+                    LastName = p.CreatedByUser .LastName
+                } : null,
+                Medias = p.Medias?.Select(m => new Media 
+                {
+                    MediaId = m.MediaId,
+                    Src = m.Src
+                }).ToList() ?? new List<Media>()
+            }).ToList();
+        }
 
-//                         // Tạo hash code
-//                         string hashCode;
-//                         using (var stream = new FileStream(filePath, FileMode.Open))
-//                         {
-//                             using (var sha256 = SHA256.Create())
-//                             {
-//                                 var hashBytes = await sha256.ComputeHashAsync(stream);
-//                                 hashCode = BitConverter.ToString(hashBytes)
-//                                     .Replace("-", "")
-//                                     .ToLowerInvariant();
-//                             }
-//                         }
+        public async Task<bool> CreatePostWithMedia(Post post, List<IFormFile> mediaFiles)
+            {
+                if (string.IsNullOrEmpty(_hostEnvironment.WebRootPath))
+                {
+                    throw new InvalidOperationException("WebRootPath is not set.");
+                }
 
-//                         // Tạo đối tượng Media
-//                         var media = new Media
-//                         {
-//                             Src = $"/media/{uniqueFileName}", // Lưu đường dẫn tương đối
-//                             HashCode = hashCode,
-//                         };
+                var mediaPath = Path.Combine(_hostEnvironment.WebRootPath, "media");
 
-//                         mediaList.Add(media);
-//                     }
-//                     catch (Exception ex)
-//                     {
-//                         Console.WriteLine($"Error saving file '{file.FileName}': {ex.Message}");
-//                         throw;
-//                     }
-//                 }
-//             }
+                // Tạo thư mục media nếu chưa tồn tại
+                if (!Directory.Exists(mediaPath))
+                {
+                    Directory.CreateDirectory(mediaPath);
+                }
 
-//             // Lưu Post trước
-//             await _unit.Post.AddAsync(post);
-//             await _unit.CompleteAsync(); // Lưu để có PostId
+                var mediaList = new List<Media>();
 
-//             // Lưu Media
-//             if (mediaList.Any())
-//             {
-//                 await _dbContext.Media.AddRangeAsync(mediaList);
-//                 await _unit.CompleteAsync(); // Lưu các Media đã thêm
-//             }
+                if (mediaFiles != null && mediaFiles.Any())
+                {
+                    foreach (var file in mediaFiles)
+                    {
+                        var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                        var filePath = Path.Combine(mediaPath, uniqueFileName);
 
-//             // Tạo liên kết PostMedia
-//             var postMediaList = mediaList.Select(media => new PostMedia
-//             {
-//                 PostId = post.PostId, // Sử dụng PostId đã lưu
-//                 MediaId = media.MediaId
-//             }).ToList();
+                        try
+                        {
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(fileStream);
+                            }
 
-//             if (postMediaList.Any())
-//             {
-//                 await _dbContext.PostMedia.AddRangeAsync(postMediaList);
-//                 await _unit.CompleteAsync(); // Lưu các liên kết PostMedia
-//             }
+                            // Tạo mã băm
+                            string hashCode;
+                            using (var stream = new FileStream(filePath, FileMode.Open))
+                            {
+                                using (var sha256 = SHA256.Create())
+                                {
+                                    var hashBytes = await sha256.ComputeHashAsync(stream);
+                                    hashCode = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                                }
+                            }
 
-//             return true;
-//         }
+                            // Tạo đối tượng Media
+                            var media = new Media
+                            {
+                                Src = $"/media/{uniqueFileName}",
+                                HashCode = hashCode,
+                            };
 
-//         public async Task<bool> GetLikesUser(int postId, int userId)
-//         {
-//             var data = await _unit.ReactsPost.GetByConditionAsync<ReactsPost>(r => r.PostId == postId && r.UserId == userId);
-//             if (data == null)
-//             {
-//                 return false;
-//             }
-//             return true;
-//         }
+                            mediaList.Add(media);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Lỗi khi lưu tệp '{file.FileName}': {ex.Message}");
+                            throw;
+                        }
+                    }
+                }
 
-//         public async Task<int> GetLikesCount(int postId)
-//         {
-//             var data = await _unit.ReactsPost.GetAll();
-//             var count = data.Count(r => r.PostId == postId);
-//             return count;
-//         }
+                // Lưu Post trước
+                await _unit.Post.AddAsync(post);
+                await _unit.CompleteAsync(); // Lưu để lấy PostId
 
-//         public async Task<int> GetCommentCount(int postId)
-//         {
-//             var data = await _unit.Comment.GetAll();
-//             var count = data.Count(r => r.PostId == postId);
-//             return count;
-//         }
+                // Lưu Media
+                if (mediaList.Any())
+                {
+                    await _dbContext.Media.AddRangeAsync(mediaList);
+                    await _unit.CompleteAsync(); // Lưu các Media đã thêm
+                }
 
-//         public async Task<bool> AddLike(int postId, int userId)
-//         {
-//             var react = new ReactsPost
-//             {
-//                 PostId = postId,
-//                 UserId = userId
-//             };
+                // Liên kết Post và Media
+                foreach (var media in mediaList)
+                {
+                    post.Medias.Add(media); // Thêm media vào bộ sưu tập Medias của bài viết
+                }
 
-//             await _unit.ReactsPost.AddAsync(react);
-//             return await _unit.CompleteAsync();
-//         }
+                // Lưu Post đã cập nhật với các liên kết Media
+                await _unit.CompleteAsync(); // Lưu Post với Media liên kết
 
-//         public async Task<bool> RemoveLike(int postId, int userId)
-//         {
-//             await _unit.ReactsPost.DeleteAsync(r => r.PostId == postId && r.UserId == userId);
-//             return await _unit.CompleteAsync();
-//         }
+                return true;
+            }
+        
+        public async Task<bool> GetLikesUser(int postId, int userId)
+        {
+            // Sử dụng GetByConditionAsync với selector để truy vấn bảng ReactPost
+            var existingReact = await _unit.ReactsPost.GetByConditionAsync<ReactsPost>(query => 
+                query.Where(r => r.PostId == postId && r.UserId == userId));
 
-//         public async Task<bool> UpdatePost(Post post)
-//         {
-//             var userExists = _dbContext.Users.Any(u => u.UserId == post.CreatedByUserId);
-//             if (!userExists)
-//             {
-//                 throw new Exception($"User với ID {post.CreatedByUserId} không tồn tại.");
-//             }
+            // Kiểm tra nếu tồn tại ReactPost thì trả về true, ngược lại false
+            return existingReact != null;
+        }
 
-//             try
-//             {
-//                 var postUpdate = await _unit.Post.GetByIdAsync(post.PostId);
+        
+        public async Task<int> GetLikesCount(int postId)
+        {
+            var data = await _unit.ReactsPost.GetAll();
+            var count = data.Count(r => r.PostId == postId);
+            return count;
+        }
+        
+        public async Task<int> GetCommentCount(int postId)
+        {
+            var data = await _unit.Comment.GetAll();
+            var count = data.Count(r => r.PostId == postId);
+            return count;
+        }
+        
+        public async Task<bool> AddLike(int postId, int userId)
+        {
+            var react = new ReactsPost
+            {
+                PostId = postId,
+                UserId = userId
+            };
 
-//                 if (postUpdate != null)
-//                 {
-//                     // Cập nhật các thuộc tính cần thiết
-//                     postUpdate.Content = post.Content;
-//                     postUpdate.DateUpdated = DateTime.Now;
-//                     postUpdate.CreatedByUserId = post.CreatedByUserId;
+            await _unit.ReactsPost.AddAsync(react);
+            return await _unit.CompleteAsync();
+        }
 
-//                     _unit.Post.UpdateAsync(postUpdate);
-//                     var postCheck = await _unit.CompleteAsync();
-//                     return postCheck;
-//                 }
+        public async Task<bool> RemoveLike(int postId, int userId)
+        {
+            await _unit.ReactsPost.DeleteAsync(r => r.PostId == postId && r.UserId == userId);
+            return await _unit.CompleteAsync();
+        }
 
-//                 return false;
-//             }
-//             catch (Exception ex)
-//             {
-//                 var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : string.Empty;
-//                 throw new Exception($"Có lỗi khi thực hiện cập nhật: {ex.Message} {innerExceptionMessage}");
-//             }
-//         }
+        public async Task<bool> UpdatePost(Post post)
+        {
+            /*var userExists = _dbContext.Users.Any(u => u.UserId == post.CreatedByUserId);
+            if (!userExists)
+            {
+                throw new Exception($"User với ID {post.CreatedByUserId} không tồn tại.");
+            }*/
 
-//     }
-// }
+            try
+            {
+                var postUpdate = await _unit.Post.GetByIdAsync(post.PostId);
+
+                if (postUpdate != null)
+                {
+                    // Cập nhật các thuộc tính cần thiết
+                    postUpdate.Content = post.Content;
+                    postUpdate.DateUpdated = DateTime.Now;
+                    postUpdate.CreatedByUserId = post.CreatedByUserId;
+
+                    _unit.Post.UpdateAsync(postUpdate);
+                    var postCheck = await _unit.CompleteAsync();
+                    return postCheck;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : string.Empty;
+                throw new Exception($"Có lỗi khi thực hiện cập nhật: {ex.Message} {innerExceptionMessage}");
+            }
+        }
+        
+    }
+}

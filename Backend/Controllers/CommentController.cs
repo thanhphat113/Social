@@ -75,8 +75,6 @@ public class CommentController : ControllerBase
             // Gán UserId cho comment
             comment.UserId = userId;
             comment.PostId = postId;
-            comment.DateCreated = DateTime.UtcNow;
-            comment.DateUpdated = DateTime.UtcNow;
             Console.WriteLine(comment.DateCreated);
 
             // Log dữ liệu comment trước khi thêm
@@ -104,6 +102,8 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> UpdateComment([FromQuery]int commentId, [FromBody] Comment comment)
     {
 
+        Console.WriteLine(comment.PostId);
+        
         try
         {
             var userId = 11;   
@@ -232,6 +232,33 @@ public class CommentController : ControllerBase
                 return Ok();
             }
             return BadRequest("Failed to like the comment.");   
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+    
+    [HttpPost("reply")]
+    public async Task<ActionResult<Comment>> ReplyToComment([FromBody] Comment comment, [FromQuery] int commentId)
+    {
+        try
+        {
+            var userId = MiddleWare.GetUserIdFromCookie(Request);
+            if (userId <= 0)
+            {
+                return BadRequest("User is not authenticated.");
+            }
+
+            comment.UserId = userId;
+            comment.ChildOf = commentId;
+
+            var createdComment = await _commentService.AddComment(comment);
+            if (createdComment == null)
+            {
+                return StatusCode(500, "Failed to create comment.");
+            }
+            return Ok();
         }
         catch (Exception ex)
         {

@@ -147,32 +147,31 @@ namespace Backend.Controllers
 		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
 		{
 
-			try
-			{
-				var userId = MiddleWare.GetUserIdFromCookie(Request);
-				var token = Request.Cookies["YourCookieName"];
-				Console.WriteLine("Token từ cookie: " + token);
-				Console.WriteLine("UserId từ token: " + userId);
-				if (userId == null)
-				{
-					return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
-				}
+            try
+            {
+                var userId = MiddleWare.GetUserIdFromCookie(Request);
+                var token = Request.Cookies["YourCookieName"];
+                Console.WriteLine("Token từ cookie: " + token);
+                Console.WriteLine("UserId từ token: " + userId);
+                if (userId == null)
+                {
+                    return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+                }
 
-				var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
-				return result
-					? Ok(new { status = 200, message = "Đổi mật khẩu thành công" })
-					: BadRequest(new { message = "Mật khẩu cũ không đúng" });
-			}
-			catch (SecurityTokenExpiredException)
-			{
-				return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(new { Message = ex.Message });
-			}
-		}
-
+                var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
+                return result
+                    ? Ok(new {status= 200, message = "Đổi mật khẩu thành công" })
+                    : BadRequest(new { message = "Mật khẩu cũ không đúng" });
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
 
 
 
