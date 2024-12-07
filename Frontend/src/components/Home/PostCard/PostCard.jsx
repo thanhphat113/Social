@@ -5,6 +5,7 @@ import styles from './PostCard.module.scss';
 import CommentPost from './../CommentPost/index';
 import axios from 'axios';
 import {getLikeUser, getLikeCount, LikePost, UnlikePost} from './../../../apis/index';
+import { IoIosMore } from "react-icons/io";
 
 function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
     // const [liked, setLiked] = useState(false);
@@ -15,16 +16,19 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
     const [likesUser , setLikesUser ] = useState(false);
     const [refreshComments, setRefreshComments] = useState(false);
 
+    const [showEditMenu, setShowEditMenu] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editContent, setEditContent] = useState(status);
+    const [editImages, setEditImages] = useState(imageUrls);
+    const [postVersion, setPostVersion] = useState(0);
+
     useEffect(() => {
         const fetchLikesCount = async () => {
             try {
                 const response = await axios.get(`http://localhost:5164/api/Post/likes?postId=${postId}`);
                 const responseComment = await axios.get(`http://localhost:5164/api/Post/comment?postId=${postId}`);
-                console.log(response.data);
-                console.log(responseComment.data);
                 setLikesCount(response.data);
                 setCommentCount(responseComment.data);
-                console.log(responseComment.data);
             } catch (error) {
                 if (error.response) {
                     // Server trả về status code không thành công
@@ -87,6 +91,52 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
         setRefreshComments(prev => !prev); // Cập nhật state để refresh comments
     };
 
+    const toggleEditMenu = () => {
+        setShowEditMenu(prev => !prev);
+    };
+
+    const handleEditPost = async () => {
+        // Gọi API để cập nhật bài viết
+        try {
+            
+            const formData = new FormData();
+            formData.append('PostId', postId);
+            formData.append('Content', editContent);
+
+
+            const response = await axios.put(`http://localhost:5164/api/Post`, 
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }, 
+                    withCredentials: true 
+                }
+            );
+            // Cập nhật lại trạng thái sau khi chỉnh sửa
+            setIsEditing(false);
+            setShowEditMenu(false);
+            window.location.reload();
+            // Cập nhật lại nội dung bài viết nếu cần
+        } catch (error) {
+            console.error("Error updating post:", error);
+        }
+    };
+    
+    const handleDeletePost = async () => {
+        // Xác nhận và gọi API để xóa bài viết
+        if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
+            try {
+                await axios.delete(`http://localhost:5164/api/Post?postId=${postId}`);
+
+                window.location.reload();
+
+            } catch (error) {
+                console.error("Error deleting post:", error);
+            }
+        }
+    };
+
     return (
         <>
             <div className={styles.postCard}>
@@ -100,10 +150,84 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
                         <span className={styles.postAuthor}>{author}</span>
                         <span className={styles.postTime}>{time}</span>
                     </div>
-                    <div className={styles.postEdit}>
-                        <AiOutlineEdit/>
-                    </div>
+                    {userId === 11 && ( // So sánh userId của người dùng hiện tại với userId của bài viết
+                        <div className={styles.postEdit}>
+                            <IoIosMore onClick={toggleEditMenu} />
+                            {showEditMenu && (
+                                <div className={styles.editMenu}>
+                                    <button onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
+                                    <button onClick={handleDeletePost}>Xóa</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
+
+                {isEditing && (
+                    <div className={styles.editFormOverlay}>
+                        <div className={styles.editForm}>
+                            <button 
+                                className={styles.closeButton} 
+                                onClick={() => setIsEditing(false)}
+                            >
+                                &times;
+                            </button>
+                            <h2 className={styles.formTitle}>Chỉnh sửa bài viết</h2>
+                            <div className={styles.editFormContent}>
+                                {editImages.length > 0 && (
+                                    <div className={styles.imagePreviewContainer}>
+                                        {editImages.length > 1 && (
+                                            <button 
+                                                className={styles.prevButton} 
+                                                onClick={handlePrevImage}
+                                            >
+                                                &#10094;
+                                            </button>
+                                        )}
+                                        
+                                        <div className={styles.imagePreview}>
+                                            <img 
+                                                src={editImages[currentImageIndex]} 
+                                                alt={`Preview ${currentImageIndex}`} 
+                                            />
+                                        </div>
+                                        
+                                        {editImages.length > 1 && (
+                                            <button 
+                                                className={styles.nextButton} 
+                                                onClick={handleNextImage}
+                                            >
+                                                &#10095;
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+
+                                <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    placeholder="Thêm mô tả..."
+                                />
+                            </div>
+
+                            
+                            <div className={styles.formActions}>
+                                <button 
+                                    className={styles.saveButton}
+                                    onClick={handleEditPost}
+                                >
+                                    Lưu
+                                </button>
+                                <button 
+                                    className={styles.cancelButton}
+                                    onClick={() => setIsEditing(false)}
+                                >
+                                    Hủy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className={styles.postContent}>
                     <p className={styles.postText}>{status}</p>

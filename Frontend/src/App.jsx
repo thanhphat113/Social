@@ -47,16 +47,8 @@ function App() {
                         </Authentication>
                     }
                 />
-                {/* <Route
-                    path="/call"
-                    element={
-                        <Authentication>
-                            <Call />
-                        </Authentication>
-                    }
-                /> */}
-                {/* <Route
-                    path="/"
+                <Route
+                    path="/home"
                     element={
                         <Authentication>
                             <Home />
@@ -95,6 +87,7 @@ function App() {
                         </Authentication>
                     }
                 />
+                <Route path="/login" element={<Login />} />
                 {/* <Route
                     path="/new-group"
                     element={

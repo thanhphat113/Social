@@ -12,7 +12,7 @@ using Backend.Models;
 using Backend.Services;
 using Backend.Helper;
 using Backend.Services.Interface;
-// using ReactPostService = Backend.Services.ReactPostService;
+using ReactPostService = Backend.Services.ReactPostService;
 using Backend.RealTime;
 
 //var builder = WebApplication.CreateBuilder(args);
@@ -25,17 +25,20 @@ builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<SocialMediaContext>(options =>
-    options
-        .EnableSensitiveDataLogging() // Bật logging nhạy cảm
-        .LogTo(Console.WriteLine, LogLevel.Information)
-        .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true; // Nếu muốn JSON dễ đọc hơn
+    });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
@@ -56,23 +59,25 @@ builder.Services.AddScoped<MainTopicService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
+//builder.Services.AddScoped<GroupChatService>();
 builder.Services.AddScoped<ReactPostService>();
 
 //Post
 
-// builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped< IPostService, PostService>();
+
 
 //Comment
-// builder.Services.AddScoped<ICommentService, CommentService>();
+//builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//Post
 
 // builder.Services.AddScoped<PostService>();
-
 
 
 builder.Services.AddCors(options =>

@@ -20,29 +20,25 @@ namespace Backend.Repository
 		private readonly IGenericRepository<RequestNotification> _RequestNotification;
 		private readonly IGenericRepository<Relationship> _Relationship;
 		private readonly IGenericRepository<Post> _post;
-		private readonly IGenericRepository<PostMedia> _postMedia;
-		private readonly IGenericRepository<ReactsPost> _reactPost;
-
 		private readonly IGenericRepository<UserGroup> _userGroup;
+		private readonly IGenericRepository<ReactsComment> _reactsComment;
+		private readonly IGenericRepository<ReactsPost> _reactsPost;
 		private readonly IGenericRepository<Comment> _comment;
-		private IGenericRepository<ReactsComment> _reactComment;
-
 		public UnitOfWork(SocialMediaContext context,
-						  IGenericRepository<User> Users,
-						  IGenericRepository<ChatInMessage> ChatInMessage,
-						  IGenericRepository<HistorySearch> HistorySearch,
-						  IGenericRepository<Message> Message,
-						  IGenericRepository<PostNotification> PostNotification,
-						  IGenericRepository<RequestNotification> RequestNotification,
-						  IGenericRepository<Relationship> Relationship,
-						  IGenericRepository<Media> Media,
-						  IGenericRepository<MainTopic> main,
-						  IGenericRepository<Post> post,
-						  IGenericRepository<UserGroup> userGroup,
-						  IGenericRepository<PostMedia> postMedia,
-						  IGenericRepository<ReactsPost> reactPost,
-						  IGenericRepository<Comment> comment,
-						  IGenericRepository<ReactsComment> reactComment)
+		                  IGenericRepository<User> Users,
+		                  IGenericRepository<ChatInMessage> ChatInMessage,
+		                  IGenericRepository<HistorySearch> HistorySearch,
+		                  IGenericRepository<Message> Message,
+		                  IGenericRepository<PostNotification> PostNotification,
+		                  IGenericRepository<RequestNotification> RequestNotification,
+		                  IGenericRepository<Relationship> Relationship,
+		                  IGenericRepository<Media> Media,
+		                  IGenericRepository<UserGroup> userGroup,
+		                  IGenericRepository<MainTopic> main,
+		                  IGenericRepository<Post> post,
+		                  IGenericRepository<Comment> comment,
+		                  IGenericRepository<ReactsComment> reactsComment,
+		                  IGenericRepository<ReactsPost> reactsPost)
 		{
 			_context = context;
 			_main = main;
@@ -55,11 +51,10 @@ namespace Backend.Repository
 			_RequestNotification = RequestNotification;
 			_Relationship = Relationship;
 			_Media = Media;
-			_userGroup = userGroup;
-			_postMedia = postMedia;
-			_reactPost = reactPost;
+			_userGroup = userGroup ?? throw new ArgumentNullException(nameof(userGroup));
 			_comment = comment;
-			_reactComment = reactComment;
+			_reactsComment = reactsComment;
+			_reactsPost = reactsPost;
 		}
 
 		// Các property chỉ đọc cho các repository
@@ -68,18 +63,17 @@ namespace Backend.Repository
 		public IGenericRepository<HistorySearch> HistorySearch => _HistorySearch;
 		public IGenericRepository<Message> Message => _Message;
 		public IGenericRepository<Media> Media => _Media;
+		public IGenericRepository<UserGroup> UserGroup { get; }
 		public IGenericRepository<MainTopic> MainTopic => _main;
-		public IGenericRepository<PostMedia> PostMedia => _postMedia;
-
-
+		public IGenericRepository<Post> Post => _post;
+		public IGenericRepository<Comment> Comment => _comment;
+		public IGenericRepository<ReactsComment> ReactsComment => _reactsComment;
+		public IGenericRepository<ReactsPost> ReactsPost => _reactsPost;
 		public IGenericRepository<PostNotification> PostNotification => _PostNotification;
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
-		public IGenericRepository<ReactsPost> ReactsPost => _reactPost;
-		public IGenericRepository<Comment> Comment => _comment;
-		public IGenericRepository<ReactsComment> ReactsComment => _reactComment;
-		public IGenericRepository<Post> Post => _post;
-		public IGenericRepository<UserGroup> UserGroup => _userGroup;
+
+		public IGenericRepository<UserGroup> userGroup => _userGroup;
 
 		// Phương thức SaveChanges
 		public async Task<bool> CompleteAsync()

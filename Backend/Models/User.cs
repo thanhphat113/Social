@@ -67,4 +67,3 @@ public partial class User
     public virtual ICollection<UserInGroup> UserInGroups { get; set; } = new List<UserInGroup>();
 
 }
-
