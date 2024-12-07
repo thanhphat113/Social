@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Information from "./pages/Information";
 import DefaultLayout from "./components/Layouts/DefaultLayout";
 import Profile from "./pages/Profile";
+import Group from "./pages/Group";
 import Authentication from "./components/Authentication";
 import { SetUser } from "./components/Redux/Actions/UserAction";
 // import Call from "./Pages/Call";
@@ -62,16 +63,16 @@ function App() {
                             <Home />
                         </Authentication>
                     }
-                />
-                {/* <Route
+                />*/}
+                 <Route
                     path="/group"
                     element={
                         <Authentication>
-                            <GroupList />
+                            <Group/>
                         </Authentication>
                     }
-                /> */}
-                <Route
+                /> 
+                {/* <Route
                     path="/:userId"
                     element={
                         <Authentication>
@@ -94,7 +95,7 @@ function App() {
                             <Information />
                         </Authentication>
                     }
-                />
+                /> */}
                 {/* <Route
                     path="/new-group"
                     element={

@@ -1,0 +1,81 @@
+.wrapper{
+  display: flex;
+  gap:2rem;
+}
+
+.left{
+	padding: 0.5rem;
+	width: var(--left-and-right-item);
+	box-shadow: 3px 2px 5px rgba(0, 0, 0, 0.5);
+  background-color: white;
+}
+
+.right{
+ flex: 1;
+ background-color: white;
+ width: 100%;
+}
+
+/* Ẩn sidebar khi không cần thiết */
+.hidden {
+  display: none;
+}
+
+.sidebar {
+    padding: 10px;
+    color: #000;
+    width: 35rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 2rem;
+
+    &__menu {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+      
+      &-item {
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        
+        i {
+          margin-right: 10px;
+        }
+  
+        &:hover {
+          background-color: #444;
+        }
+      }
+    }
+  
+    .creategroup {
+      padding: 10px;
+      background-color: var(--background-second);
+      border: none;
+      color: black;
+      cursor: pointer;
+      border-radius: 5px;
+      
+  
+      &:hover {
+            background-color: #41788d;
+        }
+    }
+    .search {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        input {
+            flex: 1;
+            border-radius: 10px;
+            border: 0.5px solid #333;
+            height: 4rem;
+        }
+    }
+}
+
+  
