@@ -67,15 +67,21 @@ function ItemUser({ list }) {
                         }
                         className={styles.item}
                     >
-                        <img
-                            src={
-                                item.profilePicture?.src
-                                    ? `${item.profilePicture.src}`
-                                    : `/public/img/default/${
-                                          item.genderId !== 2 ? "man" : "woman"
-                                      }_default.png`
-                            }
-                        ></img>
+                        <div className={styles.zone}>
+                            {item.isOnline && <span className={styles.isOnline}></span>}
+
+                            <img
+                                src={
+                                    item.profilePicture?.src
+                                        ? `${item.profilePicture.src}`
+                                        : `/public/img/default/${
+                                              item.genderId !== 2
+                                                  ? "man"
+                                                  : "woman"
+                                          }_default.png`
+                                }
+                            ></img>
+                        </div>
                         <div className={styles.content}>
                             <strong>
                                 {item.lastName} {item.firstName}
@@ -93,8 +99,12 @@ function ItemUser({ list }) {
                                 <p>
                                     {lastMess
                                         ? compareId
-                                            ? `Bạn: ${lastMess.content || "Đã gửi một file"}`
-                                            : lastMess.content || "Đã gửi một file"
+                                            ? `Bạn: ${
+                                                  lastMess.content ||
+                                                  "Đã gửi một file"
+                                              }`
+                                            : lastMess.content ||
+                                              "Đã gửi một file"
                                         : "Hãy Gửi một lời chào với bạn mới!!!"}
                                 </p>
                                 <small>
@@ -107,7 +117,7 @@ function ItemUser({ list }) {
                             </div>
                         </div>
                         {lastMess && !compareId && !lastMess.isRead && (
-                            <span></span>
+                            <span className={styles.isRead}></span>
                         )}
                     </button>
                 );

@@ -19,45 +19,49 @@ namespace Backend.Services
 			_httpContextAccessor = httpContextAccessor;
 		}
 
-		public async Task<ChatInMessage> AddWithMedia(Media value, int FromUserId, int MessageId, int typeFile)
+		public async Task<ChatInMessage> AddWithMedia(Media value, int typeFile, ChatInMessage chat)
 		{
 			try
 			{
-				var item = await _unit.Media.GetByConditionAsync<Media>(query => query.Where(m => m.HashCode == value.HashCode));
-
-
-				var ChatInMessage = new ChatInMessage
+				var media = await _unit.Media.GetByConditionAsync<Media>(query => query.Where(m => m.HashCode == value.HashCode));
+				if (media == null)
 				{
-					MessagesId = MessageId,
-					FromUser = FromUserId,
-				};
-
-				var Message = await _unit.Message.GetByIdAsync(MessageId);
-
-
-				if (item == null)
-				{
-					var newMedia = await _unit.Media.AddAsync(value);
-					ChatInMessage.Media = newMedia;
-					Message.Medias.Add(newMedia);
+					chat.Media = value;
 				}
 				else
 				{
-					ChatInMessage.MediaId = item.MediaId;
+					chat.MediaId = media.MediaId;
 				}
 
+				Message message;
+				if (chat.MessagesId == -1)
+				{
+					message = new Message
+					{
+						User1 = chat.FromUser,
+						User2 = chat.Otheruser
+					};
+					message.ChatInMessages.Add(chat);
+					var item = await _unit.Message.AddAsync(message);
+				}
+				else
+				{
+					var item = await _unit.ChatInMessage.AddAsync(chat);
+				}
 
-				var NewChatInMessage = await _unit.ChatInMessage.AddAsync(ChatInMessage);
+				var save = await _unit.CompleteAsync();
+				if (!save) return null;
 
-				var result = await _unit.CompleteAsync();
+				if (media != null)
+				{
+					chat.Media = media;
+				}
 
-				string type;
-				if (typeFile == 1 || typeFile == 2) type = "media";
-				else type = "file";
-				NewChatInMessage.Media.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{type}/{NewChatInMessage.Media.Src}";
+				string type = (typeFile == 1 || typeFile == 2) ? "media" : "file";
+				chat.Media.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{type}/{chat.Media.Src}";
 
-				if (result) return NewChatInMessage;
-				return null;
+				return chat;
+
 			}
 			catch (System.Exception ex)
 			{
@@ -97,8 +101,28 @@ namespace Backend.Services
 		{
 			try
 			{
-				var item = await _unit.ChatInMessage.AddAsync(mess);
-				await _unit.CompleteAsync();
+				ChatInMessage item;
+				if (mess.MessagesId == -1)
+				{
+					var message = new Message
+					{
+						User1 = mess.FromUser,
+						User2 = mess.Otheruser,
+					};
+					message.ChatInMessages.Add(mess);
+					var newMessage = await _unit.Message.AddAsync(message);
+					var result = await _unit.CompleteAsync();
+					if (!result) return null;
+
+					item = newMessage.ChatInMessages.FirstOrDefault();
+				}
+				else
+				{
+					item = await _unit.ChatInMessage.AddAsync(mess);
+					var result = await _unit.CompleteAsync();
+					if (!result) return null;
+				}
+
 				return item;
 			}
 			catch (System.Exception ex)
@@ -110,7 +134,7 @@ namespace Backend.Services
 
 		public async Task<bool> Delete(int id)
 		{
-			await _unit.ChatInMessage.DeleteAsync(c => c.ChatId == id);
+			await _unit.ChatInMessage.DeleteAsync(u => u.ChatId == id);
 			return await _unit.CompleteAsync();
 		}
 

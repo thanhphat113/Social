@@ -10,8 +10,8 @@ namespace Backend.Services.Interface
 	{
 		Task<ChatInMessage> UpdateNickName(int Id, int user1, string nn1, string nn2);
 		Task<Message> FindBy2User(int user1, int user2);
+		Task<bool> CheckUserInMessage(int MessageId, int UserId);
 		Task<ChatInMessage> UpdateTopic(int Id, int TopicId, int UserId);
 		Task<int> GetOtherUserIdInMessage(int MessageId, int UserId);
-
 	}
 }

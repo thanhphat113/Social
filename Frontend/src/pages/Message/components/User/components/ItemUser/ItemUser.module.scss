@@ -3,12 +3,28 @@
     flex-direction: column;
     padding: 1rem 1rem;
     gap: 1rem;
-    img {
-        width: 7rem;
-        height: 7rem;
-        border-radius: 50%;
-        border: 0.5px solid #333;
+    .zone {
+        position: relative;
+        img {
+            width: 7rem;
+            height: 7rem;
+            border-radius: 50%;
+            border: 0.5px solid #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        }
+        .isOnline {
+            position: absolute;
+            width: 2rem;
+            height: 2rem;
+            background-color: rgb(30, 191, 138);
+            border-radius: 50%;
+            right: 0.2rem;
+            border: 1.5px solid white;
+            // bottom: 0.2rem;
+        }
     }
+
+    
 
     .item {
         cursor: pointer;
@@ -28,7 +44,7 @@
             .lastmess {
                 display: flex;
                 width: 100%;
-                gap:8px;
+                gap: 8px;
                 p {
                     text-align: start;
                     width: 17rem;
@@ -44,18 +60,18 @@
                     display: flex;
                     justify-content: start;
                     align-items: center;
-                    flex:1;
+                    flex: 1;
                 }
             }
 
             .NotRead {
                 opacity: 1;
                 font-size: medium;
-				font-weight: bolder;
+                font-weight: bolder;
             }
         }
 
-        span {
+        .isRead {
             width: 1.5rem;
             height: 1.5rem;
             border-radius: 50%;

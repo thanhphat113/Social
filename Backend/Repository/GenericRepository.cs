@@ -21,7 +21,7 @@ namespace Backend.Repository
 
 		public async Task DeleteAsync(Expression<Func<T, bool>> predicate)
 		{
-			var item = _context.Set<T>().Where(predicate);
+			var item = await _context.Set<T>().Where(predicate).FirstOrDefaultAsync();
 			_context.Remove(item);
 		}
 
