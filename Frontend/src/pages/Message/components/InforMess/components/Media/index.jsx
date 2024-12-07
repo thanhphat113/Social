@@ -72,15 +72,26 @@ function Media() {
             <div className={styles.container}>
                 {medias.length > 0 &&
                     medias.map((item) => (
-                        <img
-                            onClick={() => setShow(item.mediaId)}
-                            key={item.mediaId}
-                            className={styles.source}
-                            src={`${item.src}`}
-                            alt="ảnh"
-                        ></img>
+                        item.mediaType === 1 ? (
+                            <img
+                                onClick={() => setShow(item.mediaId)}
+                                key={item.mediaId}
+                                className={styles.source}
+                                src={`${item.src}`}
+                                alt="ảnh"
+                            />
+                        ) : (
+                            <video
+                                onClick={() => setShow(item.mediaId)}
+                                key={item.mediaId}
+                                className={styles.source}
+                                src={`${item.src}`}
+                                alt="ảnh"
+                            />
+                        )
                     ))}
             </div>
+            {console.log(picture)}
             {picture && (
                 <div className={styles.showOnly}>
                     <div className={styles.action}>
@@ -97,11 +108,17 @@ function Media() {
                             className="fa-solid fa-x"
                         ></i>
                     </div>
-                    <img
+                    { picture.mediaType === 1 ? <img
                         ref={imgRef}
                         className={styles.item}
                         src={`${picture.src}`}
-                    ></img>
+                    />: <video
+                        ref={imgRef}
+                        className={styles.item}
+                        src={`${picture.src}`}
+                        controls
+                    />
+                    }
                 </div>
             )}
         </div>

@@ -5,7 +5,6 @@ public interface IUnitOfWork : IDisposable
 {
 	IGenericRepository<User> Users { get; }
 	IGenericRepository<ChatInMessage> ChatInMessage { get; }
-	IGenericRepository<GroupChat> GroupChat { get; }
 	IGenericRepository<HistorySearch> HistorySearch { get; }
 	IGenericRepository<Message> Message { get; }
 	IGenericRepository<MainTopic> MainTopic { get; }
@@ -14,8 +13,7 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<RequestNotification> RequestNotification { get; }
 	IGenericRepository<Relationship> Relationship { get; }
 	IGenericRepository<Media> Media { get; }
-
-	IGenericRepository<UserGroup> userGroup { get; }
+	IGenericRepository<UserGroup> UserGroup { get; }
 	IGenericRepository<Post> Post { get; }
 	IGenericRepository<Comment> Comment { get; }
 	IGenericRepository<ReactsComment> ReactsComment { get; }

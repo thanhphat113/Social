@@ -65,16 +65,27 @@ namespace Backend.Services
 			{
 				var item = await _unit.Message
 						.FindAsync(query => query.Where(m => m.MessagesId == MessageId)
-						.SelectMany(m => m.Medias)
-						.Where(p => p.MediaType == 1 ||
-						p.MediaType == 2));
+						.SelectMany(m => m.ChatInMessages)
+						.Where(m => m.MediaId != null)
+						.Include(m => m.Media)
+						.Where(cm => cm.Media.MediaType == 1 || cm.Media.MediaType == 2)
+						.Select(m => m.Media)
+						.GroupBy(m => m.MediaId)
+						.Select(group => group.First()));
+
 				if (type == "file")
 				{
 					item = await _unit.Message
 						.FindAsync(query => query.Where(m => m.MessagesId == MessageId)
-						.SelectMany(m => m.Medias)
-						.Where(p => p.MediaType == 3));
+						.SelectMany(m => m.ChatInMessages)
+						.Where(m => m.MediaId != null)
+						.Include(m => m.Media)
+						.Where(cm => cm.Media.MediaType == 3)
+						.Select(m => m.Media)
+						.GroupBy(m => m.MediaId)
+						.Select(group => group.First()));
 				}
+
 				foreach (var media in item)
 				{
 					if (media.MediaType == 3) media.Src = GetFullSrc(media.Src, "file");

@@ -38,23 +38,23 @@ const addMess = createAsyncThunk(
 
 const addMessWithMedia = createAsyncThunk(
     "message/chatwithmedia",
-    async ({ MessageId, file, fileType, friendId}, thunkAPI) => {
+    async ({ MessageId, file, fileType, friendId }, thunkAPI) => {
         try {
-            console.log(MessageId, file, fileType, friendId)
             const formData = new FormData();
 
-            formData.append("messageId", MessageId);
-            formData.append("file", file);
-            formData.append("fileType", fileType);
+            formData.append("MessageId", MessageId);
+            formData.append("File", file);
+            formData.append("FileType", fileType);
+            formData.append("Otheruser", friendId);
 
             const response = await axios.post(
                 `http://localhost:5164/api/ChatInMessage/chat-with-file`,
                 formData,
                 {
-                     withCredentials: true 
+                    withCredentials: true,
                 }
             );
-            return {friendId:friendId, message:response.data}
+            return { friendId: friendId, message: response.data };
         } catch (error) {
             return thunkAPI.rejectWithValue(
                 error.response ? error.response.data : error.message
@@ -68,13 +68,13 @@ const recallMess = createAsyncThunk(
     async ({ id, Otheruser }, thunkAPI) => {
         console.log("đây là: " + id);
         try {
-            const response = await axios.post(
+            const response = await axios.put(
                 `http://localhost:5164/api/ChatInMessage/recall`,
-                id,
                 {
-                    headers: { "Content-Type": "application/json" },
-                    withCredentials: true,
-                }
+                    ChatId: id, 
+                    OtherId: Otheruser
+                },
+                {withCredentials: true}
             );
 
             return { isRecall: response.data, friendId: Otheruser, chatId: id };
@@ -92,8 +92,11 @@ const deleteMess = createAsyncThunk(
     async ({ id, Otheruser }, thunkAPI) => {
         try {
             const response = await axios.delete(
-                `http://localhost:5164/api/ChatInMessage/${id}`,
-                { withCredentials: true }
+                `http://localhost:5164/api/ChatInMessage`,
+                {
+                    params: { id: id, OtherId: Otheruser },
+                    withCredentials: true,
+                }
             );
 
             return { isDelete: response.data, friendId: Otheruser, chatId: id };

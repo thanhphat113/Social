@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
@@ -18,7 +18,6 @@ public partial class SocialMediaContext : DbContext
     }
 
 
-    public virtual DbSet<ChatInGroup> ChatInGroups { get; set; }
 
     public virtual DbSet<GenderType> Genders { get; set; }
 
@@ -26,8 +25,6 @@ public partial class SocialMediaContext : DbContext
 
     public virtual DbSet<Comment> Comments { get; set; }
 
-
-    public virtual DbSet<GroupChat> GroupChats { get; set; }
 
     public virtual DbSet<HistorySearch> HistorySearches { get; set; }
 
@@ -79,55 +76,7 @@ public partial class SocialMediaContext : DbContext
             .UseCollation("utf8mb4_general_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<ChatInGroup>(entity =>
-        {
-            entity.HasKey(e => e.ChatId).HasName("PRIMARY");
 
-            entity.ToTable("chat_in_group");
-
-            entity.HasIndex(e => e.GroupChatId, "fk_chat_in_group_group_chat_id");
-
-            entity.HasIndex(e => e.FromUser, "fk_chat_in_group_user_id");
-
-            entity.Property(e => e.ChatId)
-                .HasColumnType("int(11)")
-                .HasColumnName("chat_id");
-            entity.Property(e => e.Content)
-                .HasColumnType("text")
-                .HasColumnName("content");
-            entity.Property(e => e.DateCreated)
-                .HasDefaultValueSql("current_timestamp()")
-                .HasColumnType("timestamp")
-                .HasColumnName("date_created");
-            entity.Property(e => e.FromUser)
-                .HasColumnType("int(11)")
-                .HasColumnName("from_user");
-            entity.Property(e => e.IsRead)
-                .HasColumnName("is_read")
-                .HasColumnType("tinyint(1)");
-            entity.Property(e => e.MediaId)
-                .HasColumnName("media_id")
-                .HasColumnType("int(11)");
-            entity.Property(e => e.IsRecall)
-                .HasColumnName("is_recall")
-                .HasColumnType("tinyint(1)");
-            entity.Property(e => e.GroupChatId)
-                .HasColumnType("int(11)")
-                .HasColumnName("group_chat_id");
-
-            entity.HasOne(d => d.FromUserNavigation).WithMany(p => p.ChatInGroups)
-                .HasForeignKey(d => d.FromUser)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_group_user");
-
-            entity.HasOne(d => d.Media).WithMany(p => p.ChatInGroup)
-                .HasForeignKey(d => d.MediaId)
-                .HasConstraintName("fk_chatInGroup_media");
-
-            entity.HasOne(d => d.GroupChat).WithMany(p => p.ChatInGroups)
-                .HasForeignKey(d => d.GroupChatId)
-                .HasConstraintName("fk_chat_in_group_group_chat_id");
-        });
 
         modelBuilder.Entity<ChatInMessage>(entity =>
         {
@@ -232,33 +181,6 @@ public partial class SocialMediaContext : DbContext
         });
 
 
-        modelBuilder.Entity<GroupChat>(entity =>
-        {
-            entity.HasKey(e => e.GroupChatId).HasName("PRIMARY");
-
-            entity.ToTable("group_chats");
-
-            entity.HasIndex(e => e.MainTopic, "fk_topic_group");
-
-            entity.Property(e => e.GroupChatId)
-                .HasColumnType("int(11)")
-                .HasColumnName("group_chat_id");
-            entity.Property(e => e.CoverPhoto)
-                .HasMaxLength(255)
-                .HasColumnName("cover_photo");
-            entity.Property(e => e.GroupChatName)
-                .HasMaxLength(255)
-                .HasColumnName("group_chat_name");
-            entity.Property(e => e.MainTopic)
-                .HasDefaultValueSql("'1'")
-                .HasColumnType("int(11)")
-                .HasColumnName("main_topic");
-
-            entity.HasOne(d => d.MainTopicNavigation).WithMany(p => p.GroupChats)
-                .HasForeignKey(d => d.MainTopic)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_topic_group");
-        });
 
         modelBuilder.Entity<HistorySearch>(entity =>
         {
@@ -812,37 +734,12 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.GenderId)
                 .HasColumnType("int(1)")
                 .HasColumnName("gender_id");
-            entity.Property(e => e.IsOnline)
-                .HasColumnType("tinyint(1)")
-                .HasColumnName("is_online");
 
             entity.HasOne(d => d.Gender).WithMany(g => g.Users)
                 .HasForeignKey(d => d.GenderId)
                 .HasConstraintName("fk_gender");
 
-            entity.HasMany(d => d.GroupChats).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserInGroupChat",
-                    r => r.HasOne<GroupChat>().WithMany()
-                        .HasForeignKey("GroupChatId")
-                        .HasConstraintName("fk_user_in_group_chat_group_chat_id"),
-                    l => l.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_user_in_group_chat_user_id"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "GroupChatId")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("user_in_group_chat");
-                        j.HasIndex(new[] { "GroupChatId" }, "fk_user_in_group_chat_group_chat_id");
-                        j.IndexerProperty<int>("UserId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("user_id");
-                        j.IndexerProperty<int>("GroupChatId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("group_chat_id");
-                    });
+
         });
 
         modelBuilder.Entity<UserGroup>(entity =>

@@ -13,16 +13,19 @@ import {
     addMessWithMedia,
 } from "../../../../components/Redux/Actions/MessageActions";
 import Validate from "../../../../components/Validate";
+import axios from "axios";
+import { messageContext } from "../../../../components/Layouts/DefaultLayout";
 
 function DetailMessage({ onShow }) {
+    const { setRequest } = useContext(messageContext);
     const friends = useSelector((state) => state.friends.allFriends);
     const userid = useSelector((state) => state.user.information.userId);
     const currentFriendId = useSelector((state) => state.message.currentUserId);
 
-
     const mainTopic = useSelector(
         (state) => state.message.currentMessage?.mainTopicNavigation
     );
+
     const { user1, nickName1, nickName2 } = useSelector(
         (state) => state.message.currentMessage
     );
@@ -46,7 +49,6 @@ function DetailMessage({ onShow }) {
         (u) => u.userId === currentFriendId
     );
 
-
     useEffect(() => {
         getMessage();
         scrollPosition.current = 0;
@@ -68,15 +70,28 @@ function DetailMessage({ onShow }) {
         }
     }, [friends]);
 
-    const handleCall = () => {
-        window.open("/call", "_blank", "width=400,height=600");
+    const handleCall = async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5164/api/Message/call-user`,
+                {
+                    withCredentials: true,
+                    params: {
+                        FriendId: currentFriendId,
+                    },
+                }
+            );
+            setRequest(response.data);
+        } catch (error) {
+            console.log("Lỗi", error);
+        }
     };
 
     const toggleListVisibility = () => {
         scrollPosition.current = listRef.current.scrollTop;
     };
 
-    const messageId = InforCurrentFriend?.chatInMessages[0].messagesId || -1;
+    const messageId = InforCurrentFriend?.chatInMessages[0]?.messagesId || -1;
 
     const message = InforCurrentFriend?.chatInMessages;
 
@@ -239,14 +254,11 @@ function DetailMessage({ onShow }) {
                         color: mainTopic?.color,
                     }}
                 >
-                    <CustomTooltip title="Gọi">
+                    <CustomTooltip title="Gọi video">
                         <i
                             onClick={() => handleCall()}
-                            className="fa-solid fa-phone"
+                            className="fa-solid fa-video"
                         ></i>
-                    </CustomTooltip>
-                    <CustomTooltip title="Gọi video">
-                        <i className="fa-solid fa-video"></i>
                     </CustomTooltip>
                     <CustomTooltip title="Xem thông tin">
                         <i
@@ -338,10 +350,11 @@ function DetailMessage({ onShow }) {
                                         <div
                                             className={clsx(styles.mess)}
                                             style={{
-                                                backgroundColor:
-                                                    userid === mess.fromUser &&
-                                                    mainTopic &&
-                                                    mainTopic.color,
+                                                background: mess.mediaId
+                                                    ? `none`
+                                                    : userid ===
+                                                          mess.fromUser &&
+                                                      mainTopic?.color,
                                             }}
                                         >
                                             {mess.media && !mess.isRecall ? (
@@ -375,7 +388,10 @@ function DetailMessage({ onShow }) {
                                                 >
                                                     {!mess.isRecall
                                                         ? mess.content
-                                                        : "Bạn đã thu hồi tin nhắn"}
+                                                        : mess.fromUser ===
+                                                          userid
+                                                        ? "Bạn đã thu hồi tin nhắn"
+                                                        : "Tin nhắn đã bị thu hồi"}
                                                 </p>
                                             )}
                                         </div>

@@ -24,18 +24,8 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-/*builder.Services.AddDbContext<SocialMediaContext>(options =>
-    options.UseLazyLoadingProxies()
-        .EnableSensitiveDataLogging() // Bật logging nhạy cảm
-        .LogTo(Console.WriteLine, LogLevel.Information)
-        .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-);*/
-
 builder.Services.AddDbContext<SocialMediaContext>(options =>
-        options.EnableSensitiveDataLogging() // Bật logging nhạy cảm
-            .LogTo(Console.WriteLine, LogLevel.Information)
-            .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-    // Loại bỏ UseLazyLoadingProxies()
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
 
 // Add services to the container.
@@ -53,7 +43,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IChatInMessService, ChatInMessageService>();
 builder.Services.AddScoped<RequestNotiService>();
@@ -65,11 +55,11 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MainTopicService>();
 
-builder.Services.AddScoped<GroupService>();
+// builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
-builder.Services.AddScoped<GroupChatService>();
+//builder.Services.AddScoped<GroupChatService>();
 builder.Services.AddScoped<ReactPostService>();
 
 //Post
@@ -78,7 +68,7 @@ builder.Services.AddScoped< IPostService, PostService>();
 
 
 //Comment
-builder.Services.AddScoped<ICommentService, CommentService>();
+//builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
