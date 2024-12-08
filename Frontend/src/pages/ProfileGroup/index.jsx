@@ -59,7 +59,7 @@ function ProfileGroup() {
                 </div>
                 <div className={clsx(styles.content)}>
                     <div className={clsx(styles.wrapper)}>
-                    <PostInput />
+                    <PostInput groupId={groupId}/>
                     <PostList     style={{
                                         width: "100%",
                                     }}               groupId={groupId}

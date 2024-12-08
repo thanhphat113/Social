@@ -5,7 +5,7 @@ import Post from './Post.jsx';
 import { useSelector } from "react-redux";
 
 
-function PostInput() {
+function PostInput({groupId}) {
 
   const user = useSelector((state) => state.user.information);
 
@@ -65,7 +65,7 @@ function PostInput() {
       {showPost && (
         <div className={styles.overlay}>
           <div className={styles.postWrapper}>
-            <Post onClose={handleClosePost} postImage={showPostWithImage}/>
+            <Post onClose={handleClosePost} postImage={showPostWithImage} groupId={groupId}/>
           </div>
         </div>
       )}

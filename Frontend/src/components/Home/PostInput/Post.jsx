@@ -5,7 +5,7 @@ import { FaPhotoVideo } from "react-icons/fa";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const Post = ({ onClose }) => {
+const Post = ({ onClose, groupId }) => {
   const [text, setText] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
@@ -37,46 +37,50 @@ const Post = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    
-
+  
     const formData = new FormData();
     formData.append("Content", text);
-
+  
+    // Thêm groupId nếu tồn tại
+    if (groupId) {
+      formData.append("GroupId", groupId);
+    }
+  
     // Kiểm tra xem có tệp nào không
     if (files.length > 0) {
-        files.forEach((file) => {
-            formData.append("files", file);
-        });
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
     } else {
       if (text.trim() === "Bạn đang nghĩ gì thế?" || text.trim() === "") {
         alert("Vui lòng nhập nội dung.");
         return;
       }
     }
-
+  
     try {
-        const response = await axios.post(
-            files.length > 0
-                ? "http://localhost:5164/api/Post/WithMedia"
-                : "http://localhost:5164/api/Post",
-            formData,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-                withCredentials: true,
-            }
-        );
-        console.log("Post created:", response.data);
-        alert("Bài viết đã được đăng thành công!");
-        setText("Bạn đang nghĩ gì thế?");
-        setFiles([]);
-        setPreviews([]);
-        onClose();
+      const response = await axios.post(
+        files.length > 0
+          ? "http://localhost:5164/api/Post/WithMedia"
+          : "http://localhost:5164/api/Post",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+      console.log("Post created:", response.data);
+      alert("Bài viết đã được đăng thành công!");
+      setText("Bạn đang nghĩ gì thế?");
+      setFiles([]);
+      setPreviews([]);
+      onClose();
     } catch (error) {
-        console.error("Error creating post:", error);
-        alert("Có lỗi xảy ra khi đăng bài.");
+      console.error("Error creating post:", error);
+      alert("Có lỗi xảy ra khi đăng bài.");
     }
   };
+  
 
   const handleFocus = () => {
     if (text === "Bạn đang nghĩ gì thế?") setText("");

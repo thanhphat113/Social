@@ -10,7 +10,7 @@ import { SetUser } from "../../../../../../../Redux/Actions/UserAction";
 function AccountIcon(props) {
     const { handleClick } = useContext(typeContext);
     const user = useSelector((state) => state.user.information);
-    const profilePicture = useSelector((state) => state.user.profilePicture);
+    const profilePicture = useSelector((state) => state.user.information?.profilePicture);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 

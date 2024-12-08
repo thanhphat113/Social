@@ -70,12 +70,7 @@ function GroupInfo() {
           >
             Danh sách thành viên
           </li>
-          <li
-            className={clsx({ [styles.active]: selectedTab === 'Join Requests' })}
-            onClick={() => handleSelectTab('Join Requests')}
-          >
-            Yêu cầu tham gia
-          </li>
+
           <li
             className={clsx({ [styles.active]: selectedTab === 'Edit Group Info' })}
             onClick={() => handleSelectTab('Edit Group Info')}
