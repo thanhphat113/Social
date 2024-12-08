@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Backend.Models;
 
@@ -27,11 +26,11 @@ public partial class Post
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-    public virtual User CreatedByUser { get; set; } = null!;
+    public virtual User? CreatedByUser { get; set; } = null!;
 
     public virtual UserGroup? Group { get; set; }
 
-    public virtual ICollection<Media> Medias { get; set; }
+    public virtual ICollection<Media>? Medias { get; set; } = new List<Media>();
 
     public virtual ICollection<PostNotification> PostNotifications { get; set; } = new List<PostNotification>();
 

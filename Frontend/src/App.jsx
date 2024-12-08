@@ -16,6 +16,7 @@ import Authentication from "./components/Authentication";
 import { SetUser } from "./components/Redux/Actions/UserAction";
 // import Call from "./Pages/Call";
 import LoadingPage from "./pages/Loading/index.jsx";
+import Group from "./pages/Group/index.jsx";
 // import { connectSignalR } from "./components/Redux/Actions/ConnectSignalR.jsx";
 
 function App() {
@@ -48,31 +49,33 @@ function App() {
                         </Authentication>
                     }
                 />
-                {/* <Route
-                    path="/call"
-                    element={
-                        <Authentication>
-                            <Call />
-                        </Authentication>
-                    }
-                /> */}
-                {/* <Route
-                    path="/"
+                <Route
+                    path="/home"
                     element={
                         <Authentication>
                             <Home />
                         </Authentication>
                     }
+<<<<<<< HEAD
                 />*/}
                  <Route
+=======
+                />
+                <Route
+>>>>>>> origin/main
                     path="/group"
                     element={
                         <Authentication>
                             <Group/>
                         </Authentication>
                     }
+<<<<<<< HEAD
                 /> 
                 {/* <Route
+=======
+                />
+                <Route
+>>>>>>> origin/main
                     path="/:userId"
                     element={
                         <Authentication>
@@ -95,7 +98,12 @@ function App() {
                             <Information />
                         </Authentication>
                     }
+<<<<<<< HEAD
                 /> */}
+=======
+                />
+                <Route path="/login" element={<Login />} />
+>>>>>>> origin/main
                 {/* <Route
                     path="/new-group"
                     element={

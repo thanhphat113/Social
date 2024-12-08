@@ -1,5 +1,6 @@
-
-import  { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useState } from "react";
+import axios from "axios";
 import styles from "./creategroup.module.scss";
 import { useNavigate } from 'react-router-dom';
 
@@ -8,9 +9,43 @@ import { useNavigate } from 'react-router-dom';
 function CreateGroup({ onCancel }){
   const [groupName, setGroupName] = useState('');
   const [privacy, setPrivacy] = useState('Công khai');
+  const [groupCreated, setGroupCreated] = useState(false);  // Trạng thái tạo nhóm
+  const [error, setError] = useState(null);  // Trạng thái lỗi
+
+  // useEffect theo dõi sự thay đổi của groupCreated
+  useEffect(() => {
+    if (groupCreated) {
+      const createGroup = async () => {
+        // const data = {
+        //   name: groupName,
+        //   description: bio
+        // };
+        try {
+          const response = await axios.post('http://localhost:5164/api/Group1', 
+            {
+              params: { name: groupName },
+              withCredentials: true,
+            });
+          console.log(response.data);
+          const result = await response.json();
+
+          if (response.ok) {
+            alert("Nhóm đã được tạo thành công!");
+          } else {
+            setError(result.message || 'Có lỗi xảy ra khi tạo nhóm.');
+          }
+        } catch (err) {
+          setError('Lỗi kết nối với server.');
+        }
+      };
+
+      createGroup();  // Gọi hàm tạo nhóm
+    }
+  }, [groupCreated]);  // useEffect sẽ chạy mỗi khi groupCreated thay đổi
 
   const handleCreateGroup = () => {
     console.log('Tạo nhóm:', groupName, 'Quyền riêng tư:', privacy);
+    setGroupCreated(true);
   };
 
   const navigate = useNavigate();
