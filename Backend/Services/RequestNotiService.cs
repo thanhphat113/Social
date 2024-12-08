@@ -46,12 +46,22 @@ namespace Backend.Services
 			}
 		}
 
-		public Task<RequestNotification> Add(RequestNotification product)
-		{
-			throw new NotImplementedException();
-		}
+        //tao moi 1 request
+        public async Task<RequestNotification> Add(RequestNotification req)
+        {
+            try
+            {
+                var result =  await _unit.RequestNotification.AddAsync(req);
+                await _unit.CompleteAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to add request notification.", ex);
+            }
+        }
 
-		public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id)
 		{
 			try
 			{

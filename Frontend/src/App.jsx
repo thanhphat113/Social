@@ -17,6 +17,7 @@ import { SetUser } from "./components/Redux/Actions/UserAction";
 import LoadingPage from "./pages/Loading/index.jsx";
 import Group from "./pages/Group/index.jsx";
 // import { connectSignalR } from "./components/Redux/Actions/ConnectSignalR.jsx";
+import GroupInfo from "./pages/Information/infoGroup.jsx";
 
 function App() {
     const dispatch = useDispatch();
@@ -49,7 +50,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/home"
+                    path="/"
                     element={
                         <Authentication>
                             <Home />
@@ -65,7 +66,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/:userId"
+                    path="/profile/:userId"
                     element={
                         <Authentication>
                             <Profile/>
@@ -88,6 +89,16 @@ function App() {
                         </Authentication>
                     }
                 />
+
+                <Route
+                    path="/GroupInfo"
+                    element={
+                        <Authentication>
+                            <GroupInfo />
+                        </Authentication>
+                    }
+                />
+
                 <Route path="/login" element={<Login />} />
                 {/* <Route
                     path="/new-group"

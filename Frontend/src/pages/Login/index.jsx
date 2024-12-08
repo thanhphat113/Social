@@ -35,7 +35,7 @@ function Login () {
         
       console.log('Đăng nhập thành công đã xác định fullfilled:', actionResult.payload);
       await dispatch(SetUser());
-          navigate('/information');
+          navigate('/');
       } else {
           console.error('Đăng nhập thất bại:', actionResult.error?.message || 'Không rõ nguyên nhân');
       }

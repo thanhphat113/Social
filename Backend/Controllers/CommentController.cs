@@ -145,7 +145,7 @@ public class CommentController : ControllerBase
     public async Task<bool> GetLikesUser([FromQuery]int commentId)
     {
         var userId = MiddleWare.GetUserIdFromCookie(Request);
-        Console.WriteLine("User id trong userlikecomment" + userId);
+        Console.WriteLine("User id trong userlikecomment: " + userId);
         if (userId <= 0)
         {
             return false;

@@ -43,7 +43,11 @@ body {
     margin-bottom: 1rem;
     align-items: center;
     justify-content: space-between;
-
+    .avatarAndInfo {
+        display: flex;
+        align-items: center;
+        flex-grow: 1; // Cho phép phần này chiếm không gian còn lại
+    }
     .avatar {
         width: 5rem;
         height: 5rem;

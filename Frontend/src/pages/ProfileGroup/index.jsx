@@ -7,68 +7,15 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getGroupProfile } from '../../components/Redux/Actions/ProfileAction';
-import { clearProfile } from '../../components/Redux/Slices/ProfileSlice';
+import { clearProfile, updateGroupInfo } from '../../components/Redux/Slices/ProfileSlice';
+import PostList from "../../components/Home/PostList";
+
+import PostInput from '../../components/Home/PostInput/PostInput.jsx';
 
 
 
 const group = {
-    groupName:'Fanclub Bích Phương',
-    totalMembers:250,
-    members:[{
-        username:'Negav',
-        chungFriends:5,
-        profilePicture:null,
-        location:'HCM'
-    },
-    {
-        username:'Hieuthuhai',
-        chungFriends:10,
-        profilePicture:null,
-        location:'Bình Dương'
-    },
-    {
-        username:'Hurrykang',
-        chungFriends:6,
-        profilePicture:null,
-        location:'An Giang'
-    },
-    {
-        username:'Anh Tú Atus',
-        chungFriends:3,
-        location:'An Giang',
-        profilePicture:null,
-    },
-    {
-        username:'Erik',
-        chungFriends:8,
-        profilePicture:null,
-        location:'HCM'
-    },
-    {
-        username:'Pháp Kiều',
-        chungFriends:10,
-        profilePicture:null,
-        location:'HCM'
-    },],
-    isPublic:true,
-    dateUpdated:'Nov 27, 2019',
-    coverPhoto:null,
-    totalPhotos:4,
-    photos:[
-        {
-            photo:null,
-        },
-        {
-            photo:null,
-        },
-        {
-            photo:null,
-        },
-        {
-            photo:null,
-        },
 
-    ]
 }
 
 function ProfileGroup() {
@@ -77,10 +24,19 @@ function ProfileGroup() {
     const {profile, loading, error} = useSelector((state)=>state.profile)
     useEffect(()=>{
         dispatch(getGroupProfile(groupId))
+
         return ()=>{
             dispatch(clearProfile())
         }
     },[dispatch,groupId])
+
+    useEffect(() => {
+        if (profile) {
+            dispatch(updateGroupInfo(profile));
+        }
+    }, [profile, dispatch]);
+
+
     let data = {
         name: group.groupName,
         totalConnections: group.totalMembers,
@@ -103,8 +59,11 @@ function ProfileGroup() {
                 </div>
                 <div className={clsx(styles.content)}>
                     <div className={clsx(styles.wrapper)}>
-                        {/* Chỗ nhét bài viết */}
-                        content
+                    <PostInput groupId={groupId}/>
+                    <PostList     style={{
+                                        width: "100%",
+                                    }}               groupId={groupId}
+                                    />
                     </div>
                 </div>
                 

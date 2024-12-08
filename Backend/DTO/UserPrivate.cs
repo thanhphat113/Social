@@ -14,12 +14,20 @@ public partial class UserPrivate
 
 	public string LastName { get; set; } = null!;
 
+    public string? Bio { get; set; }
 
-	public virtual Media? ProfilePicture { get; set; } = null;
+    public string? Location { get; set; }
 
-	public int? GenderId { get; set; }
+    public virtual Media? ProfilePicture { get; set; } = null;
+
+	public virtual Media? CoverPicture { get; set; } = null;
+
+    public int? GenderId { get; set; }
 
 	public bool? IsOnline { get; set; } = false;
-	public virtual ICollection<ChatInMessage> ChatInMessages { get; set; } = new List<ChatInMessage>();
+
+    public DateTime DateCreated { get; set; }
+
+    public virtual ICollection<ChatInMessage> ChatInMessages { get; set; } = new List<ChatInMessage>();
 
 }

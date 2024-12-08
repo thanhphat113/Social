@@ -8,6 +8,7 @@ const initialState = {
   loading: false,
   isUser:false,
   isGroup:false,
+  groupInfo: null,
 };
 
 const profileSlice = createSlice({
@@ -19,6 +20,9 @@ const profileSlice = createSlice({
       state.isUser = false;
       state.isGroup = false;
     },
+    updateGroupInfo: (state, action) => {
+      state.groupInfo = action.payload;
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -54,6 +58,6 @@ const profileSlice = createSlice({
   },
 });
 
-export const { clearProfile } = profileSlice.actions;
+export const { clearProfile, updateGroupInfo  } = profileSlice.actions;
 
 export default profileSlice.reducer;

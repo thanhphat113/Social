@@ -7,6 +7,8 @@ import PostInput from '../../components/Home/PostInput/PostInput.jsx';
 import styles from './Home.module.scss';
 
 function Home() {
+
+
   return (
     <>
       <div className={styles.homeContainer}>
@@ -15,11 +17,12 @@ function Home() {
         </div>
         <div className={styles.mainBar}>
           <PostInput />
-          <PostList />
+          <PostList 
+          />
         </div>
-        <div className={styles.rightBar}>
+        {/* <div className={styles.rightBar}>
           <RightBar />
-        </div>
+        </div> */}
       </div>
     </>
   )

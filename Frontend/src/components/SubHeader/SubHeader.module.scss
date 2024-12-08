@@ -128,7 +128,7 @@
             align-items: flex-end;
             .editButton{
                 padding:15px 20px;
-                margin:20px;
+                margin-right:7px;
                 border-radius:10px;
             }
         }
@@ -189,5 +189,15 @@
     }
     .avatarHolder{
         width: 120px!important;
+    }
+}
+
+.unfriendButton {
+    margin-left: 10px;
+    background-color: #f44336; // Màu đỏ để biểu thị hành động xóa
+    color: white;
+
+    &:hover {
+        background-color: #d32f2f; // Màu đỏ đậm khi hover
     }
 }

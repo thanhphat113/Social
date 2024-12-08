@@ -1,4 +1,5 @@
 import { axiosInstance } from '~/utils/axiosInstance';
+import axios from 'axios';
 
 ///////////////// Auth API ///////////////////
 
@@ -33,14 +34,24 @@ export const fetchGroupInfo = async (groupId) => {
 };
 
 
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userData) => {
   try {
     const response = await axiosInstance.put(`/api/User/`, userData);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
+export const changePassword = async (passwordData) => {
+  try {
+    const response = await axiosInstance.put(`/api/User/change-password`, passwordData);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 }
+
 
 
 export const getLikeUser = async (postId) => {
@@ -74,5 +85,93 @@ export const UnlikePost = async (postId) => {
     return response;
   } catch (error) {
     throw error.response.data;
+  }
+}
+
+
+
+export const sendFriendRequest = async (toUserId) => {
+  try {
+    const response = await axios.post(
+      `https://localhost:7294/api/Relationship/request`,
+      { ToUserId: toUserId }, 
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error sending friend request:", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const checkExistRelationship = async (toUserId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Relationship/check-exist/${toUserId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking relationship:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const checkUserInGroup = async (GroupId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Group/check-user-in-group/${GroupId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking relationship:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const sendJoinGroupRequest = async (GroupId) => {
+  try {
+    const response = await axiosInstance.post(`/api/Group/request-join/${GroupId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending join group request:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const acceptUserInGroup = async (GroupId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Group/accept-join/${GroupId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking relationship:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const unfriend = async (toUserId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Relationship/unfriend/${toUserId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error unfriending:", error);
+    throw error.response?.data || error.message;
   }
 }

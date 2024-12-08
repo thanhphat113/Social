@@ -6,9 +6,10 @@
   import { useSelector } from "react-redux";
   import { useEffect } from 'react';
   import * as Yup from 'yup';
-  import { updateUser,  } from '../../apis';
   import { updateIsRead } from '../../components/Redux/Actions/UserAction';
   import { useDispatch } from 'react-redux';
+  import { updateUser, changePassword } from '~/apis/index';
+  
 
   // import { Password } from '@mui/icons-material';
 
@@ -50,7 +51,7 @@
       if (editedUserInfo) {
         updateUser(editedUserInfo) // Giả sử `currentUser` có `id`
           .then((response) => {
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 204) {
               alert('User information updated successfully!');
               setIsChanged(false);
             } else {
@@ -114,25 +115,25 @@
     return (
       <div className={clsx(styles.container)}>
         <div className={clsx(styles.leftContent)}>
-          <h1>Information</h1>
+          <h1>Thông tin</h1>
           <ul className={clsx(styles.infoList)}>
             <li
               className={clsx({ [styles.selected]: selectedContent === 'User information' })}
               onClick={() => handleSelectContent('User information')}
             >
-              User information
+              Thông tin cá nhân
             </li>
             <li
               className={clsx({ [styles.selected]: selectedContent === 'Notification' })}
               onClick={() => handleSelectContent('Notification')}
             >
-              Notification
+              Thông báo
             </li>
             <li
               className={clsx({ [styles.selected]: selectedContent === 'Friends' })}
               onClick={() => handleSelectContent('Friends')}
             >
-              Friends
+              Bạn bè
             </li>
           </ul>
         </div>
@@ -140,10 +141,10 @@
         <div className={clsx(styles.rightContent)}>
           {selectedContent === 'User information' && (
             <div className={clsx(styles.basicInfo)}>
-              <h1>User information</h1>
+              <h1>Thông tin người dùng</h1>
               <div className={clsx(styles.username)}>
                 <div className={clsx(styles.firstName)}>
-                  <label htmlFor="firstName">First name:</label>
+                  <label htmlFor="firstName">Họ:</label>
                   <input
                     type="text"
                     id="firstName"
@@ -155,7 +156,7 @@
                   />
                 </div>
                 <div className={clsx(styles.lastName)}>
-                  <label htmlFor="lastName">Last name:</label>
+                  <label htmlFor="lastName">Tên:</label>
                   <input
                     type="text"
                     id="lastName"
@@ -180,7 +181,7 @@
                 />
               </div>
               <div className={clsx(styles.bio)}>
-                <label htmlFor="bio">Description:</label>
+                <label htmlFor="bio">Mô tả:</label>
                 <textarea
                   id="bio"
                   name="bio"
@@ -193,11 +194,11 @@
               
               <div className={clsx(styles.buttonContainer)}>
                 <Button size="large" className={clsx(styles.registerButton)} onClick={handleChangePasswordClick}>
-                  Change password
+                  Đổi mật khẩu
                 </Button>
                 {isChanged && (
                   <Button size="large" className={clsx(styles.saveButton)} onClick={handleSaveChanges}>
-                    Save Changes
+                    Lưu
                   </Button>
                 )}
               </div>
@@ -250,7 +251,7 @@
                           <ErrorMessage name="confirmPassword" component="div" className={clsx(styles.errorMessage)} />
                         </div>
                         <div className={clsx(styles.formActions)}>
-                          <Button type="submit" className={clsx(styles.changePasswordButton)}>Change</Button>
+                          <Button type="submit" className={clsx(styles.changePasswordButton)}>Thay đổi</Button>
                         </div>
                       </Form>
                     </Formik>
@@ -262,7 +263,7 @@
 
             {selectedContent === 'Notification' && (
               <div className={clsx(styles.notificationContent)}>
-                <h1>Notification</h1>
+                <h1>Thông báo</h1>
                 <ul className={clsx(styles.notificationList)}>
                   {[...postNotifications, ...reqNotifications].map((notification, index) => (
                     <li
@@ -288,7 +289,7 @@
 
           {selectedContent === 'Friends' && (
             <div className={clsx(styles.friendContent)}>
-              <h1>Friends</h1>
+              <h1>Bạn bè</h1>
               <div className={clsx(styles.friendsGrid)}>
                 {currentUserFriends && currentUserFriends.length > 0 ? (
                   currentUserFriends.map((friend) => (
@@ -303,7 +304,7 @@
                   ))
                 ) : (
                   <div>
-                  <p>No friends found.</p>
+                  <p>Chưa có bạn bè.</p>
                   </div>
                 )}
               </div>

@@ -1,5 +1,4 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchGroupInfo } from '../../../apis';
 import axios from "axios";
 
 

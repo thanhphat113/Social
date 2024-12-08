@@ -10,7 +10,7 @@ import { SetUser } from "../../../../../../../Redux/Actions/UserAction";
 function AccountIcon(props) {
     const { handleClick } = useContext(typeContext);
     const user = useSelector((state) => state.user.information);
-    const profilePicture = useSelector((state) => state.user.profilePicture);
+    const profilePicture = useSelector((state) => state.user.information?.profilePicture);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -43,7 +43,7 @@ function AccountIcon(props) {
             {props.isActive && (
                 <div className={styles.content}>
                     <Link
-                        to={`/${user.userId}`}
+                        to={`/profile/${user.userId}`}
                         onClick={() => handleClick("profile")}
                     >
                         <div className={styles.account}>
@@ -63,7 +63,7 @@ function AccountIcon(props) {
                         </div>
                     </Link>
                     <Link
-                        to={`/information/${user.userId}`}
+                        to={`/information`}
                         onClick={() => handleClick("profile")}
                     >
                         <div className={styles.choise}>

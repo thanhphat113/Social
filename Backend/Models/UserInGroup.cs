@@ -9,7 +9,7 @@ public partial class UserInGroup
 
     public int GroupId { get; set; }
 
-    public DateTime DateIn { get; set; }
+    public DateTime? DateIn { get; set; }
 
     public virtual UserGroup Group { get; set; } = null!;
 

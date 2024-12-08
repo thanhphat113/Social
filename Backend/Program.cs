@@ -55,7 +55,8 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MainTopicService>();
 
-// builder.Services.AddScoped<GroupService>();
+builder.Services.AddScoped<GroupService>();
+
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
@@ -68,7 +69,7 @@ builder.Services.AddScoped< IPostService, PostService>();
 
 
 //Comment
-//builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -77,7 +78,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
 
-// builder.Services.AddScoped<PostService>();
+ //builder.Services.AddScoped<PostService>();
 
 
 builder.Services.AddCors(options =>
@@ -153,7 +154,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseRouting();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 
 

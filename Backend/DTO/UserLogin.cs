@@ -22,6 +22,8 @@ public partial class UserLogin
 
 	public Media? ProfilePicture { get; set; } = null;
 
+	public  Media? CoverPicture { get; set; } = null;
+
 	public int? GenderId { get; set; }
 
 	public bool? IsOnline { get; set; } = false;

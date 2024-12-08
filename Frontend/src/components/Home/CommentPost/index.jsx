@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './CommentPost.Module.scss';
 import { FaCloud, FaRegComment, FaRegShareSquare, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import axios from 'axios'; // Import axios
 import {getLikeUser, getLikeCount, LikePost, UnlikePost} from './../../../apis/index';
 import { IoIosMore } from "react-icons/io";
-
+import { useSelector } from "react-redux";
 
 
 const CommentPost = ({
@@ -19,25 +19,191 @@ const CommentPost = ({
     handleNextImage,
     avatar,
     commentCounts,
-    currentUser
+    currentUser,
+    urlProfile
 }) => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [commentCount, setCommentCount] = useState(0); // Thêm state để theo dõi số lần gửi bình luận
     const [likesUser , setLikesUser ] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
-    const [likeCommentCount, setLikeCommentCount] = useState(0);
     const [likedComments, setLikedComments] = useState({});
     const [commentLikeStatus, setCommentLikeStatus] = useState({});
-    const [checkUserLikeComment, setCheckUserLikeComment] = useState(false);
     const [activeCommentOptionsId, setActiveCommentOptionsId] = useState(null);
     const [editingComment, setEditingComment] = useState(null);
     const [replyContent, setReplyContent] = useState('');
     const [activeReplyCommentId, setActiveReplyCommentId] = useState(null);
+    const [commentLikeCounts, setCommentLikeCounts] = useState({});
+    const [userCommentID, setUserCommentID] = useState(null);   
+    const [profilePictures, setProfilePictures] = useState({});
+    const [editingReply, setEditingReply] = useState(null);
+    const [replyEditingContent, setReplyEditingContent] = useState('');
+
+    
+    const handleStartEditReply = (reply) => {
+        setEditingReply(reply.commentId);
+        setReplyEditingContent(reply.content);
+    };
+
+    //=====================
+    const handleSaveEditReply = async () => {
+        try {
+            const response = await axios.put(
+                `http://localhost:5164/api/Comment?commentId=${editingReply}`, 
+                { 
+                    content: replyEditingContent 
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true 
+                }
+            );
+    
+            // Cập nhật phản hồi trong danh sách
+            setComments(prevComments => prevComments.map(comment => {
+                if (comment.inverseChildOfNavigation) {
+                    return {
+                        ...comment,
+                        inverseChildOfNavigation: comment.inverseChildOfNavigation.map(reply => 
+                            reply.commentId === editingReply 
+                                ? { ...reply, content: replyEditingContent } 
+                                : reply
+                        )
+                    };
+                }
+                return comment;
+            }));
+    
+            // Reset trạng thái chỉnh sửa
+            setEditingReply(null);
+            setReplyEditingContent('');
+        } catch (error) {
+            console.error('Error updating reply:', error);
+            alert('Không thể cập nhật phản hồi. Vui lòng thử lại.');
+        }
+    };
+
+    const handleDeleteReply = async (replyId) => {
+        try {
+            await axios.delete(`http://localhost:5164/api/Comment?commentId=${replyId}`, {
+                withCredentials: true
+            });
+    
+            // Cập nhật danh sách phản hồi sau khi xóa
+            setComments(prevComments => prevComments.map(comment => {
+                if (comment.inverseChildOfNavigation) {
+                    return {
+                        ...comment,
+                        inverseChildOfNavigation: comment.inverseChildOfNavigation.filter(reply => reply.commentId !== replyId)
+                    };
+                }
+                return comment;
+            }));
+        } catch (error) {
+            console.error('Error deleting reply:', error);
+            alert('Không thể xóa phản hồi. Vui lòng thử lại.');
+        }
+    };
+
+    const user = useSelector((state) => state.user.information);
+
+    const {
+      firstName,
+      lastName,
+      bio,
+      profilePicture,
+      email,
+    } = user;
+  
+    const defaultProfilePicture = user.genderId === 2 ? "./../../../../public/img/default/woman_default.png"
+                                                      : "./../../../../public/img/default/man_default.png";
+  
+  
+
+
+    useEffect(() => {
+        const fetchProfilePicture = async (userId) => {
+            try {
+                const response = await axios.get(`http://localhost:5164/api/Post/UserId?userId=${userId}`);
+                // Giả sử bạn muốn lấy hình ảnh đầu tiên trong mảng
+                const profilePicture = response.data[0]; // Lấy hình ảnh đầu tiên
+                setProfilePictures(prevState => ({
+                    ...prevState,
+                    [userId]: profilePicture // Lưu hình ảnh vào state
+                }));
+            } catch (error) {
+                console.error(`Error fetching profile picture for user ${userId}:`, error);
+            }
+        };
+
+        comments.forEach(comment => {
+            if (comment.userId && !profilePictures[comment.userId]) {
+                fetchProfilePicture(comment.userId);
+            }
+        });
+
+
+    }, [comments]);
+
+    useEffect(() => {
+        
+        console.log('Comments:', comments);
+
+        setUserCommentID(comments.map(comment => comment.userId));  
+    }, [comments]);
+
+    //Hàm fetch số lượt like cho comment
+    const fetchCommentLikeCount = async (commentId) => {
+        try {
+            const respone = await axios.get(`http://localhost:5164/api/Comment/likes?commentId=${commentId}`);
+            return respone.data;
+        }
+        catch (error) {
+            console.error('Error fetching comment like count:', error);
+            return 0;
+        }
+    }
+
+    // useEffect để fetch số lượt like khi comments thay đổi
+    useEffect(() => {
+        const fetchAllCommentLikeCounts = async () => {
+            try {
+                const likeCounts = {};
+                
+                // Lặp qua comment cha
+                for (const comment of comments) {
+                    const likeCount = await fetchCommentLikeCount(comment.commentId);
+                    likeCounts[comment.commentId] = likeCount;
+
+                    // Nếu có comment con, fetch like cho chúng
+                    if (comment.inverseChildOfNavigation) {
+                        for (const reply of comment.inverseChildOfNavigation) {
+                            const replyLikeCount = await fetchCommentLikeCount(reply.commentId);
+                            likeCounts[reply.commentId] = replyLikeCount;
+                        }
+                    }
+                }
+
+                setCommentLikeCounts(likeCounts);
+            } catch (error) {
+                console.error('Error fetching comment like counts:', error);
+            }
+        };
+
+        if (comments.length > 0) {
+            fetchAllCommentLikeCounts();
+        }
+    }, [comments]);
 
 
     const isCurrentUserComment = (comment) => {
         return currentUser && comment.user && currentUser === comment.userId;
+    };
+
+    const isCurrentUserReplyComment = (reply) => {
+        return currentUser && reply.user && currentUser === reply.userId;
     };
 
 
@@ -108,7 +274,26 @@ const CommentPost = ({
             });
             
             // Cập nhật danh sách comment sau khi xóa
-            setComments(comments.filter(comment => comment.commentId !== commentId));
+            setComments(prevComments => {
+                // Lọc bỏ comment cha
+                const filteredComments = prevComments.filter(comment => 
+                    comment.commentId !== commentId
+                );
+    
+                // Lọc bỏ comment con
+                return filteredComments.map(comment => {
+                    if (comment.inverseChildOfNavigation) {
+                        return {
+                            ...comment,
+                            inverseChildOfNavigation: comment.inverseChildOfNavigation.filter(
+                                reply => reply.commentId !== commentId
+                            )
+                        };
+                    }
+                    return comment;
+                });
+            });
+    
             setCommentCount(prevCount => prevCount - 1);
         } catch (error) {
             console.error('Error deleting comment:', error);
@@ -161,23 +346,49 @@ const CommentPost = ({
             try {
                 // Lặp qua từng comment để kiểm tra
                 const likeStatusPromises = comments.map(async (comment) => {
-                    console.log('COMMENT', comment);
                     try {
-                        const response = await axios.get(`http://localhost:5164/api/Comment/userlikecomment?commentId=${comment.commentId}`,
-                            {
-                                withCredentials: true, // Gửi kèm cookie
-                            }
+                        const response = await axios.get(
+                            `http://localhost:5164/api/Comment/userlikecomment?commentId=${comment.commentId}`,
+                            { withCredentials: true }
                         );
-                        setCheckUserLikeComment(response.data); 
-                        console.log(`Checkuserlikecomment 0 ${comment.commentId}`, checkUserLikeComment);
-                        } catch (error) {
+                        
+                        // Cập nhật trạng thái like cho từng comment
+                        setCommentLikeStatus(prev => ({
+                            ...prev,
+                            [comment.commentId]: response.data
+                        }));
+    
+                        // Kiểm tra cả reply
+                        if (comment.inverseChildOfNavigation) {
+                            comment.inverseChildOfNavigation.forEach(async (reply) => {
+                                try {
+                                    const replyResponse = await axios.get(
+                                        `http://localhost:5164/api/Comment/userlikecomment?commentId=${reply.commentId}`,
+                                        { withCredentials: true }
+                                    );
+                                    
+                                    setCommentLikeStatus(prev => ({
+                                        ...prev,
+                                        [reply.commentId]: replyResponse.data
+                                    }));
+                                } catch (error) {
+                                    console.error(`Error checking like status for reply ${reply.commentId}:`, error);
+                                }
+                            });
+                        }
+                    } catch (error) {
                         console.error(`Error checking like status for comment ${comment.commentId}:`, error);
-                        return {
-                            commentId: comment.commentId,
-                            isLiked: false
-                        };
+                        
+                        // Đảm bảo mặc định là false nếu không thể fetch
+                        setCommentLikeStatus(prev => ({
+                            ...prev,
+                            [comment.commentId]: false
+                        }));
                     }
                 });
+    
+                // Đợi tất cả các promise hoàn thành
+                await Promise.all(likeStatusPromises);
             } catch (error) {
                 console.error("Error fetching likes user:", error);
             }
@@ -211,68 +422,51 @@ const CommentPost = ({
 
     const handleLikeCommentClick = async (commentId) => {
         try {
-            console.log("commentId", commentId);
-            const isCurrentlyLiked = checkUserLikeComment;
-            console.log("checkUserLikeComment 1", checkUserLikeComment);
-            setCheckUserLikeComment(!checkUserLikeComment);
-            console.log("checkUserLikeComment 2", checkUserLikeComment);
-            if (isCurrentlyLiked != false) {
-                // Nếu đã like, gọi API để unlike
-                const response = await axios.post(`http://localhost:5164/api/Comment/unlike?commentId=${commentId}`,
-                    {}, // Body (nếu không có body, để trống)
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        withCredentials: true, // Gửi kèm cookie
+            const isCurrentlyLiked = commentLikeStatus[commentId] || false;
+    
+            if (!isCurrentlyLiked) {
+                await axios.post(
+                    `http://localhost:5164/api/Comment/react?commentId=${commentId}`, 
+                    {}, 
+                    { 
+                        headers: { 'Content-Type': 'application/json' },
+                        withCredentials: true 
                     }
                 );
-                setCheckUserLikeComment(!checkUserLikeComment);
-                console.log("checkUserLikeComment", checkUserLikeComment);
-                
-                // Giảm số lượng like
-                setLikedComments(prev => ({
-                    ...prev,
-                    [commentId]: Math.max((prev[commentId] || 0) - 1, 0)
-                }));
-
-                // Cập nhật trạng thái like
-                setCommentLikeStatus(prev => ({
-                    ...prev,
-                    [commentId]: false
-                }));
-
-                console.log("checkUserLikeComment 3", checkUserLikeComment);
-
-
-            } else {
-                // Nếu chưa like, gọi API để like
-                const response = await axios.post(`http://localhost:5164/api/Comment/react?commentId=${commentId}`,
-                    {}, // Body (nếu không có body, để trống)
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        withCredentials: true, // Gửi kèm cookie
-                    }
-                );
-                
-                // Tăng số lượng like
-                setLikedComments(prev => ({
-                    ...prev,
-                    [commentId]: (prev[commentId] || 0) + 1
-                }));
-
-                // Cập nhật trạng thái like
+    
+                // Update state trực tiếp
                 setCommentLikeStatus(prev => ({
                     ...prev,
                     [commentId]: true
                 }));
-
-                console.log("checkUserLikeComment 4", checkUserLikeComment);
+    
+                setCommentLikeCounts(prev => ({
+                    ...prev,
+                    [commentId]: (prev[commentId] || 0) + 1
+                }));
+            } else {
+                await axios.post(
+                    `http://localhost:5164/api/Comment/unlike?commentId=${commentId}`, 
+                    {}, 
+                    { 
+                        headers: { 'Content-Type': 'application/json' },
+                        withCredentials: true 
+                    }
+                );
+    
+                // Update state trực tiếp
+                setCommentLikeStatus(prev => ({
+                    ...prev,
+                    [commentId]: false
+                }));
+    
+                setCommentLikeCounts(prev => ({
+                    ...prev,
+                    [commentId]: Math.max((prev[commentId] || 0) - 1, 0)
+                }));
             }
         } catch (error) {
-            console.error("Error liking the comment:", error);
+            console.error("Error liking/unliking comment:", error);
             alert("Có lỗi xảy ra. Vui lòng thử lại.");
         }
     };
@@ -281,9 +475,23 @@ const CommentPost = ({
         const fetchComments = async () => {
             try {
                 const response = await axios.get(`http://localhost:5164/api/Comment?postid=${postId}`);
-                setComments(response.data);
+                const commentsData = response.data;
+                console.log('Fetched Comments:', commentsData);
+    
+                // Sắp xếp bình luận sao cho bình luận con nằm sau bình luận cha
+                const sortedComments = commentsData.sort((a, b) => {
+                    if (a.childOf === null && b.childOf !== null) {
+                        return -1; // a là bình luận cha, b là bình luận con
+                    }
+                    if (a.childOf !== null && b.childOf === null) {
+                        return 1; // a là bình luận con, b là bình luận cha
+                    }
+                    return 0; // Giữ nguyên thứ tự
+                });
+    
+                setComments(sortedComments);
                 const initialLikedComments = {};
-                response.data.forEach(comment => {
+                sortedComments.forEach(comment => {
                     initialLikedComments[comment.commentId] = comment.reactsComments.length; // Giả sử reactsComments chứa số lượt thích
                 });
                 setLikedComments(initialLikedComments);
@@ -291,9 +499,9 @@ const CommentPost = ({
                 console.error('Error fetching comments:', error);
             }
         };
-
+    
         fetchComments();
-    }, [postId, commentCount ]);
+    }, [postId, commentCount]);
 
     const formatTimeAgo = (date) => {
         const now = new Date();
@@ -338,7 +546,7 @@ const CommentPost = ({
 
     const handleReplyComment = async (commentId) => {
         if (!replyContent.trim()) return;
-
+    
         try {
             const response = await axios.post(`http://localhost:5164/api/Comment/reply?commentId=${commentId}`, {
                 content: replyContent,
@@ -346,20 +554,10 @@ const CommentPost = ({
             }, {
                 withCredentials: true
             });
-
-            // Thêm bình luận con vào danh sách
-            setComments(prevComments => {
-                return prevComments.map(comment => {
-                    if (comment.commentId === commentId) {
-                        return {
-                            ...comment,
-                            InverseChildOfNavigation: [...(comment.InverseChildOfNavigation || []), response.data]
-                        };
-                    }
-                    return comment;
-                });
-            });
-
+    
+            // Tăng commentCount để kích hoạt lại useEffect
+            setCommentCount(prevCount => prevCount + 1);
+    
             // Reset nội dung reply
             setReplyContent('');
             setActiveReplyCommentId(null);
@@ -367,7 +565,6 @@ const CommentPost = ({
             console.error('Error replying to comment:', error);
         }
     };
-    
     return (
         <div className={styles.postContainer}>
             <div className={styles.postTitle}>
@@ -377,7 +574,7 @@ const CommentPost = ({
             <div className={styles.contentContainer}>
                 <div className={styles.postHeader}>
                     <img
-                        src={avatar}
+                        src={urlProfile}
                         className={styles.avatar}
                         alt="Avatar"
                     />
@@ -452,13 +649,20 @@ const CommentPost = ({
                     </div>
                 </div>
                 <div className={styles.commentSection}>
-                    {comments.map(comment => (
+                    {comments
+                    .filter(comment => comment.childOf === null)
+                    .map(comment => (
                         <div key={comment.commentId} className={styles.commentWrapper}>
                             <div key={comment.commentId} className={styles.comment}>
                                 <div className={styles.commentProfilePic}>
-                                    <img
-                                        src={comment.user?.profilePicture || (comment.user?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')} // Sử dụng avatar từ API
-                                    />
+                                <img
+                                    src={profilePictures[comment.userId] 
+                                        ? `http://localhost:5164/media/${profilePictures[comment.userId]}`
+                                        : (comment.user?.genderId === 2 
+                                            ? './../../../../public/img/default/woman_default.png' 
+                                            : './../../../../public/img/default/man_default.png')} 
+                                    alt="Avatar" 
+                                />
                                 </div>
                                 <div className={styles.commentContentContainer}>
                                     <div className={styles.commentHeader}>
@@ -526,7 +730,6 @@ const CommentPost = ({
                                                     </div>
                                                 )}
                                             </div>
-
                                         )}  
                                     </div>
                                     <div className={styles.commentReact}>
@@ -540,7 +743,7 @@ const CommentPost = ({
                                         >
                                             Thích
                                         </span>
-                                        <span>{(likedComments[comment.commentId] || 0).toLocaleString()}</span>
+                                        <span>{(commentLikeCounts[comment.commentId] || 0).toLocaleString()}</span>
                                         <span 
                                             onClick={() => setActiveReplyCommentId(
                                                 activeReplyCommentId === comment.commentId ? null : comment.commentId
@@ -578,42 +781,102 @@ const CommentPost = ({
                             </div>
                             {/* Phần phản hồi */}
                             {comment.inverseChildOfNavigation && comment.inverseChildOfNavigation.length > 0 && (
-                                <div className={styles.replySection}>
-                                    {comment.inverseChildOfNavigation.map(reply => (
-                                        <div key={reply.commentId} className={styles.replyComment}>
-                                            <div className={styles.commentProfilePicReply}>
-                                                <img
-                                                    src={reply.user?.profilePicture || 
-                                                        (reply.user?.genderId === 2 
-                                                            ? './../../../../public/img/default/woman_default.png' 
-                                                            : './../../../../public/img/default/man_default.png')
-                                                    }
-                                                    alt="Avatar"
-                                                />
-                                            </div>
-                                            <div className={styles.commentContentContainer}>
-                                                <div className={styles.commentHeader}>
-                                                    <div className={styles.commentContent}>
-                                                        <span>
-                                                            <strong>
-                                                                {reply.user 
-                                                                    ? `${reply.user.firstName} ${reply.user.lastName}` 
-                                                                    : 'Ẩn danh'}
-                                                            </strong>
-                                                        </span>
-                                                        <br />
-                                                        <span>{reply.content}</span>
-                                                    </div>
-                                                </div>
-                                                <div className={styles.commentReact}>
-                                                    <span>{formatTimeAgo(reply.dateCreated)}</span>
-                                                    <span>Thích</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+    <div className={styles.replySection}>
+        {comment.inverseChildOfNavigation.map((reply) => (
+            <div key={reply.commentId} className={styles.replyComment}>
+                <div className={styles.commentProfilePicReply}>
+                    <img
+                        src={profilePictures[reply.userId] 
+                            ? `http://localhost:5164/media/${profilePictures[reply.userId]}`
+                            : (reply.user?.genderId === 2 
+                                ? './../../../../public/img/default/woman_default.png' 
+                                : './../../../../public/img/default/man_default.png')} 
+                        alt="Avatar" 
+                    />
+                </div>
+                <div className={styles.commentContentContainer}>
+                    <div className={styles.commentHeader}>
+                        {editingReply === reply.commentId ? (
+                            <div className={styles.editCommentContainer}>
+                                <textarea 
+                                    type="text"
+                                    value={replyEditingContent}
+                                    onChange={(e) => setReplyEditingContent(e.target.value)}
+                                    className={styles.editCommentInput}
+                                    autoFocus
+                                    onInput={(e) => {
+                                        e.target.style.height = "auto";
+                                        e.target.style.height = `${e.target.scrollHeight}px`;
+                                    }}
+                                />
+                                <div className={styles.editCommentActions}>
+                                    <button 
+                                        onClick={handleSaveEditReply}
+                                        className={styles.saveButton}
+                                    >
+                                        Lưu
+                                    </button>
+                                    <button 
+                                        onClick={() => setEditingReply(null)}
+                                        className={styles.cancelButton}
+                                    >
+                                        Hủy
+                                    </button>
                                 </div>
-                            )}
+                            </div>
+                        ) : (
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                <div className={styles.commentContent}>
+                                    <span>
+                                        <strong>
+                                            {reply.user 
+                                                ? `${reply.user.firstName} ${reply.user.lastName}` 
+                                                : 'Ẩn danh'}
+                                        </strong>
+                                    </span>
+                                    <br />
+                                    <span>{reply.content}</span>
+                                </div>
+                                {isCurrentUserReplyComment(reply) && (
+                                    <div className={styles.commentActions}>
+                                        <IoIosMore 
+                                            onClick={() => toggleCommentOptions(reply.commentId)} 
+                                        />
+                                        {activeCommentOptionsId === reply.commentId && (
+                                            <div className={styles.actionDropdown}>
+                                                <button onClick={() => handleStartEditReply(reply)}>
+                                                    Chỉnh sửa
+                                                </button>
+                                                <button onClick={() => handleDeleteReply(reply.commentId)}>
+                                                    Xóa
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <div className={styles.commentReact}>
+                        <span>{formatTimeAgo(reply.dateCreated)}</span>
+                        <span 
+                            className={`
+                                ${styles.likeComment} 
+                                ${commentLikeStatus[reply.commentId] ? styles.likeActive : ''}
+                            `} 
+                            onClick={() => handleLikeCommentClick(reply.commentId)}
+                        >
+                            Thích
+                        </span>
+                        <span>
+                            {(commentLikeCounts[reply.commentId] || 0).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+)}
                         </div>
                     ))}
                 </div>
@@ -622,12 +885,16 @@ const CommentPost = ({
                 
                 <div className={styles.commentInput}>
                     <div className={styles.commentProfilePic}>
-                        {/* Thêm ảnh avatar người dùng hiện tại */}
+                    <img 
+                        src={ user.profilePicture.src || defaultProfilePicture} 
+                        className={styles.avatar}
+                        alt="Avatar"
+                        />
                     </div>
                     <div className={styles.commentContentInput}>
                         <textarea 
                             type="text" 
-                            placeholder="Bình luận dưới tên Đức Toàn"
+                            placeholder="Hãy nhập bình luận"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             onInput={(e) => {

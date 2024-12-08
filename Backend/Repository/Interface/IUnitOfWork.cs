@@ -8,7 +8,6 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<HistorySearch> HistorySearch { get; }
 	IGenericRepository<Message> Message { get; }
 	IGenericRepository<MainTopic> MainTopic { get; }
-
 	IGenericRepository<PostNotification> PostNotification { get; }
 	IGenericRepository<RequestNotification> RequestNotification { get; }
 	IGenericRepository<Relationship> Relationship { get; }
@@ -18,5 +17,7 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<Comment> Comment { get; }
 	IGenericRepository<ReactsComment> ReactsComment { get; }
 	IGenericRepository<ReactsPost> ReactsPost { get; }
-	Task<bool> CompleteAsync();
+
+    IGenericRepository<UserInGroup> UserInGroup { get; }
+    Task<bool> CompleteAsync();
 }
