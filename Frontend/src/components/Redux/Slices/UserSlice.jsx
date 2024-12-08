@@ -33,7 +33,9 @@ const UserSlice = createSlice({
 				state.postrequests = []
 			})
 			.addCase(acceptRequests.fulfilled,(state,action) => {
-				state.requests = action.payload
+				const result = action.payload
+				const index = state.requests.findIndex(e => e.notificationId === result.newRequest.notificationId)
+				state.requests[index] = result.newRequest
 			})
 			.addCase(deleteRequests.fulfilled,(state,action) => {
 				state.requests = action.payload

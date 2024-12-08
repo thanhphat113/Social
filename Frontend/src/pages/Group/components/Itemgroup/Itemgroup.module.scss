@@ -1,0 +1,37 @@
+.wrapper {
+    width: 100%;
+    height: 50rem;
+    overflow-y: auto;
+
+    .frame {
+        display: flex;
+        flex-wrap: nowrap;
+        width: 25rem;
+        flex-wrap: wrap;
+        gap: 2rem;
+        padding: 1rem;
+        width: 100%;
+
+        .item {
+            flex: 0 0 30%;
+            height: 25rem;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            border-radius: 10px;
+
+        }
+        img{
+            width: 100%;
+            height: 15rem;
+        }
+        h3{
+            height: 2.5rem;
+        }
+        button {
+            background-color: var(--background-second);
+            height: 3rem;
+        }
+    }
+}

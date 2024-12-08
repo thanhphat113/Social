@@ -31,11 +31,11 @@ const acceptRequests = createAsyncThunk(
     "User/acceptRequests",
     async (userid) => {
         try {
-            const response = await axios.post(
+            const response = await axios.put(
                 "http://localhost:5164/Request",
                 {},
                 {
-                    params: { otheruser: userid },
+                    params: {otheruser: userid},
                     withCredentials: true,
                 }
             );

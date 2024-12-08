@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { SetUser } from "../Actions/UserAction";
+import { acceptRequests, SetUser } from "../Actions/UserAction";
 import {
     recallMess,
     deleteMess,
@@ -92,9 +92,17 @@ const FriendSlice = createSlice({
         builder
             .addCase(SetUser.fulfilled, (state, action) => {
                 const infor = action.payload;
+                // console.log(infor.friends)
                 state.allFriends = sortFriendsByLatestMessage(infor?.friends) || []
                 state.isLoad = false;
                 state.isError = false;
+            })
+            .addCase(acceptRequests.fulfilled, (state, action) => {
+                const result = action.payload;
+                const newList = [...state.allFriends,result.newFriend]
+
+                state.allFriends = sortFriendsByLatestMessage(newList) || []
+
             })
             .addCase(SetUser.pending, (state) => {
                 state.allFriends = [];
