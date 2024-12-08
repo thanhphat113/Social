@@ -61,6 +61,19 @@ namespace Backend.Services
             }
         }
 
+        public async Task<List<string>> GetProfileUser(int userId)
+        {
+            var mediaList = await _dbContext.Users
+                .Where(u => u.UserId == userId)
+                .SelectMany(u => u.Posts)
+                .Where(p => p.IsPictureProfile == true)  // Chỉ lấy ảnh profile
+                .SelectMany(p => p.Medias)
+                .Select(m => m.Src)
+                .ToListAsync();
+
+            return mediaList;
+        }
+
         public Task<Post> GetById(int id)
         {
             throw new NotImplementedException();
@@ -155,6 +168,9 @@ namespace Backend.Services
                 CreatedByUserId = p.CreatedByUserId,
                 DateCreated = p.DateCreated,
                 DateUpdated = p.DateUpdated,
+                IsVisible = p.IsVisible,
+                IsPictureProfile = p.IsPictureProfile,
+                IsCoverPhoto = p.IsCoverPhoto,
                 Comments = p.Comments?.Select(c => new Comment 
                 {
                     CommentId = c.CommentId,
@@ -168,7 +184,8 @@ namespace Backend.Services
                 {
                     UserId = p.CreatedByUser .UserId,
                     FirstName = p.CreatedByUser .FirstName,
-                    LastName = p.CreatedByUser .LastName
+                    LastName = p.CreatedByUser .LastName,
+                    GenderId = p.CreatedByUser.GenderId
                 } : null,
                 Medias = p.Medias?.Select(m => new Media 
                 {
@@ -223,7 +240,7 @@ namespace Backend.Services
                             // Tạo đối tượng Media
                             var media = new Media
                             {
-                                Src = $"/media/{uniqueFileName}",
+                                Src = $"{uniqueFileName}",
                                 HashCode = hashCode,
                             };
 
@@ -295,6 +312,16 @@ namespace Backend.Services
 
             await _unit.ReactsPost.AddAsync(react);
             return await _unit.CompleteAsync();
+        }
+        public async Task<IEnumerable<Post>> SearchPostByUserNameAsync(string searchTerm)
+        {
+            return await _unit.Post.FindAsync<Post>(
+                query => query.Include(p => p.CreatedByUser)
+                    .Where(p => p.CreatedByUser.FirstName.ToLower().Contains(searchTerm.ToLower()) ||
+                                p.CreatedByUser.LastName.ToLower().Contains(searchTerm.ToLower()) ||
+                                (p.CreatedByUser.FirstName + " " + p.CreatedByUser.LastName).ToLower().Contains(searchTerm.ToLower()))
+                    .OrderByDescending(p => p.DateCreated)
+            );
         }
 
         public async Task<bool> RemoveLike(int postId, int userId)

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FaCloud, FaRegComment, FaRegShareSquare, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { AiOutlineEdit } from "react-icons/ai";
 import styles from './PostCard.module.scss';
@@ -6,6 +6,7 @@ import CommentPost from './../CommentPost/index';
 import axios from 'axios';
 import {getLikeUser, getLikeCount, LikePost, UnlikePost} from './../../../apis/index';
 import { IoIosMore } from "react-icons/io";
+
 
 function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
     // const [liked, setLiked] = useState(false);
@@ -21,6 +22,22 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
     const [editContent, setEditContent] = useState(status);
     const [editImages, setEditImages] = useState(imageUrls);
     const [postVersion, setPostVersion] = useState(0);
+    const [urlProfile, setUrlProfile] = useState('');
+
+
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5164/api/Post/UserId?userId=${userId}`);
+                setUrlProfile(response.data);
+            } catch (error) {
+                console.error("Error fetching likes user:", error);
+            }
+        };
+
+        fetchProfile();
+    }, [userId]);
 
     useEffect(() => {
         const fetchLikesCount = async () => {
@@ -137,18 +154,35 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
         }
     };
 
+
+
+    const urlProfiles = useMemo(() => {
+
+        // Nếu có URL profile, sử dụng URL từ server
+        if (urlProfile && urlProfile.length > 0) {
+            return `http://localhost:5164/media/${urlProfile[0]}`;
+        }
+        
+        // Nếu không, sử dụng avatar được truyền vào
+        return avatar || 'default-avatar-path';
+    }, [urlProfile, avatar]);
+
+
+
     return (
         <>
             <div className={styles.postCard}>
                 <div className={styles.postHeader}>
-                    <img
-                        src={avatar}
-                        className={styles.avatar}
-                        alt="Avatar"
-                    />  
-                    <div className={styles.postInfo}>
-                        <span className={styles.postAuthor}>{author}</span>
-                        <span className={styles.postTime}>{time}</span>
+                    <div className={styles.avatarAndInfo}>
+                        <img
+                            src={urlProfiles}
+                            className={styles.avatar}
+                            alt="Avatar"
+                        />  
+                        <div className={styles.postInfo}>
+                            <span className={styles.postAuthor}>{author}</span>
+                            <span className={styles.postTime}>{time}</span>
+                        </div>
                     </div>
                     {userId === 11 && ( // So sánh userId của người dùng hiện tại với userId của bài viết
                         <div className={styles.postEdit}>
@@ -281,7 +315,7 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
                         </div>
                         <div className={styles.postShares}>
                             <a href="">
-                                <span>100 lượt chia sẻ</span>
+                                <span>0 lượt chia sẻ</span>
                             </a>
                         </div>
                     </div>
@@ -314,6 +348,7 @@ function PostCard({ author, time, status, imageUrls, avatar, postId,userId }) {
                             likesCount={likesCount}
                             commentCounts={commentCount}
                             currentUser={userId}
+                            urlProfile={urlProfiles}
                         />
                     </div>
                 </div>

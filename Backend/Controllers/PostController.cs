@@ -35,6 +35,21 @@ namespace Backend.Controllers
             }
         }
         
+        [HttpGet("search-by-username")]
+        public async Task<IActionResult> SearchPostsByUserName([FromQuery] string searchTerm)
+        {
+            var posts = await _postService.SearchPostByUserNameAsync(searchTerm);
+            return Ok(posts);
+        }
+        
+        [HttpGet("UserId")]
+        public async Task<IActionResult> GetUserPostMedia([FromQuery]int userId)
+        {
+            var mediaList = await _postService.GetProfileUser(userId);
+            return Ok(mediaList);
+        }
+        
+        
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromForm] Post post)
         {

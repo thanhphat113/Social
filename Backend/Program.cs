@@ -68,7 +68,7 @@ builder.Services.AddScoped< IPostService, PostService>();
 
 
 //Comment
-//builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
