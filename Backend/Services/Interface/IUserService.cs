@@ -19,5 +19,7 @@ namespace Backend.Services.Interface
 		Task<User> FindToLogin(string email, string password);
 		Task<UserLogin> GetLoginById(int id);
 		Task<IEnumerable<UserPrivate>> GetListByName(string name, int UserId);
+		Task<UserPrivate> GetUserById(int id);
+
 	}
 }

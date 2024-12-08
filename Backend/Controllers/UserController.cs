@@ -31,15 +31,15 @@ namespace Backend.Controllers
 
 
 
-        public UserController(MediaService media, IUserService UserContext, 
+		public UserController(MediaService media, IUserService UserContext,
 			RequestNotiService NotiContext, PostNotiService PostContext,
-            IPostService postService
-            )
+			IPostService postService
+			)
 		{
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
-			 _Post = postService;
+			_Post = postService;
 			_media = media;
 		}
 
@@ -56,12 +56,13 @@ namespace Backend.Controllers
 			var userId = MiddleWare.GetUserIdFromCookie(Request);
 			if (userId == -1) return null;
 
-			var information = await _userContext.GetLoginById(userId);
 			var friends = await _userContext.GetFriends(userId);
 			foreach (var item in friends)
 			{
 				if (OnlineHub.IsOnline(item.UserId)) item.IsOnline = true;
 			}
+			var information = await _userContext.GetLoginById(userId);
+
 			var requests = await _NotiContext.FindByUserId(userId);
 			var postrequests = await _PostContext.FindByUserId(userId);
 			return Ok(new { information = information, friends = friends, requests = requests, postrequests = postrequests });
@@ -133,13 +134,13 @@ namespace Backend.Controllers
 
 			var friends = await _userContext.GetFriends(userId);
 			var user = await _userContext.FindById(userId);
-			var post =  await _Post.GetPostsByCreatedByUserId(userId);
+			var post = await _Post.GetPostsByCreatedByUserId(userId);
 
-            if (user == null)
+			if (user == null)
 			{
 				return NotFound(new { message = "Không tìm thấy người dùng" });
 			}
-			return Ok(new { information = user, friend = friends , posts = post});
+			return Ok(new { information = user, friend = friends, posts = post });
 
 		}
 
@@ -149,33 +150,30 @@ namespace Backend.Controllers
 		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
 		{
 
-            try
-            {
-                var userId = MiddleWare.GetUserIdFromCookie(Request);
-                var token = Request.Cookies["YourCookieName"];
-                Console.WriteLine("Token từ cookie: " + token);
-                Console.WriteLine("UserId từ token: " + userId);
-                if (userId == null)
-                {
-                    return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
-                }
+			try
+			{
+				var userId = MiddleWare.GetUserIdFromCookie(Request);
+				var token = Request.Cookies["YourCookieName"];
+				Console.WriteLine("Token từ cookie: " + token);
+				Console.WriteLine("UserId từ token: " + userId);
+				if (userId == null)
+				{
+					return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+				}
 
-                var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
-                return result
-                    ? Ok(new {status= 200, message = "Đổi mật khẩu thành công" })
-                    : BadRequest(new { message = "Mật khẩu cũ không đúng" });
-            }
-            catch (SecurityTokenExpiredException)
-            {
-                return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-
-
-    }
+				var result = await _userContext.ChangePassword(userId, model.OldPassword, model.NewPassword);
+				return result
+					? Ok(new { status = 200, message = "Đổi mật khẩu thành công" })
+					: BadRequest(new { message = "Mật khẩu cũ không đúng" });
+			}
+			catch (SecurityTokenExpiredException)
+			{
+				return Unauthorized(new { message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại." });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new { Message = ex.Message });
+			}
+		}
+	}
 }

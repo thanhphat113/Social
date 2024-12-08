@@ -34,6 +34,7 @@ const UserSlice = createSlice({
 			})
 			.addCase(acceptRequests.fulfilled,(state,action) => {
 				const result = action.payload
+				console.log(result)
 				const index = state.requests.findIndex(e => e.notificationId === result.newRequest.notificationId)
 				state.requests[index] = result.newRequest
 			})

@@ -105,8 +105,7 @@ public partial class SocialMediaContext : DbContext
                 .HasColumnName("is_read");
             entity.Property(e => e.IsNoti)
                 .HasColumnType("tinyint(1)")
-                .HasColumnName("is_notification")
-                .HasDefaultValue(false);
+                .HasColumnName("is_notification");
             entity.Property(e => e.MediaId)
                 .HasColumnType("int(1)")
                 .HasColumnName("media_id");
@@ -758,9 +757,6 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.Bio)
                 .HasColumnType("text")
                 .HasColumnName("bio");
-            entity.Property(e => e.CoverPhoto)
-                .HasMaxLength(255)
-                .HasColumnName("cover_photo");
             entity.Property(e => e.CreatedByUserId)
                 .HasColumnType("int(11)")
                 .HasColumnName("created_by_user_id");
@@ -776,16 +772,9 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.GroupName)
                 .HasMaxLength(255)
                 .HasColumnName("group_name");
-            entity.Property(e => e.MemberCount)
-                .HasDefaultValueSql("'0'")
-                .HasColumnType("int(11)")
-                .HasColumnName("member_count");
             entity.Property(e => e.PrivacyId)
                 .HasColumnType("int(11)")
                 .HasColumnName("privacy_id");
-            entity.Property(e => e.ProfilePicture)
-                .HasMaxLength(255)
-                .HasColumnName("profile_picture");
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.UserGroups)
                 .HasForeignKey(d => d.CreatedByUserId)

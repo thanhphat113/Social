@@ -2,31 +2,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Backend.DTO;
+using Backend.Helper;
 using Backend.Models;
 using Backend.Repository.Interface;
 
 using Backend.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services
 {
 	public class RequestNotiService : INotificationsService
 	{
 		private readonly IUnitOfWork _unit;
-		public RequestNotiService(IUnitOfWork unit)
+		private readonly IMapper _mapper;
+		public RequestNotiService(IUnitOfWork unit, IMapper mapper)
 		{
 			_unit = unit;
+			_mapper = mapper;
 		}
 
-		public async Task<bool> Accept(int user1, int user2)
+		public async Task<dynamic> Accept(int user1, int user2)
 		{
 			try
 			{
 				var item = await _unit.RequestNotification.GetByConditionAsync<RequestNotification>(query => query
 							.Where(r =>
 							(r.FromUserId == user1 && r.ToUserId == user2) ||
-					 		(r.FromUserId == user2 && r.ToUserId == user1)));
-				if (item == null) return false;
-
+					 		(r.FromUserId == user2 && r.ToUserId == user1))
+							.Include(u => u.FromUser)
+							.ThenInclude(u => u.Posts)
+							.ThenInclude(p => p.Medias)) ?? throw new ArgumentException("Không tìm thấy quan hệ");
 				item.IsAccept = true;
 				item.IsRead = true;
 
@@ -37,12 +45,13 @@ namespace Backend.Services
 
 				relation.TypeRelationship = 2;
 
-				return await _unit.CompleteAsync();
+				var result = _mapper.Map<RequestUser>(item);
+				if (await _unit.CompleteAsync()) return result;
+				return null;
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Lỗi: " + e.Data);
-				return false;
+				throw new ArgumentException("Lỗi" + e.Data);
 			}
 		}
 
@@ -65,7 +74,7 @@ namespace Backend.Services
 		{
 			try
 			{
-				_unit.RequestNotification.DeleteAsync(r => r.NotificationId == id);
+				await _unit.RequestNotification.DeleteAsync(r => r.NotificationId == id);
 				return await _unit.CompleteAsync();
 			}
 			catch
@@ -81,16 +90,18 @@ namespace Backend.Services
 			{
 				var items = await _unit.RequestNotification.FindAsync(query => query
 							.Where(r => r.ToUserId == id)
-							.Select(u => new
-							{
-								u.FromUser.UserId,
-								u.FromUser.LastName,
-								u.FromUser.FirstName,
-								u.FromUser.GenderId,
-								u.IsAccept,
-								u.NotificationId,
-								u.IsRead
-							}));
+							.Include(r => r.FromUser)
+							.ThenInclude(r => r.Posts)
+							.ThenInclude(r => r.Medias)
+							.ProjectTo<RequestUser>(_mapper.ConfigurationProvider));
+
+				foreach (var item in items)
+				{
+					if (item.ProfilePicture == null) continue;
+					var type = item.ProfilePicture.MediaType;
+					item.ProfilePicture.Src = MiddleWare.GetFullSrc(item.ProfilePicture.Src, type != 3 ? "media" : "file");
+				}
+
 				return items;
 			}
 			catch

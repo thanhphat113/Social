@@ -69,33 +69,11 @@ namespace Backend.Services
 		{
 			try
 			{
-				// var items = await _unit.HistorySearch.FindAsync(h => h.FromUserId == userid, h => new HistoryWithUser
-				// {
-				// 	HistoryId = h.HistoryId,
-				// 	UserId = h.OtherUser.UserId,
-				// 	FirstName = h.OtherUser.FirstName,
-				// 	LastName = h.OtherUser.LastName,
-				// 	GenderId = h.OtherUser.GenderId,
-				// }, query => query.OrderByDescending(h => h.DateSearch));
-
 				var items = await _unit.HistorySearch.FindAsync(query => query
 							.Where(h => h.FromUserId == userid)
 							.OrderByDescending(h => h.DateSearch)
 							.Include(h => h.FromUser)
 							.ProjectTo<HistoryWithUser>(_mapper.ConfigurationProvider));
-
-				// foreach (var item in items)
-				// {
-				// 	var UserMedia = await _unit.UserMedia.GetByConditionAsync<UserMedia>(u => u.UserId == item.UserId && u.IsProfilePicture == true);
-				// 	if (UserMedia == null)
-				// 	{
-				// 		continue;
-				// 	};
-
-				// 	var profilePicture = await _unit.Media.GetByConditionAsync<Media>(m => m.MediaId == UserMedia.MediaId);
-
-				// 	item.ProfilePicture = profilePicture;
-				// }
 
 				return items;
 			}

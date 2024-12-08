@@ -1,10 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Backend.Models;
+using Backend.Services.Interface;
 using Backend.Helper;
 
 namespace Backend.Controllers
@@ -47,7 +50,7 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message+"hahaha");
+                return NotFound(ex.Message + "hahaha");
             }
         }
 
@@ -93,6 +96,42 @@ namespace Backend.Controllers
             }
 
         }
+
+
+        // [HttpGet("group-list-by-name")]
+        // public async Task<IActionResult> GetGroupByName(string Name)
+        // {
+        // 	return Ok(await _groupService.GetByName(Name));
+        // }
+
+        // [HttpPost]
+        // public async Task<IActionResult> AddItem([FromBody] UserGroup value)
+        // {
+        // 	var UserId = MiddleWare.GetUserIdFromCookie(Request);
+        // 	value.CreatedByUserId = UserId;
+        // 	return Ok(await _groupService.Add(value));
+        // }
+
+        // [HttpGet]
+        // public async Task<IActionResult> GetAll(int OffSet, int Limit)
+        // {
+        // 	return Ok(await _groupService.GetAllByCondition(OffSet, Limit));
+        // }
+
+
+        // [HttpGet("{groupId}")]
+        // public async Task<IActionResult> GetGroupById(int groupId)
+        // {
+        // 	try
+        // 	{
+        // 		var group = await _groupService.GetGroupById(groupId);
+        // 		return Ok(group);
+        // 	}
+        // 	catch (Exception ex)
+        // 	{
+        // 		return NotFound(ex.Message);
+        // 	}
+        // }
 
 
     }

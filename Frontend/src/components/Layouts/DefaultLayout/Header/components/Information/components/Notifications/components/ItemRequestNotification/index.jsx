@@ -17,7 +17,7 @@ function ItemRequestNotification(props) {
         >
             <img
                 src={
-                    item.profilePicture ||
+                    item.profilePicture?.src ||
                     `/public/img/default/${
                         item.genderId !== 2 ? "man" : "woman"
                     }_default.png`

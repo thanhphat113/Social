@@ -9,7 +9,7 @@ namespace Backend.Services.Interface
 	public interface INotificationsService : IService<RequestNotification>
 	{
 		Task<IEnumerable<Object>> FindByUserId(int userid);
-		Task<bool> Accept(int user1, int user2);
+		Task<dynamic> Accept(int user1, int user2);
 
 	}
 }

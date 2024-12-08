@@ -86,6 +86,9 @@ const FriendSlice = createSlice({
                 state.allFriends[index].isOnline = value.isOnline;
             }
         },
+        updateFriend: (state, action) => {
+            state.allFriends.push(action.payload)
+        },
     },
 
     extraReducers: (builder) => {
@@ -207,6 +210,6 @@ const FriendSlice = createSlice({
     },
 });
 
-export const { receiveMess, staticMess, receiveUpdateChat, updateOnline } =
+export const { receiveMess, staticMess, receiveUpdateChat, updateOnline, updateFriend } =
     FriendSlice.actions;
 export default FriendSlice.reducer;

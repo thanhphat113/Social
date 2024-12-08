@@ -18,7 +18,7 @@ using Backend.RealTime;
 //var builder = WebApplication.CreateBuilder(args);
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
-    WebRootPath = "wwwroot" // Đặt WebRootPath tại đây
+    WebRootPath = "wwwroot"
 });
 
 builder.Services.AddSignalR();
@@ -31,6 +31,7 @@ builder.Services.AddDbContext<SocialMediaContext>(options =>
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -41,14 +42,16 @@ builder.Services.AddControllers()
     });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GroupRepositories>();
+
 /*builder.Services.AddScoped<IRepositories<UserGroup>, GroupRepositories>();*/
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IChatInMessService, ChatInMessageService>();
 builder.Services.AddScoped<RequestNotiService>();
 builder.Services.AddScoped<PostNotiService>();
-builder.Services.AddScoped<RelationshipService>();
+builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<IService<MainTopic>, MainTopicService>();
 
 builder.Services.AddScoped<AuthService>();
@@ -65,7 +68,7 @@ builder.Services.AddScoped<ReactPostService>();
 
 //Post
 
-builder.Services.AddScoped< IPostService, PostService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 
 //Comment
@@ -78,7 +81,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
 
- //builder.Services.AddScoped<PostService>();
+//builder.Services.AddScoped<PostService>();
 
 
 builder.Services.AddCors(options =>
@@ -129,6 +132,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+MiddleWare.Configure(app.Services.GetRequiredService<IHttpContextAccessor>());
+
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -154,7 +160,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseRouting();
-//app.UseHttpsRedirection();
+
+// app.UseHttpsRedirection();
 
 
 

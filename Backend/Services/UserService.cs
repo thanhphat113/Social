@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper.QueryableExtensions;
+using Backend.Helper;
 
 namespace Backend.Services
 {
@@ -74,23 +75,17 @@ namespace Backend.Services
 
         public async Task<UserLogin> GetLoginById(int id)
         {
-            var item = await _unit.Users.GetByIdAsync(id);
-
-            var result = _mapper.Map<UserLogin>(item);
-
-            var MediaIsProfile = await _unit.Post.GetByConditionAsync<Media>(query => query
-                            .Where(p => p.CreatedByUserId == item.UserId && p.IsPictureProfile == true)
-                            .SelectMany(p => p.Medias));
-
-            if (MediaIsProfile != null)
-            {
-                MediaIsProfile.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{MediaIsProfile.Src}";
-
-                result.ProfilePicture = MediaIsProfile;
-            }
-
-
+            var result = await _unit.Users.GetByConditionAsync(query => query
+                    .Where(u => u.UserId == id)
+                    .Include(u => u.Posts)
+                    .ThenInclude(p => p.Medias)
+                    .ProjectTo<UserLogin>(_mapper.ConfigurationProvider)
+                    );
+            if (result.ProfilePicture == null) return result;
+            var type = result.ProfilePicture.MediaType;
+            if (type != null) result.ProfilePicture.Src = MiddleWare.GetFullSrc(result.ProfilePicture.Src, type != 3 ? "media" : "file");
             return result;
+
         }
 
         public Task<IEnumerable<User>> GetListById(int id)
@@ -141,13 +136,10 @@ namespace Backend.Services
 
         public async Task<IEnumerable<UserPrivate>> GetFriends(int id)
         {
-            // var users = await _unit.Relationship.FindAsync<User>(predicate, selector);
             var users = await _unit.Relationship.FindAsync<UserPrivate>(query =>
                     query.Where(r =>
                             (r.FromUserId == id || r.ToUserId == id) &&
                             r.TypeRelationship == 2)
-                            // .Include(r => r.FromUser)
-                            // .Include(r => r.ToUser)
                             .Select(r => r.FromUserId == id ? r.ToUser : r.FromUser)
                             .ProjectTo<UserPrivate>(_mapper.ConfigurationProvider));
 
@@ -156,6 +148,7 @@ namespace Backend.Services
                 var MediaIsProfile = await _unit.Post.GetByConditionAsync<Media>(query => query
                             .Where(p => p.CreatedByUserId == item.UserId && p.IsPictureProfile == true)
                             .SelectMany(p => p.Medias));
+
 
                 if (MediaIsProfile != null)
                 {
@@ -205,6 +198,29 @@ namespace Backend.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<UserPrivate> GetUserById(int id)
+        {
+            try
+            {
+                var item = await _unit.Users.GetByConditionAsync(query => query
+                        .Where(u => u.UserId == id)
+                        .Include(u => u.Posts)
+                        .ThenInclude(p => p.Medias)
+                        .ProjectTo<UserPrivate>(_mapper.ConfigurationProvider));
+
+                if (item.ProfilePicture == null) return item;
+                var type = item.ProfilePicture.MediaType;
+                if (type != null) item.ProfilePicture.Src = MiddleWare.GetFullSrc(item.ProfilePicture.Src, type != 3 ? "media" : "file");
+                return item;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ArgumentException("Lỗi: " + ex);
+            }
+        }
+
+
 
 
         public async Task<IEnumerable<UserPrivate>> GetListByName(string name, int UserId)

@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as signalR from "@microsoft/signalr";
 import { useEffect, useRef, useState, createContext } from "react";
-import { receiveMess, receiveUpdateChat, updateOnline } from "../../Redux/Slices/FriendSlice";
+import { receiveMess, receiveUpdateChat, updateFriend, updateOnline } from "../../Redux/Slices/FriendSlice";
 import { setNNPassive, setTopicPassive } from "../../Redux/Slices/MessageSlice";
 import styles from "./DefaultLayout.module.scss";
 import Header from "./Header";
@@ -280,6 +280,11 @@ function DefaultLayout() {
                     );
                 }
             });
+            connection.off("NewFriend")
+            connection.on("NewFriend", async (value) => {
+                dispatch(updateFriend(value))
+            });
+            
 
             connection.on("sendLeaveCall", async (value) => {
                 stopMedia();

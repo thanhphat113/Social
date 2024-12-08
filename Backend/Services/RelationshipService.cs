@@ -10,13 +10,13 @@ using Backend.Services.Interface;
 
 namespace Backend.Services
 {
-	public class RelationshipService
-	{
-		private readonly IUnitOfWork _unit;
-		public RelationshipService(IUnitOfWork unit)
-		{
-			_unit = unit;
-		}
+    public class RelationshipService : IRelationshipService
+    {
+        private readonly IUnitOfWork _unit;
+        public RelationshipService(IUnitOfWork unit)
+        {
+            _unit = unit;
+        }
 
         // kiem tra xem co ton tai trong bang relationship va bang friendrequest chua
         public async Task<bool> CheckExist(int fromUserId, int toUserId)
@@ -100,29 +100,34 @@ namespace Backend.Services
             }
         }
 
+        public Task<IEnumerable<Relationship>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Relationship> GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Relationship>> GetListById(int userid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Update(Relationship value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Accept(int user1, int user2)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> Delete(int id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<Relationship>> GetAll()
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<Relationship> GetById(int id)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<IEnumerable<Relationship>> GetListById(int userid)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<bool> Update(Relationship value)
-		{
-			throw new NotImplementedException();
-		}
-	}
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
