@@ -18,7 +18,8 @@ const getFriendList = createAsyncThunk(
 );
 
 const sortFriendsByLatestMessage = (friends) => {
-    return friends?.sort((a, b) => {
+    // Tạo một bản sao của mảng `friends` trước khi sắp xếp
+    return [...(friends || [])].sort((a, b) => {
         const latestA = a.chatInMessages?.reduce((latest, message) => {
             return latest &&
                 new Date(latest.dateCreated) > new Date(message.dateCreated)

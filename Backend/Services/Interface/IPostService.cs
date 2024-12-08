@@ -16,5 +16,8 @@ namespace Backend.Services.Interface
         Task<IEnumerable<Post>> GetPostsByCreatedByUserId(int userId);
         Task<int?> GetProfilePicturePostId(int userId);
         Task<int?> GetCoverPhotoPostId(int userId);
+        Task<IEnumerable<Post>> SearchPostByUserNameAsync(string searchTerm);
+        Task<List<string>> GetProfileUser(int userId);
+
     }
 }

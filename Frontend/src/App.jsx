@@ -49,7 +49,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/home"
+                    path="/"
                     element={
                         <Authentication>
                             <Home />

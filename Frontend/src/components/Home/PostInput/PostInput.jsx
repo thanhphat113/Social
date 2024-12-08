@@ -2,8 +2,24 @@ import { FaVideo, FaPhotoVideo, FaSmile } from "react-icons/fa";
 import styles from './PostInput.module.scss'; 
 import {useState} from 'react';
 import Post from './Post.jsx';
+import { useSelector } from "react-redux";
+
 
 function PostInput() {
+
+  const user = useSelector((state) => state.user.information);
+
+  const {
+    firstName,
+    lastName,
+    bio,
+    profilePicture,
+    email,
+  } = user;
+
+  const defaultProfilePicture = user.genderId === 2 ? "./../../../../public/img/default/woman_default.png"
+                                                    : "./../../../../public/img/default/man_default.png";
+
 
   const [showPost, setShowPost] = useState(false);
   const [showPostWithImage, setShowPostWithImage] = useState(false);
@@ -26,13 +42,13 @@ function PostInput() {
     <div className={styles.postInput}>
       <div className={styles.inputBox}>
         <img 
-          src={'src/assets/img/avata.png'} 
+          src={ user.profilePicture.src || defaultProfilePicture} 
           className={styles.avatar}
           alt="Avatar"
         />
         <input 
           type="text" 
-          placeholder="Đức ơi, bạn đang nghĩ gì thế?" 
+          placeholder="Bạn đang nghĩ gì thế?`" 
           className={styles.input}
           onClick={handleInputClick}
         />

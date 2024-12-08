@@ -2,7 +2,7 @@
 import axios from 'axios';
 import PostCard from './../PostCard/PostCard.jsx';
 
-export default function PostList() {
+export default function PostList({ userId, groupId }) {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -10,8 +10,17 @@ export default function PostList() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await axios.get('http://localhost:5164/api/Post');
-                console.log("DDaay là json postlist" , response.data);
+                let url = 'http://localhost:5164/api/Post';
+                if (groupId) {
+                    url += `?groupId=${groupId}`;
+                }
+
+                const response = await axios.get(url);
+                if (response.data && Array.isArray(response.data)) {
+                    setPosts(response.data);
+                } else {
+                    setPosts([]); // Đảm bảo `posts` là mảng rỗng nếu không có dữ liệu
+                }
                 if (response.data && Array.isArray(response.data)) {
                     setPosts(response.data);
                 } else {
@@ -46,12 +55,11 @@ export default function PostList() {
                         time={new Date(post.dateCreated).toLocaleString()}
                         status={post.content || ''}
                         imageUrls={post.medias && Array.isArray(post.medias) 
-                            ? post.medias.map(m => `http://localhost:5164/${m.src.split('\\').slice(-2).join('/')}`) 
+                            ? post.medias.map(m => `http://localhost:5164/media/${m.src.split('\\').slice(-2).join('/')}`) 
                             : []}
-                        avatar={post.createdByUser ?.profilePicture || (post.createdByUser ?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')}
+                        avatar={post.createdByUser?.profilePicture || (post.createdByUser ?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')}
                         postId={post.postId}
-                        userId={post.createdByUser .userId}
-                        
+                        userId={post.createdByUser.userId}
                     />
                 ))
             ) : (

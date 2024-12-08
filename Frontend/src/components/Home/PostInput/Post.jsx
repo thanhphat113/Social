@@ -3,6 +3,7 @@ import styles from "./Post.module.scss";
 import Button from "react-bootstrap/Button";
 import { FaPhotoVideo } from "react-icons/fa";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Post = ({ onClose }) => {
   const [text, setText] = useState("");
@@ -12,6 +13,20 @@ const Post = ({ onClose }) => {
   const [isDragVisible, setIsDragVisible] = useState(false);
 
   const allowedTypes = ["image/jpeg", "image/png", "video/mp4", "video/webm"];
+
+  const user = useSelector((state) => state.user.information);
+
+  const {
+    firstName,
+    lastName,
+    bio,
+    profilePicture,
+    email,
+  } = user;
+
+  const defaultProfilePicture = user.genderId === 2 ? "./../../../../public/img/default/woman_default.png"
+                                                    : "./../../../../public/img/default/man_default.png";
+
 
   // Xóa URL được tạo tạm thời khi component unmount
   useEffect(() => {
@@ -134,9 +149,9 @@ const Post = ({ onClose }) => {
       </div>
       <div className={styles.header}>
         <div className={styles.avatar}>
-          <img src="./../../../../public/img/Cloudy.png" alt="Avatar" />
+          <img src={user.profilePicture.src || defaultProfilePicture} alt="Avatar" />
         </div>
-        <div className={styles.name}>Đức Toàn</div>
+        <div className={styles.name}>{firstName} {lastName}</div>
       </div>
 
       <div className={styles.message}>
