@@ -68,7 +68,6 @@ namespace Backend.Repository
 		public IGenericRepository<Media> Media => _Media;
 		public IGenericRepository<UserGroup> UserGroup => _UserGroup;
 		public IGenericRepository<MainTopic> MainTopic => _main;
-		//public IGenericRepository<PostMedia> PostMedia => _postMedia;
 		public IGenericRepository<Post> Post => _post;
 		public IGenericRepository<Comment> Comment => _comment;
 		public IGenericRepository<ReactsComment> ReactsComment => _reactsComment;
@@ -77,6 +76,7 @@ namespace Backend.Repository
 		public IGenericRepository<RequestNotification> RequestNotification => _RequestNotification;
 		public IGenericRepository<Relationship> Relationship => _Relationship;
 		public IGenericRepository<UserInGroup> UserInGroup => _userInGroup;
+
 
 		// Phương thức SaveChanges
 		public async Task<bool> CompleteAsync()

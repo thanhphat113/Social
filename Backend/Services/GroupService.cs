@@ -41,7 +41,6 @@ public class GroupService
 		return await _unit.CompleteAsync();
 	}
 
-
 	public async Task<bool> DeleteGroup(int groupId)
 	{
 		await _unit.UserGroup.DeleteAsync(x => x.GroupId == groupId);
@@ -104,5 +103,4 @@ public class GroupService
 
 		return true;
 	}
-
 }
