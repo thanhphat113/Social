@@ -19,6 +19,28 @@ namespace Backend.Controllers
             _logger = logger;
         }
 
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetPostsByUserId(int userId)
+        {
+            try
+            {
+                var posts = await _postService.GetPostsByCreatedByUserId(userId);
+
+                if (posts == null || !posts.Any())
+                {
+                    return NotFound(new { Message = "Không tìm thấy bài viết nào cho người dùng này." });
+                }
+
+                return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi
+                return StatusCode(500, new { Message = "Đã xảy ra lỗi khi lấy danh sách bài viết.", Error = ex.Message });
+            }
+        }
+
         #region thêm sửa xóa bài viết
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Post>>> GetAllPost()
@@ -42,10 +64,13 @@ namespace Backend.Controllers
             {
                 return BadRequest("Invalid post data");
             }
+
+
             var userId = MiddleWare.GetUserIdFromCookie(Request);
 
             var token = Request.Cookies["YourCookieName"];
-            
+
+
             Console.WriteLine($"User id: {userId}");
             Console.WriteLine("Token từ cookie: " + token);            
             post.CreatedByUserId = userId;
@@ -77,7 +102,60 @@ namespace Backend.Controllers
             var userId = MiddleWare.GetUserIdFromCookie(Request);
 
             var token = Request.Cookies["YourCookieName"];
-            
+
+            // Xử lý avatar (ảnh đại diện)
+            if (post.IsPictureProfile == true)
+            {
+                try
+                {
+                    // Lấy ID bài viết của ảnh đại diện hiện tại
+                    var currentAvatarPostId = await _postService.GetProfilePicturePostId(userId);
+
+                    if (currentAvatarPostId.HasValue)
+                    {
+                        // Xóa bài viết cũ chứa ảnh đại diện
+                        var deleteResult = await _postService.Delete(currentAvatarPostId.Value);
+                        if (!deleteResult)
+                        {
+                            Console.WriteLine("Không thể xóa bài viết ảnh đại diện cũ.");
+                            return BadRequest("Không thể xóa bài viết ảnh đại diện cũ.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi xử lý avatar: {ex.Message}");
+                    return StatusCode(500, "Lỗi xử lý avatar.");
+                }
+            }
+
+            // Xử lý cover photo (ảnh bìa)
+            if (post.IsCoverPhoto == true)
+            {
+                try
+                {
+                    // Lấy ID bài viết của ảnh bìa hiện tại
+                    var currentCoverPhotoPostId = await _postService.GetCoverPhotoPostId(userId);
+
+                    if (currentCoverPhotoPostId.HasValue)
+                    {
+                        // Xóa bài viết cũ chứa ảnh bìa
+                        var deleteResult = await _postService.Delete(currentCoverPhotoPostId.Value);
+                        if (!deleteResult)
+                        {
+                            Console.WriteLine("Không thể xóa bài viết ảnh bìa cũ.");
+                            return BadRequest("Không thể xóa bài viết ảnh bìa cũ.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi xử lý cover photo: {ex.Message}");
+                    return StatusCode(500, "Lỗi xử lý cover photo.");
+                }
+            }
+
+
             Console.WriteLine($"User id: {userId}");
             Console.WriteLine("Token từ cookie: " + token);            
             post.CreatedByUserId = userId;

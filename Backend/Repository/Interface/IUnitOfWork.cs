@@ -17,5 +17,7 @@ public interface IUnitOfWork : IDisposable
 	IGenericRepository<Comment> Comment { get; }
 	IGenericRepository<ReactsComment> ReactsComment { get; }
 	IGenericRepository<ReactsPost> ReactsPost { get; }
-	Task<bool> CompleteAsync();
+
+    IGenericRepository<UserInGroup> UserInGroup { get; }
+    Task<bool> CompleteAsync();
 }

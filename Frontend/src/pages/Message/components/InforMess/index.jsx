@@ -42,7 +42,7 @@ function InforMess() {
             </div>
             <div className={styles.action}>
                 <CustomTooltip title="Trang cá nhân">
-                    <i onClick={() => navigate(`/${currentFriendId}`)} className="fa-solid fa-circle-user"></i>
+                    <i onClick={() => navigate(`/profile/${currentFriendId}`)} className="fa-solid fa-circle-user"></i>
                 </CustomTooltip>
             </div>
             {click && <input placeholder="Nhập nội dung tin nhắn"></input>}

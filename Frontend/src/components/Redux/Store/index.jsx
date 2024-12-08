@@ -6,6 +6,7 @@ import FriendReducer from "../Slices/FriendSlice"
 import MessageReducer from "../Slices/MessageSlice"
 import ProfileReducer from "../Slices/ProfileSlice"
 import GroupChatReducer from "../Slices/GroupChatSlice"
+import popupReducer from "../Slices/PopupSlice"
 
 
 const Store = configureStore({
@@ -15,7 +16,8 @@ const Store = configureStore({
         friends: FriendReducer,
         message: MessageReducer,
         profile: ProfileReducer,
-        groupchat: GroupChatReducer
+        groupchat: GroupChatReducer,
+        popup: popupReducer,
     },
 });
 

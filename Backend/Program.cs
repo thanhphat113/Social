@@ -56,6 +56,7 @@ builder.Services.AddScoped<MediaService>();
 builder.Services.AddScoped<MainTopicService>();
 
 builder.Services.AddScoped<GroupService>();
+
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<HistorySearchService>();
@@ -77,7 +78,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Post
 
-// builder.Services.AddScoped<PostService>();
+ //builder.Services.AddScoped<PostService>();
 
 
 builder.Services.AddCors(options =>

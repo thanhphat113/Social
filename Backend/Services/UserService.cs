@@ -88,6 +88,8 @@ namespace Backend.Services
 
                 result.ProfilePicture = MediaIsProfile;
             }
+
+
             return result;
         }
 
@@ -180,10 +182,20 @@ namespace Backend.Services
                             .Where(p => p.CreatedByUserId == item.UserId && p.IsPictureProfile == true)
                             .SelectMany(p => p.Medias));
 
+            var MediaIsCover = await _unit.Post.GetByConditionAsync<Media>(query => query
+                            .Where(p => p.CreatedByUserId == item.UserId && p.IsCoverPhoto == true)
+                            .SelectMany(p => p.Medias));
+
             if (MediaIsProfile != null)
             {
                 MediaIsProfile.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{MediaIsProfile.Src}";
                 result.ProfilePicture = MediaIsProfile;
+            }
+
+            if (MediaIsCover != null)
+            {
+                MediaIsCover.Src = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/media/{MediaIsCover.Src}";
+                result.CoverPicture = MediaIsCover;
             }
 
             return result;

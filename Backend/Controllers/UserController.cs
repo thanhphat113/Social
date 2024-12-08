@@ -25,19 +25,21 @@ namespace Backend.Controllers
 		private readonly RequestNotiService _NotiContext;
 		private readonly PostNotiService _PostContext;
 		private readonly MediaService _media;
+		private readonly IPostService _Post;
 
 
 
 
 
-		public UserController(MediaService media, IUserService UserContext, 
-			RequestNotiService NotiContext, PostNotiService PostContext
-			)
+        public UserController(MediaService media, IUserService UserContext, 
+			RequestNotiService NotiContext, PostNotiService PostContext,
+            IPostService postService
+            )
 		{
 			_userContext = UserContext;
 			_NotiContext = NotiContext;
 			_PostContext = PostContext;
-			// _Post = postService;
+			 _Post = postService;
 			_media = media;
 		}
 
@@ -130,10 +132,10 @@ namespace Backend.Controllers
 			if (userId == -1) return null;
 
 			var friends = await _userContext.GetFriends(userId);
-			var user = await _userContext.GetLoginById(userId);
-			var post =  new List<Post>();
+			var user = await _userContext.FindById(userId);
+			var post =  await _Post.GetPostsByCreatedByUserId(userId);
 
-			if (user == null)
+            if (user == null)
 			{
 				return NotFound(new { message = "Không tìm thấy người dùng" });
 			}

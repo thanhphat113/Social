@@ -21,34 +21,35 @@ namespace Backend.Services
         // kiem tra xem co ton tai trong bang relationship va bang friendrequest chua
         public async Task<bool> CheckExist(int fromUserId, int toUserId)
         {
-            //var exists = await _unit.Relationship.GetByConditionAsync<object>(
-            //    x =>
-            //        (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
-            //        (x.FromUserId == toUserId && x.ToUserId == fromUserId)
-            //);
+            // Kiểm tra sự tồn tại trong bảng Relationship
+            var exists = await _unit.Relationship.FindAsync<object>(query =>
+                query.Where(x =>
+                    (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                    (x.FromUserId == toUserId && x.ToUserId == fromUserId)));
 
-            //if (exists != null)
-            //    return true;
+            if (exists.Any())
+                return true;
 
-            //var pendingRequest = await _unit.RequestNotification.GetByConditionAsync<object>(
-            //    x => x.FromUserId == fromUserId && x.ToUserId == toUserId && x.IsAccept == null
-            //);
+            // Kiểm tra yêu cầu đang chờ xử lý trong bảng RequestNotification
+            var pendingRequest = await _unit.RequestNotification.FindAsync<object>(query =>
+                query.Where(x =>
+                    x.FromUserId == fromUserId &&
+                    x.ToUserId == toUserId &&
+                    x.IsAccept == null));
 
-            //return pendingRequest != null;
-            return true;
+            return pendingRequest.Any();
         }
         public async Task<int> CheckRelationshipType(int fromUserId, int toUserId)
         {
-            //// Lấy quan hệ dựa trên điều kiện FromUserId và ToUserId
-            //var relationship = await _unit.Relationship.GetByConditionAsync<Relationship>(
-            //    x =>
-            //        (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
-            //        (x.FromUserId == toUserId && x.ToUserId == fromUserId)
-            //);
+            // Truy vấn để lấy TypeRelationship
+            var relationshipType = await _unit.Relationship.FindAsync<int?>(query =>
+                query.Where(x =>
+                    (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                    (x.FromUserId == toUserId && x.ToUserId == fromUserId))
+                    .Select(x => x.TypeRelationship));
 
-            //// Nếu tồn tại, trả về TypeRelationship; nếu không, trả về 0 (mặc định không có quan hệ)
-            //return relationship?.TypeRelationship ?? 0;
-            return 0;
+            // Nếu có kết quả, trả về giá trị TypeRelationship; nếu không, trả về 0
+            return relationshipType.FirstOrDefault() ?? 0;
         }
 
 
@@ -69,34 +70,34 @@ namespace Backend.Services
         }
         public async Task<bool> Delete(int fromUserId, int toUserId)
         {
-            //try
-            //{
-            //    // Tìm mối quan hệ giữa hai người dùng
-            //    var relationship = await _unit.Relationship.GetByConditionAsync<Relationship>(
-            //        x =>
-            //            (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
-            //            (x.FromUserId == toUserId && x.ToUserId == fromUserId)
-            //    );
+            try
+            {
+                // Tìm các mối quan hệ cần xóa bằng cách sử dụng query
+                var relationships = await _unit.Relationship.FindAsync<Relationship>(query =>
+                    query.Where(x =>
+                        (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
+                        (x.FromUserId == toUserId && x.ToUserId == fromUserId)
+                    ));
 
-            //    if (relationship == null)
-            //        return false;
+                // Nếu không tìm thấy quan hệ nào, trả về false
+                if (!relationships.Any())
+                    return false;
 
-            //    // Sử dụng DeleteAsync để xóa
-            //    await _unit.Relationship.DeleteAsync(x =>
-            //        (x.FromUserId == fromUserId && x.ToUserId == toUserId) ||
-            //        (x.FromUserId == toUserId && x.ToUserId == fromUserId)
-            //    );
+                // Xóa từng mối quan hệ tìm được
+                foreach (var relationship in relationships)
+                {
+                    await _unit.Relationship.DeleteAsync(x => x.FromUserId == relationship.FromUserId && x.ToUserId == relationship.ToUserId);
+                }
 
-            //    // Hoàn tất và kiểm tra kết quả
-            //    bool isDeleted = await _unit.CompleteAsync();
-            //return isDeleted;
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Bảo toàn thông tin lỗi gốc
-            //    throw new Exception($"Failed to delete relationship between User {fromUserId} and User {toUserId}.", ex);
-            //}
-            return true;
+                // Lưu thay đổi
+                var isDeleted = await _unit.CompleteAsync();
+                return isDeleted;
+            }
+            catch (Exception ex)
+            {
+                // Ném ngoại lệ với thông tin chi tiết
+                throw new Exception($"Failed to delete relationship between User {fromUserId} and User {toUserId}.", ex);
+            }
         }
 
         public Task<bool> Delete(int id)

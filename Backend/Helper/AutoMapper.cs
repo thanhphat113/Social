@@ -11,8 +11,9 @@ public class MappingProfile : Profile
 		// .ForMember(dest => dest.ProfilePicture, opt => opt.MapFrom();
 
 		CreateMap<User, UserLogin>()
-			.ForMember(dest => dest.ProfilePicture, opt => opt.MapFrom(src => src.Posts.Where(p => p.IsPictureProfile == true).FirstOrDefault()));
-		CreateMap<HistorySearch, HistoryWithUser>()
+			.ForMember(dest => dest.ProfilePicture, opt => opt.MapFrom(src => src.Posts.Where(p => p.IsPictureProfile == true).FirstOrDefault()))
+			.ForMember(dest => dest.CoverPicture, opt => opt.MapFrom(src => src.Posts.Where(p => p.IsCoverPhoto == true).FirstOrDefault()));
+        CreateMap<HistorySearch, HistoryWithUser>()
 			.ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.OtherUser.FirstName))
 			.ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.OtherUser.LastName))
 			.ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.OtherUser.UserId))

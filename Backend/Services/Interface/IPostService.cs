@@ -12,5 +12,9 @@ namespace Backend.Services.Interface
         Task<int> GetCommentCount(int postId);
         Task<bool> RemoveLike(int postId, int userId);
         Task<bool> AddLike(int postId, int userId);
+
+        Task<IEnumerable<Post>> GetPostsByCreatedByUserId(int userId);
+        Task<int?> GetProfilePicturePostId(int userId);
+        Task<int?> GetCoverPhotoPostId(int userId);
     }
 }

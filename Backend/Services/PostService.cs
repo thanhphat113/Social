@@ -45,7 +45,48 @@ namespace Backend.Services
             }
         }
 
-        public async Task<Post> GetListById(int id)
+        public async Task<int?> GetProfilePicturePostId(int userId)
+        {
+            try
+            {
+                // Truy vấn bài viết là ảnh đại diện
+                var profilePicturePost = await _dbContext.Posts
+                    .Where(p => p.CreatedByUserId == userId && p.IsPictureProfile == true)
+                    .OrderByDescending(p => p.DateCreated)
+                    .FirstOrDefaultAsync();
+
+                return profilePicturePost?.PostId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving profile picture post ID for user {userId}: {ex.Message}");
+                throw;
+            }
+        }
+
+
+        public async Task<int?> GetCoverPhotoPostId(int userId)
+        {
+            try
+            {
+                // Truy vấn bài viết là ảnh bìa
+                var coverPhotoPost = await _dbContext.Posts
+                    .Where(p => p.CreatedByUserId == userId && p.IsCoverPhoto == true)
+                    .OrderByDescending(p => p.DateCreated)
+                    .FirstOrDefaultAsync();
+
+                return coverPhotoPost?.PostId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving cover photo post ID for user {userId}: {ex.Message}");
+                throw;
+            }
+        }
+
+
+
+            public async Task<Post> GetListById(int id)
         {
             try
             {
@@ -78,6 +119,52 @@ namespace Backend.Services
             if(result) 
                 return posts;
             return null;
+        }
+
+        public async Task<IEnumerable<Post>> GetPostsByCreatedByUserId(int userId)
+        {
+            try
+            {
+                // Truy vấn dữ liệu sử dụng LINQ
+                var posts = await (from post in _dbContext.Posts
+                                   where post.CreatedByUserId == userId
+                                   orderby post.DateCreated descending
+                                   select new Post
+                                   {
+                                       PostId = post.PostId,
+                                       Content = post.Content,
+                                       CreatedByUserId = post.CreatedByUserId,
+                                       DateCreated = post.DateCreated,
+                                       DateUpdated = post.DateUpdated,
+                                       Comments = post.Comments.Select(c => new Comment
+                                       {
+                                           CommentId = c.CommentId,
+                                           Content = c.Content,
+                                           DateCreated = c.DateCreated,
+                                           DateUpdated = c.DateUpdated,
+                                           PostId = c.PostId,
+                                           UserId = c.UserId
+                                       }).ToList(),
+                                       CreatedByUser = post.CreatedByUser != null ? new User
+                                       {
+                                           UserId = post.CreatedByUser.UserId,
+                                           FirstName = post.CreatedByUser.FirstName,
+                                           LastName = post.CreatedByUser.LastName
+                                       } : null,
+                                       Medias = post.Medias.Select(m => new Media
+                                       {
+                                           MediaId = m.MediaId,
+                                           Src = m.Src
+                                       }).ToList()
+                                   }).ToListAsync();
+
+                return posts;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving posts for user {userId}: {ex.Message}");
+                throw;
+            }
         }
 
         public Task<bool> Update(Post value)
@@ -223,7 +310,7 @@ namespace Backend.Services
                             // Tạo đối tượng Media
                             var media = new Media
                             {
-                                Src = $"/media/{uniqueFileName}",
+                                Src = $"/{uniqueFileName}",
                                 HashCode = hashCode,
                             };
 

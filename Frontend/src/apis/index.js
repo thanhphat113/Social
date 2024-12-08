@@ -121,6 +121,46 @@ export const checkExistRelationship = async (toUserId) => {
   }
 }
 
+export const checkUserInGroup = async (GroupId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Group/check-user-in-group/${GroupId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking relationship:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const sendJoinGroupRequest = async (GroupId) => {
+  try {
+    const response = await axiosInstance.post(`/api/Group/request-join/${GroupId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending join group request:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
+export const acceptUserInGroup = async (GroupId) => {
+  try {
+    const response = await axios.get(
+      `https://localhost:7294/api/Group/accept-join/${GroupId}`,
+      {
+        withCredentials: true, 
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking relationship:", error);
+    throw error.response?.data || error.message;
+  }
+}
+
 export const unfriend = async (toUserId) => {
   try {
     const response = await axios.get(

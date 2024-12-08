@@ -37,7 +37,7 @@ export default function PostList() {
     }
 
     return (
-        <div>
+        <div style={{width: "100%"}}>
             {posts.length > 0 ? (
                 posts.map((post) => (
                     <PostCard
@@ -51,6 +51,7 @@ export default function PostList() {
                         avatar={post.createdByUser ?.profilePicture || (post.createdByUser ?.genderId === 2 ? './../../../../public/img/default/woman_default.png' : './../../../../public/img/default/man_default.png')}
                         postId={post.postId}
                         userId={post.createdByUser .userId}
+                        
                     />
                 ))
             ) : (

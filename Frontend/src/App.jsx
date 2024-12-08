@@ -16,6 +16,7 @@ import { SetUser } from "./components/Redux/Actions/UserAction";
 // import Call from "./Pages/Call";
 import LoadingPage from "./pages/Loading/index.jsx";
 // import { connectSignalR } from "./components/Redux/Actions/ConnectSignalR.jsx";
+import GroupInfo from "./pages/Information/infoGroup.jsx";
 
 function App() {
     const dispatch = useDispatch();
@@ -87,6 +88,16 @@ function App() {
                         </Authentication>
                     }
                 />
+
+                <Route
+                    path="/GroupInfo"
+                    element={
+                        <Authentication>
+                            <GroupInfo />
+                        </Authentication>
+                    }
+                />
+
                 <Route path="/login" element={<Login />} />
                 {/* <Route
                     path="/new-group"

@@ -11,7 +11,7 @@ function ItemPostNotification( props ) {
 		to={`post/${item.postId}`}>
 			<img onClick={async(e) =>{
 				e.preventDefault(),
-				navigate(`/${item.fromUser.userId}`)
+				navigate(`/profile/${item.fromUser.userId}`)
 			}} src={item.fromUser.profilePicture ? `/public/img/Picture/${item.fromUser.profilePicture.src}`:`/public/img/default/${item.genderId !==2 ? "man" : "woman"}_default.png`}></img>
 			<p><strong>{item.fromUser.lastName} {item.fromUser.firstName}</strong> {item.type.content}</p>
 			<div className={styles.isread}>{ item.isRead === 0 && <span></span>}</div>

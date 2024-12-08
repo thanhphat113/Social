@@ -5,14 +5,14 @@ import { useSelector } from "react-redux";
 
 function Connections() {
     const { profile, isUser, isGroup, loading, error } = useSelector((state) => state.profile);
-    const data = isUser ? profile.friend : profile.userInGroups;
+    const data = isUser ? profile.friend : profile.userInGroups.map(uig => uig.user); // Lấy user từ userInGroups
 
     return (
         <div className={clsx(styles.connectionsWrapper)}>
             <div className={clsx(styles.header)}>
                 <h1>{isUser ? 'Bạn bè' : 'Thành viên'}</h1>
-                <span>{isUser ? profile.friend.length : profile.memberCount} người</span>
-                {(isUser ? profile.friend.length : profile.memberCount) > 0 && (
+                <span>{isUser ? profile.friend.length : profile.userInGroups.length} người</span>
+                {(isUser ? profile.friend.length : profile.userInGroups.length) > 0 && (
                     <button className={clsx(styles.viewAll)}>Xem tất cả</button>
                 )}
             </div>
@@ -24,5 +24,6 @@ function Connections() {
         </div>
     );
 }
+
 
 export default Connections;
