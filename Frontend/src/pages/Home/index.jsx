@@ -8,8 +8,6 @@ import styles from './Home.module.scss';
 
 function Home() {
 
-  const userId = '11';  // ID người dùng (thay bằng giá trị thực tế)
-  const groupId = null; 
 
   return (
     <>
@@ -20,8 +18,6 @@ function Home() {
         <div className={styles.mainBar}>
           <PostInput />
           <PostList 
-              userId={userId}
-              groupId={groupId}
           />
         </div>
         {/* <div className={styles.rightBar}>

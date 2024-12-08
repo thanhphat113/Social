@@ -134,6 +134,53 @@ namespace Backend.Services
             return null;
         }
 
+        public async Task<IEnumerable<Post>> GetPostsByGroupId(int groupId)
+        {
+            try
+            {
+                // Truy vấn dữ liệu sử dụng LINQ
+                var posts = await (from post in _dbContext.Posts
+                                   where post.GroupId == groupId
+                                   orderby post.DateCreated descending
+                                   select new Post
+                                   {
+                                       PostId = post.PostId,
+                                       Content = post.Content,
+                                       CreatedByUserId = post.CreatedByUserId,
+                                       DateCreated = post.DateCreated,
+                                       DateUpdated = post.DateUpdated,
+                                       GroupId = post.GroupId,
+                                       Comments = post.Comments.Select(c => new Comment
+                                       {
+                                           CommentId = c.CommentId,
+                                           Content = c.Content,
+                                           DateCreated = c.DateCreated,
+                                           DateUpdated = c.DateUpdated,
+                                           PostId = c.PostId,
+                                           UserId = c.UserId
+                                       }).ToList(),
+                                       CreatedByUser = post.CreatedByUser != null ? new User
+                                       {
+                                           UserId = post.CreatedByUser.UserId,
+                                           FirstName = post.CreatedByUser.FirstName,
+                                           LastName = post.CreatedByUser.LastName
+                                       } : null,
+                                       Medias = post.Medias.Select(m => new Media
+                                       {
+                                           MediaId = m.MediaId,
+                                           Src = m.Src
+                                       }).ToList()
+                                   }).ToListAsync();
+
+                return posts;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving posts for group {groupId}: {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<Post>> GetPostsByCreatedByUserId(int userId)
         {
             try

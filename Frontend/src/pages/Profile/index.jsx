@@ -65,7 +65,9 @@ function Profile() {
                                 <PostInput />
                                 <PostList style={{
                                     width: "100%",
-                                }} />
+                                }}
+                                userId={userId}
+                                 />
                             </div>
                         </div>
 

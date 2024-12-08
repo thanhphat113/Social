@@ -67,11 +67,10 @@ public class GroupService
         }
 
 
-        else if (userInGroup.DateIn == null)
+        else
         {
             return "1";
         }
-        return "null";
 
     }
 

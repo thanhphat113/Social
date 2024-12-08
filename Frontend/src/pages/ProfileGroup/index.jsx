@@ -36,7 +36,7 @@ function ProfileGroup() {
         }
     }, [profile, dispatch]);
 
-    
+
     let data = {
         name: group.groupName,
         totalConnections: group.totalMembers,
@@ -62,7 +62,8 @@ function ProfileGroup() {
                     <PostInput />
                     <PostList     style={{
                                         width: "100%",
-                                    }} />
+                                    }}               groupId={groupId}
+                                    />
                     </div>
                 </div>
                 

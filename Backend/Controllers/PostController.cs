@@ -41,6 +41,32 @@ namespace Backend.Controllers
             }
         }
 
+
+        [HttpGet("group/{groupId}")]
+        public async Task<IActionResult> GetPostsByGroupId(int groupId)
+        {
+            try
+            {
+                var posts = await _postService.GetPostsByGroupId(groupId);
+
+                if (posts == null || !posts.Any())
+                {
+                    return NotFound(new { Message = "Không tìm thấy bài viết nào cho nhóm này." });
+                }
+
+                return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi
+                return StatusCode(500, new { Message = "Đã xảy ra lỗi khi lấy danh sách bài viết.", Error = ex.Message });
+            }
+        }
+
+
+
+
+
         #region thêm sửa xóa bài viết
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Post>>> GetAllPost()

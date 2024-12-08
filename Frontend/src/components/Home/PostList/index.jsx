@@ -12,7 +12,11 @@ export default function PostList({ userId, groupId }) {
             try {
                 let url = 'http://localhost:5164/api/Post';
                 if (groupId) {
-                    url += `?groupId=${groupId}`;
+                    url += `/group/${groupId}`;
+                }
+
+                if (userId) {
+                    url += `/user/${userId}`;
                 }
 
                 const response = await axios.get(url);
@@ -27,7 +31,7 @@ export default function PostList({ userId, groupId }) {
                     setPosts([]);  // Nếu dữ liệu không phải là mảng, đảm bảo setPosts là mảng rỗng
                 }
             } catch (e) {
-                setError('Lỗi tải bài viết: ' + e.message);
+                setError('Chưa có bài viết');
                 setPosts([]);
             } finally {
                 setLoading(false);

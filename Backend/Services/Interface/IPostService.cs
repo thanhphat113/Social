@@ -19,5 +19,7 @@ namespace Backend.Services.Interface
         Task<IEnumerable<Post>> SearchPostByUserNameAsync(string searchTerm);
         Task<List<string>> GetProfileUser(int userId);
 
+        Task<IEnumerable<Post>> GetPostsByGroupId(int groupId);
+
     }
 }
