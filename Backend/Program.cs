@@ -50,6 +50,8 @@ builder.Services.AddScoped<RequestNotiService>();
 builder.Services.AddScoped<PostNotiService>();
 builder.Services.AddScoped<RelationshipService>();
 builder.Services.AddScoped<IService<MainTopic>, MainTopicService>();
+builder.Services.AddScoped<IGroupService, Group1Service>();
+
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<MediaService>();

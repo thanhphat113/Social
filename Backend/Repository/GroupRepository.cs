@@ -101,6 +101,13 @@ public class GroupRepositories /*: IRepository<UserGroup>*/
         }
     }
 
+    public async Task<IEnumerable<UserGroup>> SearchGroupsByNameAsync(string name)
+    {
+        return await _context.UserGroups
+            .Where(g => g.GroupName.Contains(name))  // Tìm nhóm theo tên
+            .ToListAsync();
+    }
+
 
 
 }

@@ -75,6 +75,16 @@ function Group() {
         }
     };
 
+    const handleCreateGroupClick = () => {
+        setIsCreate(!isCreate); // Toggle trạng thái
+        setShowSidebar(!showSidebar); // Toggle sidebar
+    };
+
+    const handleCancelCreateGroup = () => {
+        setIsCreate(false); // Đặt lại trạng thái ban đầu
+        setShowSidebar(true); // Hiển thị lại sidebar
+    };
+
     return (
         <div className={styles.wrapper}>
             <div
@@ -92,21 +102,13 @@ function Group() {
                         />
                     </div>
 
-                    <button
-                        onClick={() => {
-                            setShowSidebar(!showSidebar) 
-                            setIsCreate(!isCreate)}}
-                        className={styles.creategroup}
-                    >
-                        {" "}
-                        {isCreate ? "Hủy tạo nhóm" : "+ Tạo nhóm mới"}
-                    </button>
+                    <button onClick={handleCreateGroupClick} className={styles.creategroup}> {isCreate ? 'Hủy tạo nhóm' : '+ Tạo nhóm mới'}</button>
                 </div>
             </div>
 
             <div  className={styles.right}>
                 {isCreate ? (
-                    <CreateGroup onCancel={setIsCreate} />
+                    <CreateGroup onCancel={handleCancelCreateGroup} />
                 ) : (
                     <Itemgroup handle={handleScroll} list={allGroups} />
                 )}

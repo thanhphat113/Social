@@ -758,9 +758,6 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.Bio)
                 .HasColumnType("text")
                 .HasColumnName("bio");
-            entity.Property(e => e.CoverPhoto)
-                .HasMaxLength(255)
-                .HasColumnName("cover_photo");
             entity.Property(e => e.CreatedByUserId)
                 .HasColumnType("int(11)")
                 .HasColumnName("created_by_user_id");
@@ -783,9 +780,6 @@ public partial class SocialMediaContext : DbContext
             entity.Property(e => e.PrivacyId)
                 .HasColumnType("int(11)")
                 .HasColumnName("privacy_id");
-            entity.Property(e => e.ProfilePicture)
-                .HasMaxLength(255)
-                .HasColumnName("profile_picture");
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.UserGroups)
                 .HasForeignKey(d => d.CreatedByUserId)
