@@ -42,7 +42,7 @@ function PostInput({groupId}) {
     <div className={styles.postInput}>
       <div className={styles.inputBox}>
         <img 
-          src={ user.profilePicture.src || defaultProfilePicture} 
+          src={ user.profilePicture?.src || defaultProfilePicture} 
           className={styles.avatar}
           alt="Avatar"
         />

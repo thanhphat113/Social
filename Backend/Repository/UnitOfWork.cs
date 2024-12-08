@@ -26,7 +26,7 @@ namespace Backend.Repository
 		private readonly IGenericRepository<Comment> _comment;
 		private readonly IGenericRepository<UserInGroup> _userInGroup;
 		public UnitOfWork(SocialMediaContext context,
-						  IGenericRepository<UserInGroup> userInGroup
+						  IGenericRepository<UserInGroup> userInGroup,
 						  IGenericRepository<User> Users,
 						  IGenericRepository<ChatInMessage> ChatInMessage,
 						  IGenericRepository<HistorySearch> HistorySearch,

@@ -886,7 +886,7 @@ const CommentPost = ({
                 <div className={styles.commentInput}>
                     <div className={styles.commentProfilePic}>
                     <img 
-                        src={ user.profilePicture.src || defaultProfilePicture} 
+                        src={ user.profilePicture?.src || defaultProfilePicture} 
                         className={styles.avatar}
                         alt="Avatar"
                         />

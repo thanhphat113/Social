@@ -153,7 +153,7 @@ const Post = ({ onClose, groupId }) => {
       </div>
       <div className={styles.header}>
         <div className={styles.avatar}>
-          <img src={user.profilePicture.src || defaultProfilePicture} alt="Avatar" />
+          <img src={user.profilePicture?.src || defaultProfilePicture} alt="Avatar" />
         </div>
         <div className={styles.name}>{firstName} {lastName}</div>
       </div>
