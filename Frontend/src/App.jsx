@@ -15,6 +15,7 @@ import Authentication from "./components/Authentication";
 import { SetUser } from "./components/Redux/Actions/UserAction";
 // import Call from "./Pages/Call";
 import LoadingPage from "./pages/Loading/index.jsx";
+import Group from "./pages/Group/index.jsx";
 // import { connectSignalR } from "./components/Redux/Actions/ConnectSignalR.jsx";
 
 function App() {
@@ -55,14 +56,14 @@ function App() {
                         </Authentication>
                     }
                 />
-                {/* <Route
+                <Route
                     path="/group"
                     element={
                         <Authentication>
-                            <GroupList />
+                            <Group/>
                         </Authentication>
                     }
-                /> */}
+                />
                 <Route
                     path="/:userId"
                     element={

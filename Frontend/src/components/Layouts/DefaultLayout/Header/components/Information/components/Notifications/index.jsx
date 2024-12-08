@@ -49,7 +49,7 @@ function Notifications({ title, nameicon, onToggle, isActive }) {
                         </button>
                     </div>
                     <div className={clsx(styles.list)} key={type}>
-                        {list.map((item) =>
+                        {list?.map((item) =>
                             type === "request" ? (
                                 <ItemRequestNotification
                                     key={item.userId}
